@@ -477,6 +477,7 @@ function stargateCreateVortexOpening(stargateID)
     horizon = createObject(1337, x, y, z)
     killZone = createMarker(x, y+2.6, z, "corona", 3, 25, 90, 200, 25)
     setElementID(killZone, stargateID.."KZM")
+    setElementData(killZone, "isVortex", true)
     addEventHandler("onMarkerHit", killZone, stargateVortexKill)
 
     setElementID(vortex, stargateID.."V")

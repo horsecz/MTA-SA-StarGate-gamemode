@@ -1,0 +1,72 @@
+# Gate script
+
+Contains:
+- Stargate model and textures initialization
+- Animations (ring rotation, event horizon, kawoosh-vortex effect, etc.) including sound effects
+- Element teleportation
+- Physics - wormhole operations, "stargate laws"
+- Stargate element basic functionality
+
+Stargate element is element of type 'object' with custom ID (assigned on client-side) and custom stargate model.
+All models are in 'models' folder and must be downloaded by client (as well as sound effects in 'sounds' folder).
+This element has following properties:
+- Element ID
+    - Constant part **"SG"**
+    - Variable parts **SGType** and **SGNumericalID**
+    - SGType values:
+        - MW
+    - SGNumericalID values:
+        - any number ranging from 1
+    - Parts separated by **_** character
+- Collisions: disabled
+- Object Model ID: assigned by 'engineRequestModel' on client-side
+- Attachments
+    - Other elements with **similar Element ID** (same as stargate element ID **+ AttachmentID**)
+    - AttachmentID values:
+        - R
+            - Gate ring model
+            - Has one attribute (element data) 'ringRotation' containing time in ms needed to rotate ring to desired symbol 
+        - C[N]
+            - Gate chevron (active)
+            - [N] represents number from 1 to 9; no. of chevron
+        - TPM
+            - Gate teleport marker at event horizon
+        - H
+            - Event horizon model
+        - V
+            - Vortex/Kawoosh model
+        - KZM
+            - Gate killzone marker (used at vortex position to kill player touching the vortex)
+    - Note: Elements are *not attached* on stargate object *directly*, rather they just use similar ID with additional letter(s) at the end 
+- Basic Element Data - stargate attributes
+    - "address"
+        - Address of this stargate
+        - Array of numbers ranging 0 to 38 where 0 represents point of origin
+    - "isRotating"
+        - Is stargate's ring rotating?
+    - "diallingAddress"
+        - Stargate address that is being dialed by this stargate
+        - See "address" attribute for format; can be nil if stargate is idle 
+    - "active"
+        - Is stargate active? (open, dialling or being dialed)
+    - "open"
+        - Is stargate open? (wormhole estabilished and event horizon present for teleportation)
+    - "connectedTo"
+        - ID of stargate which is this stargate connected to
+        - primary use if this stargate's wormhole is outgoing
+    - "connectedFrom"
+        - ID of stargate which is this stargate connected from
+        - primary use if this stargate's wormhole is incoming
+    - "disabled"
+        - Is stargate disabled? (unable to be used or dialed to; ex. buried, damaged, ...)
+- Development Element Data
+    - "horizonMainArray"
+        - main timer for animating event horizon
+    - "horizonArray"
+        - array of timers for animating (six frames of) event horizon
+    - "isHorizon"
+        - value for marker; determine if marker is stargate's event horizon or not
+    - "isVortex"
+        - value for marker; determine if marker is stargate's vortex
+    - "closeTimer"
+        - stargate autoclose timer; defaults 38 game minutes
