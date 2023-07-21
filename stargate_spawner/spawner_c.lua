@@ -1,0 +1,1 @@
+--- spawner_c.lua: Element spawner for Stargate gamemode

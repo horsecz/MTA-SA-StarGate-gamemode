@@ -1,8 +1,30 @@
 <meta>
     <min_mta_version server="1.5.8-9.20957"></min_mta_version>
     <info type="stargate_gate" version="1.0.0"></info>
+
+    <script src="gate_imports_c.lua" type="client"></script>
+    <script src="gate_imports_s.lua" type="server"></script>
+
     <script src="gate_s.lua" type="server"></script>
     <script src="gate_c.lua" type="client"></script>
+
+    <script src="gate_chevron_s.lua" type="server"></script>
+    <script src="gate_galaxy_s.lua" type="server"></script>
+    <script src="gate_horizon_s.lua" type="server"></script>
+    <script src="gate_marker_s.lua" type="server"></script>
+    <script src="gate_models_s.lua" type="server"></script>
+    <script src="gate_models_c.lua" type="client"></script>
+    <script src="gate_ring_s.lua" type="server"></script>
+    <script src="gate_sound_s.lua" type="server"></script>
+    <script src="gate_sound_c.lua" type="client"></script>
+    <script src="gate_vortex_s.lua" type="server"></script>
+    <script src="gate_wormhole_s.lua" type="server"></script>
+
+    <export function="stargate_create" type="server" />
+    <export function="import_enum_markerType" type="server" />
+    <export function="import_enum_galaxy" type="server" />
+    <export function="import_enum_stargateStatus" type="server" />
+    <export function="import_enum_stargateDialType" type="server" />
 
     <file src="models/mw.txd" />
     <file src="models/mw.dff" />
@@ -44,6 +66,30 @@
     <file src="models/Kawoosh10.dff" />
     <file src="models/Kawoosh11.dff" />
     <file src="models/Kawoosh12.dff" />
+
+    <file src="collisions/Kawoosh1.col" />
+    <file src="collisions/Kawoosh2.col" />
+    <file src="collisions/Kawoosh3.col" />
+    <file src="collisions/Kawoosh4.col" />
+    <file src="collisions/Kawoosh5.col" />
+    <file src="collisions/Kawoosh6.col" />
+    <file src="collisions/Kawoosh7.col" />
+    <file src="collisions/Kawoosh8.col" />
+    <file src="collisions/Kawoosh9.col" />
+    <file src="collisions/Kawoosh10.col" />
+    <file src="collisions/Kawoosh11.col" />
+    <file src="collisions/Kawoosh12.col" />
+
+    <file src="collisions/mw.col" />
+    <file src="collisions/mw_ring.col" />
+    <file src="collisions/chevs.col" />
+    <file src="collisions/1.col" />
+    <file src="collisions/2.col" />
+    <file src="collisions/3.col" />
+    <file src="collisions/4.col" />
+    <file src="collisions/5.col" />
+    <file src="collisions/6.col" />
+
 
     <file src="sounds/mw_chevron_incoming.mp3" />
     <file src="sounds/mw_chevron_lock.mp3" />

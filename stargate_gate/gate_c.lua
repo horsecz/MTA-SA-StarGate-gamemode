@@ -1,8 +1,10 @@
---- gate_c.lua: StarGate gamemode part script - client-side stargate operations, models and logic
+--- gate_c.lua: Core clientside module
+
 ---
---- Global variables
+--- GLOBALS (CLIENT)
 ---
 
+--- are they any use?
 MWID = nil
 MWID_r = nil
 MWID_c = {}
@@ -13,17 +15,25 @@ MW_Horizon_last = 0
 SG_Kawoosh = {}
 SG_Kawoosh_last = 0
 
+SG_MW = nil
+
 ---
---- Initializing functions
+--- INIT
 ---
 
-function begin()
+function initClient()
 	triggerServerEvent("clientStartedEvent", source)
 end
-addEventHandler("onClientResourceStart", resourceRoot, begin)
+addEventHandler("onClientResourceStart", resourceRoot, initClient)
+
+function serverLoaded(gate_list)
+	SG_MW = gate_list
+end
+addEvent("onServerGateLoaded", true)
+addEventHandler("onServerGateLoaded", resourceRoot, serverLoaded)
 
 -- at the end of resource, free models
-function stop()
+function endClient()
 	engineFreeModel(MWID)
 	engineFreeModel(MWID_r)
 	for i=1,9 do
@@ -31,148 +41,56 @@ function stop()
 	end
 	-- TODO; free the rest
 end
-addEventHandler("onClientResourceStop", resourceRoot, stop)
+--addEventHandler("onClientResourceStop", resourceRoot, endClient)
 
----
---- Model and textures functions
----
-
-function loadMWModel()
-	modelID = engineRequestModel("object")
-	if not modelID then
-		outputDebugString("Very bad error in loadMWModel() gate_c.lua")
-	end
-
-	txd = engineLoadTXD("models/mw.txd")
-	engineImportTXD(txd, modelID)
-	dff = engineLoadDFF("models/mw.dff")
-	engineReplaceModel(dff, modelID)
-	MWID = modelID
-	triggerServerEvent("MWModelLoaded", resourceRoot, modelID)
-end
-
-function loadMWModelRing()
-	modelID = engineRequestModel("object")
-	if not modelID then
-		outputDebugString("Very bad error in loadMWModelRing() gate_c.lua")
-	end
-
-	txd = engineLoadTXD("models/mw.txd")
-	engineImportTXD(txd, modelID)
-	dff = engineLoadDFF("models/mw_ring.dff")
-	engineReplaceModel(dff, modelID)
-	MWID_r = modelID
-	triggerServerEvent("MWModelRingLoaded", resourceRoot, modelID)
-end
-
-function loadMWModelChevrons()
-	number = MWID_c_last + 1
-	MWID_c_last = MWID_c_last + 1
-	modelID = engineRequestModel("object")
-	if not modelID then
-		outputDebugString("Very bad error in loadMWModelChevrons() gate_c.lua")
-	end
-
-	txd = engineLoadTXD("models/9chevs.txd")
-	engineImportTXD(txd, modelID)
-	dff = engineLoadDFF("models/chevs"..(number)..".dff")
-	engineReplaceModel(dff, modelID)
-	MWID_c[number] = modelID
-	triggerServerEvent("MWModelChevronLoaded", resourceRoot, modelID)
-end
-
-function loadMWModelHorizon()
-	number = MW_Horizon_last + 1
-	MW_Horizon_last = MW_Horizon_last + 1
-	modelID = engineRequestModel("object")
-	if not modelID then
-		outputDebugString("Very bad error in loadMWModelHorizon() gate_c.lua")
-	end
-
-	txd = engineLoadTXD("models/"..tostring(number)..".txd")
-	engineImportTXD(txd, modelID)
-	dff = engineLoadDFF("models/"..(number)..".dff")
-	engineReplaceModel(dff, modelID)
-	MW_Horizon[number] = modelID
-	triggerServerEvent("MWModelHorizonLoaded", resourceRoot, modelID)
-end
-
-function loadModelKawoosh()
-	number = SG_Kawoosh_last + 1
-	SG_Kawoosh_last = SG_Kawoosh_last + 1
-	modelID = engineRequestModel("object")
-	if not modelID then
-		outputDebugString("Very bad error in loadModelKawoosh() gate_c.lua")
-	end
-
-	txd = engineLoadTXD("models/Kawoosh.txd")
-	engineImportTXD(txd, modelID)
-	dff = engineLoadDFF("models/Kawoosh"..(number)..".dff")
-	engineReplaceModel(dff, modelID)
-	SG_Kawoosh[number] = modelID
-	triggerServerEvent("ModelKawooshLoaded", resourceRoot, modelID)
+function testCall(text)
+	outputChatBox(text)
 end
 
 ---
---- "Shared" functions with server-side
+---
 ---
 
--- sets elements model from serverside script
-function setElementModelClient(element, modelID)
-	setElementModel(element, modelID)
-end
-addEvent("setElementModelClient", true)
-addEventHandler("setElementModelClient", resourceRoot, setElementModelClient)
-
--- plays3d sound from server
-function playSound3DFromServerSG(stargateID, soundpath, x, y, z, distance, soundAttrib)
-	s = playSound3D(soundpath, x, y, z)
-	if distance then
-		setSoundMaxDistance(s, distance)
-	else
-		distance = 150
-	end
-	setElementData(getElementByID(stargateID), soundAttrib, s)
-
-	if soundAttrib == "ringRotate" then
-		beginSoundLength = getSoundLength(s)*1000
-		continueRotationSound = setTimer(function(stargateID, distance)
-			ls = playSound3D("sounds/mw_ring_rotate.mp3", x, y, z)
-			setSoundMaxDistance(ls, distance)
-			setElementData(getElementByID(stargateID), "ringRotateLongSound", ls)
+function handleProjectileCreation(creator)
+	local t = setTimer(
+		function(creator, SG_MW, source, timer)
+			if not isElement(source) then
+				if isTimer(timer) then
+					killTimer(timer)
+				end
+				return nil
+			end
+			for i, gateElement in pairs(SG_MW) do
+				if getElementData(gateElement, "open") == true then
+					local horizon = getElementByID(getElementID(gateElement).."TPM")
+					if isElement(horizon) then
+						if isProjectileInHorizon(source, horizon) then
+							local sx, sy, sz = getElementPosition(getElementByID(getElementData(gateElement, "connectionID")))
+							local vx, vy, vz = getElementVelocity(source)
+							setElementPosition(source, sx, sy, sz)
+							setElementVelocity(source, vx, -vy, vz)
+						end
+					end
+				end
+			end
 		end
-		, beginSoundLength-100, 1, stargateID, distance)
-		setElementData(getElementByID(stargateID), "ringRotateLongTimer", continueRotationSound)
-	end
+	, 50, 0, creator, SG_MW, source)
 end
-addEvent("clientPlaySound3D", true)
-addEventHandler("clientPlaySound3D", root, playSound3DFromServerSG)
+addEventHandler("onClientProjectileCreation", root, handleProjectileCreation)
 
--- stops sound from server
-function stopSoundFromServerSG(stargateID, soundAttribute)
-	sound = getElementData(getElementByID(stargateID), soundAttribute)
-	if sound then
-		stopSound(sound)
+function isProjectileInHorizon(projectile, horizon, positionError)
+	local x, y, z = getElementPosition(horizon)
+	local px, py, pz = getElementPosition(projectile)
+	local EPS = positionError
+	if not positionError then
+		EPS = 1.33
 	end
-	if soundAttribute == "ringRotate" then
-		timer = getElementData(getElementByID(stargateID), "ringRotateLongTimer")
-		if isTimer(timer) then
-			killTimer(timer)
-		else
-			stopSound(getElementData(getElementByID(stargateID), "ringRotateLongSound"))
+	if math.abs(math.abs(x) - math.abs(px)) < EPS then
+		if math.abs(math.abs(y) - math.abs(py)) < EPS then
+			if math.abs(math.abs(z) - math.abs(pz)) < EPS then
+				return true
+			end
 		end
 	end
+	return false
 end
-addEvent("clientStopSound", true)
-addEventHandler("clientStopSound", root, stopSoundFromServerSG)
-
--- server-side only -- calls function from client
-function callClientFunction(funcname, ...)
-    local arg = { ... }
-    if (arg[1]) then
-        for key, value in next, arg do arg[key] = tonumber(value) or value end
-    end
-    loadstring("return "..funcname)()(unpack(arg))
-end
-addEvent("onServerCallsClientFunction", true)
-addEventHandler("onServerCallsClientFunction", resourceRoot, callClientFunction)

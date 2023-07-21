@@ -1,0 +1,9 @@
+<meta>
+    <min_mta_version server="1.5.8-9.20957"></min_mta_version>
+    <info type="stargate_gamemode" version="1.0.0"></info>
+    <script src="gamemode_s.lua" type="server" />
+
+    <include resource="stargate_exports" />
+    <include resource="stargate_gate" />
+    <include resource="stargate_spawner" />
+</meta>

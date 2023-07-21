@@ -1,0 +1,8 @@
+<meta>
+    <min_mta_version server="1.5.8-9.20957"></min_mta_version>
+    <info type="stargate_spawner" version="1.0.0"></info>
+
+    <script src="spawner_s.lua" type="server"></script>
+    <script src="spawner_c.lua" type="client"></script>
+    <script src="spawner_imports_s.lua" type="server"></script>
+</meta>
