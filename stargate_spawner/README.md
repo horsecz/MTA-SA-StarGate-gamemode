@@ -4,3 +4,4 @@ Creates and spawns all elements which can be pre-created and are required by sta
 
 Contains:
 - Gate spawner
+- DHD spawner

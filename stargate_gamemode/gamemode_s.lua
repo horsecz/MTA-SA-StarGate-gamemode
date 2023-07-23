@@ -11,7 +11,7 @@ end
 addEventHandler ( "onPlayerWasted", getRootElement(), onPlayerWasted)
 
 function onPlayerJoin(player)
-    spawnPlayer(source, 0, 10, 4)
+    spawnPlayer(source, 0, 10, 4, 180)
     setCameraTarget(source, source)
     fadeCamera(source, true)
     local PLAYERS_JOINED = global_getData("var_players_joined")

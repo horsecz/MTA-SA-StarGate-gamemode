@@ -11,17 +11,40 @@ end
 
 -- precalculate ring rotation time on MWSG
 function stargate_ring_getSymbolRotationTime(symbol_a, symbol_b)
-    local oneSymbolAngle = 360/39
-    local currentSymbol = symbol_a
-    local symbolDistance = 0
-    local np = 1
-    if currentSymbol < symbol_b then
-        symbolDistance = symbol_b-currentSymbol
+    if symbol_a < symbol_b then
+        symbolDistance = symbol_b-symbol_a
     else
-        symbolDistance = currentSymbol-symbol_b
-        np = -1
+        symbolDistance = symbol_a-symbol_b
     end
-    return MW_RING_SPEED*symbolDistance+MW_RING_CHEVRON_LOCK+MW_RING_CHEVRON_LOCK_AE+MW_RING_ROTATE_PAUSE
+
+    local beginTime = 0
+    for i=1,symbolDistance do
+        beginTime = beginTime + MW_RING_SPEED*3
+    end
+    return beginTime
+end
+
+function stargate_ring_rotateSymbols(ring, rotateClockwise, symbolDistance)
+    local beginTime = 0
+    for i=1,symbolDistance do
+        beginTime = beginTime + MW_RING_SPEED*3
+        setTimer(stargate_ring_rotateOneSymbol, beginTime, 1, ring, rotateClockwise)
+    end
+    return beginTime
+end
+
+function stargate_ring_rotateOneSymbol(ring, rotateClockwise)
+    setTimer(function(ring, rotateClockwise)
+        local x,y,z,rx,ry,rz = getElementAttachedOffsets(ring)
+        local oneSymbolAngle = 360/39
+        if rotateClockwise == true then
+            ry = ry + (oneSymbolAngle/MW_RING_SPEED)
+        else
+            ry = ry - (oneSymbolAngle/MW_RING_SPEED)
+        end
+        setElementAttachedOffsets(ring, 0, 0, 0, 0, ry, 0)
+    end, 1, MW_RING_SPEED, ring, rotateClockwise)
+    return MW_RING_SPEED
 end
 
 function stargate_ring_setID(id, newID)

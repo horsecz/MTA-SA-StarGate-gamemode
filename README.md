@@ -11,20 +11,23 @@ Features, updates here are not the newest, but more up-to-date unlike **release*
 
 # Current release
 
-- Release 0.2
+- Release 0.2a
 - New Features:
-    - A lot of fixes
-    - Stargate object can be rotated
-    - Better animations
-    - Separated model loading into models script
-    - DHD element (dial ability, attaching to gates)
-    - Global element (used for storing data across whole gamemode; both client and server)
+    - Fixed gate ring; attached ring to gate
+    - Better gate ring rotation when dialling
 - Features:
     - Skeleton scripts (energy, lifesupport, etc.)
     - Basic gamemode script (spawn, respawn, join)
-    - Stargate (MilkyWay model) with dialling, dial modes, animations, ability to transport all elements except bullets
-    - Working gatespawner
+    - Stargate element (MilkyWay model)
+        - dialling, dial modes;
+        - animations;
+        - ability to transport all elements (except bullets from weapons)
+    - DHD element (MilkyWay model)
+        - dial ability
+        - attaching to gates
+    - Working gatespawner; dhdspawner
     - Work in progress map (San Andreas; Stargate base) not used in gamemode yet 
+    - Global element (used for storing data across whole gamemode; both client and server)
 
 
 # Script list

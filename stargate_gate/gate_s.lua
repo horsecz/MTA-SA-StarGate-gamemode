@@ -5,9 +5,11 @@
 ---
 
 -- constants
-MW_RING_SPEED = 600    -- milkyway gate ring rotation speed [ms per symbol]; default 600
-MW_RING_CHEVRON_LOCK = 750 -- milkyway gate chevron lock time [ms]; default 750
-MW_RING_CHEVRON_LOCK_AE = 550 -- milkyway gate chevron unlock time [ms]; default 550
+MW_RING_SPEED = 150    -- milkyway gate ring rotation speed [ms per symbol]; default 150
+MW_RING_CHEVRON_LOCK = 1500 -- milkyway gate chevron lock time [ms]; default 1500
+MW_RING_CHEVRON_LOCK_AE = 500 -- milkyway gate chevron unlock time [ms]; default 1500
+MW_RING_CHEVRON_LOCK_FAST_DELAY = 1500 -- milkway gate last chevron lock delay [ms]; default 1500 
+MW_RING_CHEVRON_LOCK_SLOW_DELAY = 5000 -- milkway gate chevron lock delay [ms]; 5000
 MW_RING_ROTATE_PAUSE = 1250 -- milkyway gate ring rotation pause after chevron lock [ms]; default 1250
 MW_INCOMING_CHVRN_DELAY = 1200 -- milkyway gate incoming wormhole chevron activate delay between activation [ms]; default 1200
 MW_WORMHOLE_CREATE_DELAY = 500 -- milkyway gate wormhole creation delay (after succesful link) [ms]; default 500
@@ -345,44 +347,29 @@ function stargate_animateOutgoingDial(stargateID, symbol, chevron, lastChevron)
     local oneSymbolAngle = 360/39
     local currentSymbol = ry/oneSymbolAngle
     local symbolDistance = 0
-    local np = 1
+    local clockWise = true
     if currentSymbol < symbol then
         symbolDistance = symbol-currentSymbol
     else
         symbolDistance = currentSymbol-symbol
-        np = -1
+        clockWise = false
     end
     -- start rotating
     stargate_sound_play(stargateID, enum_soundDescription.GATE_RING_ROTATE)
     stargate_ring_setRotating(stargateID, true)
-    setElementData(ring, "rotationTime", MW_RING_SPEED*symbolDistance+MW_RING_CHEVRON_LOCK+MW_RING_CHEVRON_LOCK_AE+MW_RING_ROTATE_PAUSE)
-    moveAttachedObject(MW_RING_SPEED*symbolDistance, ring, 0, 0, 0, rx, np*oneSymbolAngle*symbolDistance, rz)
+    local timeTook = stargate_ring_rotateSymbols(ring, clockWise, symbolDistance)
+    setElementData(ring, "rotationTime", MW_RING_CHEVRON_LOCK_SLOW_DELAY+timeTook+MW_RING_CHEVRON_LOCK+MW_RING_CHEVRON_LOCK_AE+MW_RING_ROTATE_PAUSE)
 
     -- top chevron after symbol reached
-    setTimer(stargate_chevron_setActive, MW_RING_SPEED*symbolDistance, 1, stargateID, 7, true)
+    setTimer(stargate_chevron_setActive, MW_RING_CHEVRON_LOCK_SLOW_DELAY+timeTook, 1, stargateID, 7, true)
     if not lastChevron then
-        setTimer(stargate_chevron_setActive, MW_RING_SPEED*symbolDistance+MW_RING_CHEVRON_LOCK+MW_RING_CHEVRON_LOCK_AE, 1, stargateID, 7, false)
-        setTimer(stargate_chevron_setActive, MW_RING_SPEED*symbolDistance+MW_RING_CHEVRON_LOCK, 1, stargateID, chevron, true)
+        setTimer(stargate_chevron_setActive, MW_RING_CHEVRON_LOCK_SLOW_DELAY+timeTook+MW_RING_CHEVRON_LOCK+MW_RING_CHEVRON_LOCK_AE, 1, stargateID, 7, false)
+        setTimer(stargate_chevron_setActive, MW_RING_CHEVRON_LOCK_SLOW_DELAY+timeTook+MW_RING_CHEVRON_LOCK, 1, stargateID, chevron, true)
     end
     -- engaged chevron after symbol reached
-    setTimer(stargate_ring_setRotating, MW_RING_SPEED*symbolDistance+MW_RING_CHEVRON_LOCK+MW_RING_CHEVRON_LOCK_AE+MW_RING_ROTATE_PAUSE, 1, stargateID, false)
-    setTimer(stargate_sound_stop, MW_RING_SPEED*symbolDistance, 1, stargateID, enum_soundDescription.GATE_RING_ROTATE)
-    setTimer(stargate_sound_play, MW_RING_SPEED*symbolDistance, 1, stargateID, enum_soundDescription.GATE_CHEVRON_LOCK)
-end
-
-function moveAttachedObject(timeToMove, attachedObject, x, y, z, rx, ry, rz)
-    local cx, cy, cz, crx, cry, crz = getElementAttachedOffsets(attachedObject)
-    local sx = x - cx
-    local sy = y - cy
-    local sz = z - cz
-    local srx = rx - crx
-    local sry = ry - cry
-    local srz = rz - crz
-
-    setTimer(function(attachedObject, sx, sy, sz, srx, sry, srz)
-        local cx, cy, cz, crx, cry, crz = getElementAttachedOffsets(attachedObject)
-        setElementAttachedOffsets(attachedObject, cx+sx, cy+sy, cz+sz, crx+srx, cry+sry, crz+srz) 
-    end, timeToMove/50, 50, timeToMove, attachedObject)
+    setTimer(stargate_ring_setRotating, MW_RING_CHEVRON_LOCK_SLOW_DELAY+timeTook+MW_RING_CHEVRON_LOCK+MW_RING_CHEVRON_LOCK_AE+MW_RING_ROTATE_PAUSE, 1, stargateID, false)
+    setTimer(stargate_sound_stop, MW_RING_CHEVRON_LOCK_SLOW_DELAY+timeTook, 1, stargateID, enum_soundDescription.GATE_RING_ROTATE)
+    setTimer(stargate_sound_play, MW_RING_CHEVRON_LOCK_SLOW_DELAY+timeTook, 1, stargateID, enum_soundDescription.GATE_CHEVRON_LOCK)
 end
 
 -- stargate address dialling animation
@@ -401,12 +388,16 @@ function stargate_diallingAnimation(stargateID, stargateDialType)
 
             symbol_target = stargate_getAddressSymbol(stargate_getDialAddress(stargateID), i)
             if i == 7 then
-                timer =setTimer(stargate_animateOutgoingDial, t, 1, stargateID, symbol_target, i, true)
+                timer = setTimer(stargate_animateOutgoingDial, t, 1, stargateID, symbol_target, i, true)
             else
                 timer = setTimer(stargate_animateOutgoingDial, t, 1, stargateID, symbol_target, i)
             end
             setElementData(stargate_getElement(stargateID), "rot_anim_timer_"..tostring(i), timer)
-            t = t + stargate_ring_getSymbolRotationTime(symbol_f_current, symbol_target)
+            t = t + stargate_ring_getSymbolRotationTime(symbol_f_current, symbol_target) + MW_RING_CHEVRON_LOCK_SLOW_DELAY*1.66
+            if i == 7 then
+                t = t - MW_RING_CHEVRON_LOCK_SLOW_DELAY/7
+            end
+
             if getElementData(stargate_getElement(stargateID), "dial_failed") == true then
                 return false
             end
@@ -418,26 +409,36 @@ function stargate_diallingAnimation(stargateID, stargateDialType)
     elseif stargateDialType == enum_stargateDialType.FAST then
         local ring = stargate_getRingElement(stargateID)
         local stargate = stargate_getElement(stargateID)
-        local x, y, z = getElementPosition(ring)
-        local rx, ry, rz = getElementRotation(ring)
+        local x, y, z, rx, ry, rz = getElementAttachedOffsets(ring)
         local oneSymbolAngle = 360/39
         local currentSymbol = ry/oneSymbolAngle
-        local symbolDistance = 16
+        local symbolDistance = 0
+        local clockWise = true
+        local symbol = currentSymbol + 16
+        if symbol > 39 then
+            symbol = symbol - 39
+        end
+        if currentSymbol < symbol then
+            symbolDistance = symbol-currentSymbol
+        else
+            symbolDistance = currentSymbol-symbol
+            clockWise = false
+        end
         -- start rotating
         stargate_sound_play(stargateID, enum_soundDescription.GATE_RING_ROTATE)
         stargate_ring_setRotating(stargateID, true)
-        setElementData(ring, "rotationTime", MW_RING_SPEED*600*7)
-        moveObject(ring, MW_RING_SPEED*symbolDistance, x, y, z, rx, oneSymbolAngle*symbolDistance, rz)
-
+        local timeTook = stargate_ring_rotateSymbols(ring, clockWise, symbolDistance)
+        setElementData(ring, "rotationTime", timeTook+MW_RING_CHEVRON_LOCK+MW_RING_CHEVRON_LOCK_AE+MW_RING_ROTATE_PAUSE)
+    
         local delay = MW_FASTDIAL_START_DELAY
         for i=1,7 do
             setTimer(stargate_chevron_setActive, delay, 1, stargateID, i, true, true)
             delay = delay + MW_FASTDIAL_CHEVRON_DELAY
         end
-        setTimer(stargate_ring_setRotating, MW_RING_SPEED*symbolDistance, 1, stargateID, false)
-        setTimer(stargate_sound_stop, MW_RING_SPEED*symbolDistance, 1, stargateID, enum_soundDescription.GATE_RING_ROTATE)
-        setTimer(stargate_sound_play, MW_RING_SPEED*symbolDistance, 1, stargateID, enum_soundDescription.GATE_CHEVRON_LOCK)
-        t = MW_RING_SPEED*symbolDistance + MW_WORMHOLE_CREATE_DELAY*2
+        setTimer(stargate_ring_setRotating, timeTook+MW_RING_CHEVRON_LOCK+MW_RING_CHEVRON_LOCK_AE+MW_RING_ROTATE_PAUSE, 1, stargateID, false)
+        setTimer(stargate_sound_stop, timeTook+MW_RING_CHEVRON_LOCK+MW_RING_CHEVRON_LOCK_AE+MW_RING_ROTATE_PAUSE, 1, stargateID, enum_soundDescription.GATE_RING_ROTATE)
+        setTimer(stargate_sound_play, timeTook+MW_RING_CHEVRON_LOCK+MW_RING_CHEVRON_LOCK_AE+MW_RING_ROTATE_PAUSE+MW_RING_CHEVRON_LOCK_FAST_DELAY, 1, stargateID, enum_soundDescription.GATE_CHEVRON_LOCK)
+        t = timeTook + MW_RING_CHEVRON_LOCK+MW_RING_CHEVRON_LOCK_AE+MW_RING_ROTATE_PAUSE+ MW_WORMHOLE_CREATE_DELAY*6
     else
         outputDebugString("Stargate "..stargateID.." tried to dial in unsupported dial mode "..tostring(stargate_dialType))
         return false

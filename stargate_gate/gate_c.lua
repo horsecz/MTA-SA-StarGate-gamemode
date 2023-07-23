@@ -13,22 +13,6 @@ function initClient()
 end
 addEventHandler("onClientResourceStart", resourceRoot, initClient)
 
--- at the end of resource, free models
-function endClient()
-	engineFreeModel(getElementData(source, "models_gate_milkyway"))
-	engineFreeModel(getElementData(source, "models_gate_milkyway_ring"))
-	for i=1,9 do
-		engineFreeModel(getElementData(source, "models_gate_milkyway_chevron_"..tostring(i)))
-	end
-	for i=1,12 do
-		engineFreeModel(getElementData(source, "models_gate_milkyway_kawoosh_"..tostring(i)))
-	end
-	for i=1,6 do
-		engineFreeModel(getElementData(source, "models_gate_milkyway_horizon_"..tostring(i)))
-	end
-end
-addEventHandler("onClientResourceStop", resourceRoot, endClient)
-
 function handleProjectileCreation(creator)
 	local t = setTimer(
 		function(creator, SG_MW, source, timer)
