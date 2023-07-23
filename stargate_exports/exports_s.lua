@@ -1,5 +1,10 @@
 -- exports_s.lua_ Functions used across gate_* resources in server-side
 
+function createGlobalElement()
+    GLOBAL_ELEMENT = createElement("stargate_root", "stargate_root_element")
+end
+addEventHandler("onResourceStart", resourceRoot, createGlobalElement)
+
 -- active wait function
 function wait(time)
     current = getTickCount()
@@ -54,15 +59,67 @@ function array_new()
 end
 
 function array_size(array)
+    if array == nil then
+        return 0
+    end
     return (table.getn(array))
 end
 
 function array_pop(array)
-    return (table.remove(array))
+    table.remove(array)
+    return array
+end
+
+function array_remove(array, index)
+    table.remove(array, index)
+    return array
+end
+
+function array_contains(array, value)
+    for i,f_value in pairs(array) do
+        if f_value == value then
+            return i
+        end
+    end
+    return nil
 end
 
 function array_push(array, value)
-    local sOld = array_size(array)
-    table.insert(array, value)
+    if array == nil or array == {} then
+        array = {}
+        table.insert(array, 1, value)
+    else
+        table.insert(array, value)
+    end
     return array
+end
+
+---
+---
+---  GLOBAL ELEMENT
+
+function global_getElement()
+    local e = getElementByID("stargate_root_element")
+    if (getElementType(e) == "stargate_root") then
+        return e
+    end
+
+    outputDebugString("[GATE_EXPORTS] FATAL ERROR: Global element returned NIL VALUE!",1)
+    return nil
+end
+
+function global_addData(key, value)
+    return (setElementData(global_getElement(), key, value))
+end
+
+function global_getData(key)
+    return (getElementData(global_getElement(), key))
+end
+
+function global_setData(key, value)
+    return (global_addData(key, value))
+end
+
+function global_removeData(key)
+    return (global_setData(key, nil))
 end

@@ -11,6 +11,10 @@ function callClientFunction(client, funcname, ...)
     triggerClientEvent(client, "onServerCallsClientFunction", resourceRoot, funcname, unpack(arg or {}))
 end
 
+function spawner_gateList_add(...)
+    return (exports.stargate_spawner:spawner_gateList_add(...))
+end
+
 function array_equal(a, b)
     return (exports.stargate_exports:array_equal(a, b))
 end
@@ -41,4 +45,8 @@ end
 
 function array_push(a, b)
     return (exports.stargate_exports:array_push(a, b))
+end
+
+function global_getData(...)
+    return (exports.stargate_exports:global_getData(...))
 end

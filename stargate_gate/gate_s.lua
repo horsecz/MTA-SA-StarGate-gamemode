@@ -18,25 +18,14 @@ MW_FASTDIAL_CHEVRON_DELAY = 1000 -- milkway gate fast dial chevron encode delay 
 GATE_OPEN_DELAY = 200
 
 SG_WORMHOLE_OPEN_TIME = 38  -- stargate classic wormhole open time [s]; default 38
-SG_VORTEX_ANIM_SPEED = 115 -- stargate vortex opening animation speed [ms]; default 115
+SG_VORTEX_ANIM_SPEED = 85 -- stargate vortex opening animation speed [ms]; default 115
+SG_VORTEX_ANIM_TOP_DELAY = 300 -- stargate vortex opening animation delay (when vortex is greatest) [ms]; default 200
 SG_HORIZON_ANIMATION_SPEED = 100 -- stargate horizon animation change speed [ms]; default 100; recommended 100-200
+SG_HORIZON_OPACITY = 65 -- stargate horizon object transparency [0-100]; default 75
 
 -- variable constants
 SG_HORIZON_ANIMATION_BEGIN = SG_HORIZON_ANIMATION_SPEED*3,5
-
--- global variables
-MWID = nil
-MWID_r = nil
-MWID_c = {}
-MWID_c_last = 0
-LastMWGateID = nil
-MW_Horizon = {}
-MW_Horizon_last = 0
-
-SG_Kawoosh = {}
-SG_Kawoosh_last = 0
-
-SG_MW = nil
+SG_HORIZON_ALPHA = 255 - SG_HORIZON_OPACITY
 
 -- enums
 enum_markerType = {
@@ -50,6 +39,7 @@ function import_enum_markerType()
 end
 
 enum_stargateStatus = {
+    DIAL_SELF = -5,
     DIAL_GATE_INCOMING_TOGATE = -4,
     DIAL_GATE_INCOMING = -3,
     DIAL_UNKNOWN_ADDRESS = -2,
@@ -58,7 +48,8 @@ enum_stargateStatus = {
     GATE_IDLE = 0,
     GATE_ACTIVE = 1,
     GATE_OPEN = 2,
-    GATE_DISABLED = 3
+    GATE_DISABLED = 3,
+    GATE_GROUNDED = 4
 }
 
 function import_enum_stargateStatus()
@@ -76,12 +67,16 @@ function enum_stargateStatus.toString(v)
         return "Gate open"
     elseif v == enum_stargateStatus.GATE_DISABLED then
         return "Gate disabled"
+    elseif v == enum_stargateStatus.GATE_GROUNDED then
+        return "Gate grounded"
     elseif v == enum_stargateStatus.DIAL_UNKNOWN_ADDRESS then
         return "Unknown address"
     elseif v == enum_stargateStatus.DIAL_GATE_INCOMING then
         return "Incoming wormhole"
     elseif v == enum_stargateStatus.DIAL_GATE_INCOMING_TOGATE then
         return "Incoming wormhole (fromgate)"
+    elseif v == enum_stargateStatus.DIAL_SELF then
+        return "Dialed itself"    
     end
 end
 
@@ -111,19 +106,8 @@ function setAllStargatesIntoDevMode()
     SG_WORMHOLE_OPEN_TIME = 5  -- stargate classic wormhole open time [s]; default 38
 end
 
-
 function testFunc(playerSource, commandName, arg1, arg2, arg3)
-    --setAllStargatesIntoDevMode()
-    if arg3 == "slow" then
-        arg3 = enum_stargateDialType.SLOW
-    elseif arg3 == "fast" then 
-        arg3 = enum_stargateDialType.FAST
-    else
-        arg3 = enum_stargateDialType.INSTANT
-    end
-
-    outputChatBox("Dialling "..arg1.."->"..arg2.." ["..arg3.." mode]")
-    stargate_dialByID("SG_MW_"..arg1, "SG_MW_"..arg2, arg3)
+    outputChatBox("Doin nothin'")
 end
 addCommandHandler("work", testFunc)
     
@@ -134,39 +118,37 @@ addCommandHandler("work", testFunc)
 
 -- script begin/init
 function initServer(startedResource)
-	outputChatBox("GATE: Resource gate started - test functions started.")
-    loadModels()
 end
 addEvent("clientStartedEvent", true)
 addEventHandler("clientStartedEvent", resourceRoot, initServer)
-
--- initialize models
-function initModels()
-    if array_size(SG_MW) < 1 then
-        outputDebugString("GATE: No stargates detected", 2)
-    end
-    triggerClientEvent("onServerGateLoaded", root, SG_MW)
-
-    for i,sg in pairs(SG_MW) do
-        local id = stargate_getID(sg)
-        local ringID = stargate_ring_getID(stargate_getRingElement(id))
-        stargate_setModel(id, MWID)
-        stargate_ring_setModel(ringID, MWID_r)
-    end
-end
-addEvent("gateSpawnerActive", true)
-addEventHandler("gateSpawnerActive", resourceRoot, initModels)
 
 -----
 ----- GENERAL
 -----
 
--- create stargate element
--- required_ gateType; position [x,y,z], address
--- address in format {s1, s2, s3, ... sn};
--- rx, ry, rz not supported yet
--- sn represents one symbol on SG in number from 0 to 38 (beginning from point of origin; ring rotation=0)
-function stargate_create(gateType, x, y, z, address, defaultDialType, rx, ry, rz)
+-- function for creating stargate
+
+-- REQUIRED PARAMETERS:
+--> gateType
+--- model of stargate (determined by galaxy; see enum_stargateGalaxy)
+--> x, y, z gate position
+--> address
+--- stargate address in format of array/table {s1, s2, s3, ... sn};
+--- sn represents one symbol on SG in number from 0 to 38 (beginning from point of origin)
+
+-- OPTIONAL PARAMETERS:
+--> defaultDialType refers to dial type this gate will use by default
+--- default if not specified: enum_stargateDialType.FAST
+--> rx, ry, rz gate rotation
+--- rx  horizontal rotation     [0->normal; 90->lying on ground, pointing up; ...]
+--- ry  gate object rotation    [0->symbol 0 at top; 360/38*15-> symbol 15 at top; ...]
+--- rz  vertical rotation       [0->facing north; 90->facing west; ...]
+--- default if not specified: 0
+--> isGrounded determines if stargate is facing ground or other object that will prevent it to be used
+--- default if not specified: false or true if rx is between 240 and 300
+--> forceDefaultDialType - if this is enabled, defaultDialType will be forced
+--- default if not specified: true
+function stargate_create(gateType, x, y, z, address, defaultDialType, rx, ry, rz, isGrounded, forceDefaultDialType)
     if not rx then
         rx = 0
     end
@@ -176,26 +158,51 @@ function stargate_create(gateType, x, y, z, address, defaultDialType, rx, ry, rz
     if not rz then
         rz = 0
     end
+    
+    local dt = defaultDialType
+    if not defaultDialType then
+        dt = enum_stargateDialType.FAST
+    end
+    if not forceDefaultDialType then
+        forceDefaultDialType = true
+    end
 
-    -- force 0 
-    rx = 0
-    ry = 0
-    rz = 0
     local stargate = createObject(1337, x, y, z, rx, ry, rz)
     local id = stargate_assignID(stargate)
     stargate_setAddress(id, address)
+    stargate_setDefaultDialType(id, dt)
+    stargate_setForceDialType(id, forceDefaultDialType)
     stargate_addCollisions(id)
 
     if gateType == enum_galaxy.MILKYWAY then
         stargate_ring_create(id, x, y, z, rx, ry, rz)
         stargate_galaxy_set(id, "milkyway")
-        local dt = defaultDialType
-        if not defaultDialType then
-            dt = enum_stargateDialType.FAST
-        end
-        stargate_setDefaultDialType(id, dt)
     end
+    
+    for i=1,9 do
+        stargate_chevron_create(id, i)
+    end
+    for i=1,12 do
+        stargate_vortex_create(id, i)
+    end
+    for i=1,6 do
+        stargate_horizon_create(id, i)
+    end
+
+    if not isGrounded then
+        isGrounded = false
+    end
+
+    if not isGrounded then
+        isGrounded = false
+        if rx > 240 and rx < 300 then
+            isGrounded = true
+        end
+    end
+    stargate_setGrounded(id, isGrounded)
+    stargate_setAssignedDHD(id, nil)
     outputDebugString("Created Stargate (ID="..tostring(getElementID(stargate)).." galaxy="..tostring(stargate_galaxy_get(id))..") at "..tostring(x)..","..tostring(y)..","..tostring(z).."")
+    return stargate
 end
 
 -- remove stargate
@@ -206,21 +213,22 @@ end
 function stargate_addCollisions(id)
     setElementCollisionsEnabled(stargate_getElement(id), false)
     x, y, z = stargate_getPosition(id)
-    local col_w stargate_addCollisionObject(id, x+2.1, y, z, 0, "W")
-    local col_e = stargate_addCollisionObject(id, x-2.1, y, z, 0, "E")
-    local col_n = stargate_addCollisionObject(id, x, y, z+2.1, 90, "N")
-    local col_s = stargate_addCollisionObject(id, x, y, z-2.1, 90, "S")
-    local col_ne = stargate_addCollisionObject(id, x-1.5, y, z+1.5, 45, "NE")
-    local col_nw = stargate_addCollisionObject(id, x+1.5, y, z+1.5, -45, "NW")
-    local col_se = stargate_addCollisionObject(id, x+1.5, y, z-1.5, 45, "SW")
-    local col_sw = stargate_addCollisionObject(id, x-1.5, y, z-1.5, -45, "SE")
+    local srx, sry, srz = stargate_getRotation(id)
+    local col_w stargate_addCollisionObject(id, 2.1, 0, 0, 0, 0, 0, "W")
+    local col_e = stargate_addCollisionObject(id, -2.1, 0, 0, 0, 0, 0, "E")
+    local col_n = stargate_addCollisionObject(id, 0, 0, 2.1, 0, 90, 0, "N")
+    local col_s = stargate_addCollisionObject(id, 0, 0, -2.1, 0, 90, 0, "S")
+    local col_ne = stargate_addCollisionObject(id, -1.5, 0, 1.5, 0, 45, 0, "NE")
+    local col_nw = stargate_addCollisionObject(id, 1.5, 0, 1.5, 0, -45, 0, "NW")
+    local col_se = stargate_addCollisionObject(id, 1.5, 0, -1.5, 0, 45, 0, "SW")
+    local col_sw = stargate_addCollisionObject(id, -1.5, 0, -1.5, 0, -45, 0, "SE")
 end
 
-function stargate_addCollisionObject(id, x, y, z, ry, desc)
-    local srx, sry, srz = getElementRotation(stargate_getElement(id))
-    local collisionObject = createObject(9131, x, y, z, srx+0, sry+ry, srz+0)
+function stargate_addCollisionObject(id, x, y, z, rx, ry, rz, desc)
+    local collisionObject = createObject(9131, 0, 0, -1000, rx, ry, rz)
     setElementID(collisionObject, id.."COLOBJ."..desc)
     setElementAlpha(collisionObject, 0)
+    attachElements(collisionObject, getElementByID(id), x, y, z, rx, ry, rz)
     return collisionObject
 end
 
@@ -256,15 +264,21 @@ end
 -- dialling process of stargate
 -- returns true if ok; false if stargate is already active (and wont dial)
 function stargate_dial(stargateIDFrom, addressArray, stargateDialType)
+    local stargateIDTo = stargate_convertAddressToID(stargateIDFrom, addressArray)
+
     if stargate_isActive(stargateIDFrom) then
-        outputChatBox("Wont dial, im active!")
+        outputChatBox("[STARGATE ("..stargateIDFrom..")]: WHOA! I wont dial, im doing something rn!")
+        return false
+    end
+    if stargate_getGrounded(stargateIDFrom) then
+        stargate_diallingFailed(stargateIDFrom, stargateIDTo, enum_stargateStatus.GATE_GROUNDED, false)
         return false
     end
 
     stargate_setDialAddress(stargateIDFrom, addressArray)
     stargate_setActive(stargateIDFrom, true)
     local dt = stargateDialType
-    if not stargateDialType then
+    if not stargateDialType or stargate_getForceDialType(stargateIDFrom) == true then
         dt = stargate_getDefaultDialType(stargateIDFrom)
     end
     local totalTime = stargate_diallingAnimation(stargateIDFrom, dt)
@@ -274,11 +288,14 @@ function stargate_dial(stargateIDFrom, addressArray, stargateDialType)
         return false
     end
 
-    local stargateIDTo = stargate_convertAddressToID(stargateIDFrom, addressArray)
     stargate_setConnectionID(stargateIDFrom, stargateIDTo)
     if stargateIDTo then -- may success
         local result = stargate_wormhole_checkAvailability(stargateIDFrom, stargateIDTo)
         if result == enum_stargateStatus.GATE_DISABLED then
+            setTimer(stargate_diallingFailed, totalTime+MW_WORMHOLE_CREATE_DELAY, 1, stargateIDFrom, stargateIDTo, result)
+        elseif result == enum_stargateStatus.GATE_GROUNDED then
+            setTimer(stargate_diallingFailed, totalTime+MW_WORMHOLE_CREATE_DELAY, 1, stargateIDFrom, stargateIDTo, result)
+        elseif result == enum_stargateStatus.DIAL_SELF then
             setTimer(stargate_diallingFailed, totalTime+MW_WORMHOLE_CREATE_DELAY, 1, stargateIDFrom, stargateIDTo, result)
         else
             setTimer(stargate_wormhole_secureConnection, totalTime, 1, stargateIDFrom, stargateIDTo)
@@ -299,10 +316,10 @@ end
 -- dial failed
 function stargate_diallingFailed(stargateIDFrom, stargateIDTo, reason, dontPlaySound)
     local id = stargateIDFrom
-    local arrow = "->"
+    local arrow = "to"
     if reason == enum_stargateStatus.DIAL_GATE_INCOMING then
         id = stargateIDTo
-        arrow = "<-"
+        arrow = "from"
     end
 
     if not dontPlaySound then
@@ -312,7 +329,7 @@ function stargate_diallingFailed(stargateIDFrom, stargateIDTo, reason, dontPlayS
     setTimer(stargate_setAllChevronsActive, MW_DIAL_FAIL_CHVRN_DELAY, 1, id, false, false)
     stargate_setDialAddress(id, nil)
     stargate_setActive(id, false)
-    outputChatBox("Dialing "..tostring(stargateIDFrom)..arrow..tostring(stargateIDTo).." failed. ("..enum_stargateStatus.toString(reason)..")")
+    outputChatBox("[STARGATE ("..tostring(stargateIDFrom)..")] Dialling "..arrow.." "..tostring(stargateIDTo).." failed. ("..enum_stargateStatus.toString(reason)..")")
 end
 
 
@@ -324,8 +341,7 @@ end
 function stargate_animateOutgoingDial(stargateID, symbol, chevron, lastChevron)
     local ring = stargate_getRingElement(stargateID)
     local stargate = stargate_getElement(stargateID)
-    local x, y, z = getElementPosition(ring)
-    local rx, ry, rz = getElementRotation(ring)
+    local x, y, z, rx, ry, rz = getElementAttachedOffsets(ring)
     local oneSymbolAngle = 360/39
     local currentSymbol = ry/oneSymbolAngle
     local symbolDistance = 0
@@ -340,7 +356,7 @@ function stargate_animateOutgoingDial(stargateID, symbol, chevron, lastChevron)
     stargate_sound_play(stargateID, enum_soundDescription.GATE_RING_ROTATE)
     stargate_ring_setRotating(stargateID, true)
     setElementData(ring, "rotationTime", MW_RING_SPEED*symbolDistance+MW_RING_CHEVRON_LOCK+MW_RING_CHEVRON_LOCK_AE+MW_RING_ROTATE_PAUSE)
-    moveObject(ring, MW_RING_SPEED*symbolDistance, x, y, z, rx, np*oneSymbolAngle*symbolDistance, rz)
+    moveAttachedObject(MW_RING_SPEED*symbolDistance, ring, 0, 0, 0, rx, np*oneSymbolAngle*symbolDistance, rz)
 
     -- top chevron after symbol reached
     setTimer(stargate_chevron_setActive, MW_RING_SPEED*symbolDistance, 1, stargateID, 7, true)
@@ -352,6 +368,21 @@ function stargate_animateOutgoingDial(stargateID, symbol, chevron, lastChevron)
     setTimer(stargate_ring_setRotating, MW_RING_SPEED*symbolDistance+MW_RING_CHEVRON_LOCK+MW_RING_CHEVRON_LOCK_AE+MW_RING_ROTATE_PAUSE, 1, stargateID, false)
     setTimer(stargate_sound_stop, MW_RING_SPEED*symbolDistance, 1, stargateID, enum_soundDescription.GATE_RING_ROTATE)
     setTimer(stargate_sound_play, MW_RING_SPEED*symbolDistance, 1, stargateID, enum_soundDescription.GATE_CHEVRON_LOCK)
+end
+
+function moveAttachedObject(timeToMove, attachedObject, x, y, z, rx, ry, rz)
+    local cx, cy, cz, crx, cry, crz = getElementAttachedOffsets(attachedObject)
+    local sx = x - cx
+    local sy = y - cy
+    local sz = z - cz
+    local srx = rx - crx
+    local sry = ry - cry
+    local srz = rz - crz
+
+    setTimer(function(attachedObject, sx, sy, sz, srx, sry, srz)
+        local cx, cy, cz, crx, cry, crz = getElementAttachedOffsets(attachedObject)
+        setElementAttachedOffsets(attachedObject, cx+sx, cy+sy, cz+sz, crx+srx, cry+sry, crz+srz) 
+    end, timeToMove/50, 50, timeToMove, attachedObject)
 end
 
 -- stargate address dialling animation
@@ -413,17 +444,6 @@ function stargate_diallingAnimation(stargateID, stargateDialType)
     end
     return t
 end
-
--- create unstable vortex and horizon at stargate
--- returns time needed for animation
-function stargate_animateOpening(stargateID)
-    local x, y, z = stargate_getPosition(stargateID)
-    local vortex = stargate_vortex_create(stargateID, x, y, z)
-    local horizon = stargate_horizon_create(stargateID, x, y, z)
-    local killZone = stargate_marker_create(x, y+2.6, z, "corona", 3, 25, 90 ,200, 25, enum_markerType.VORTEX, stargateID)
-    return (stargate_vortex_animate(stargateID))
-end
-
 -----
 ----- GETTERS/SETTERS
 -----
@@ -461,10 +481,6 @@ function stargate_setAddress(id, address)
     setElementData(stargate_getElement(id), "address", address)
 end
 
-function stargate_setModel(id, modelID, colPath)
-    triggerClientEvent("setElementModelClient", resourceRoot, stargate_getElement(id), modelID, colPath)
-end
-
 -- turn on all chevrons
 -- useDelay = use slow chevron turning on animation
 function stargate_setAllChevronsActive(stargateID, useDelay, active)
@@ -477,9 +493,16 @@ function stargate_setAllChevronsActive(stargateID, useDelay, active)
     end
 end
 
--- returns chevron if chevron is active or nil
 function stargate_getChevron(id, chevronNumber)
     return getElementByID(id.."C"..tostring(chevronNumber))
+end
+
+function stargate_getKawoosh(id, kawooshNumber)
+    return getElementByID(id.."V"..tostring(kawooshNumber))
+end
+
+function stargate_getHorizon(id, horizonNumber)
+    return getElementByID(id.."H"..tostring(horizonNumber))
 end
 
 function stargate_isActive(stargateID)
@@ -535,6 +558,11 @@ function stargate_getPosition(stargateID)
     return x, y, z
 end
 
+function stargate_getRotation(stargateID)
+    local x, y, z = getElementRotation(stargate_getElement(stargateID))
+    return x, y, z
+end
+
 function stargate_getIncomingStatus(stargateID) 
     return getElementData(getElementByID(stargateID), "incomingStatus")
 end
@@ -566,6 +594,30 @@ function stargate_getDefaultDialType(id)
     return (getElementData(stargate_getElement(id), "defaultDialType"))
 end
 
+function stargate_setGrounded(id, v)
+    return (setElementData(stargate_getElement(id), "isGrounded", v))
+end
+
+function stargate_getGrounded(id)
+    return (getElementData(stargate_getElement(id), "isGrounded"))
+end
+
+function stargate_setForceDialType(id, v)
+    return (setElementData(stargate_getElement(id), "forceDialType", v))
+end
+
+function stargate_getForceDialType(id)
+    return (getElementData(stargate_getElement(id), "forceDialType"))
+end
+
+function stargate_setAssignedDHD(id, v)
+    return (setElementData(stargate_getElement(id), "assignedDHD", v))
+end
+
+function stargate_getAssignedDHD(id)
+    return (getElementData(stargate_getElement(id), "assignedDHD"))
+end
+
 -- returns remaining time wormhole will be open in miliseconds or nil
 function stargate_getWormholeTimeRemaining(stargateID)
     local timer = stargate_getCloseTimer(stargateID)
@@ -591,4 +643,8 @@ function stargate_getGateModel(type)
     if type == "MW" then
         return MWID
     end
+end
+
+function stargate_getGalaxy(id)
+    return (getElementData(stargate_getElement(id), "galaxy"))
 end

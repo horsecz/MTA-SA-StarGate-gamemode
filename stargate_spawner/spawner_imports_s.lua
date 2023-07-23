@@ -6,3 +6,23 @@ enum_stargateDialType = (exports.stargate_gate:import_enum_stargateDialType())
 function stargate_create(...)
     return (exports.stargate_gate:stargate_create(...))
 end
+
+function stargate_getGalaxy(...)
+    return (exports.stargate_gate:stargate_getGalaxy(...))
+end
+
+function dhd_create(...)
+    return (exports.stargate_dhd:dhd_create(...))
+end
+
+function array_push(...)
+    return (exports.stargate_exports:array_push(...))
+end
+
+function global_getData(...)
+    return (exports.stargate_exports:global_getData(...))
+end
+
+function global_setData(...)
+    return (exports.stargate_exports:global_setData(...))
+end

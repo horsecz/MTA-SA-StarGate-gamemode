@@ -4,19 +4,6 @@
 --- GLOBALS (CLIENT)
 ---
 
---- are they any use?
-MWID = nil
-MWID_r = nil
-MWID_c = {}
-MWID_c_last = 0
-MW_Horizon = {}
-MW_Horizon_last = 0
-
-SG_Kawoosh = {}
-SG_Kawoosh_last = 0
-
-SG_MW = nil
-
 ---
 --- INIT
 ---
@@ -26,30 +13,21 @@ function initClient()
 end
 addEventHandler("onClientResourceStart", resourceRoot, initClient)
 
-function serverLoaded(gate_list)
-	SG_MW = gate_list
-end
-addEvent("onServerGateLoaded", true)
-addEventHandler("onServerGateLoaded", resourceRoot, serverLoaded)
-
 -- at the end of resource, free models
 function endClient()
-	engineFreeModel(MWID)
-	engineFreeModel(MWID_r)
+	engineFreeModel(getElementData(source, "models_gate_milkyway"))
+	engineFreeModel(getElementData(source, "models_gate_milkyway_ring"))
 	for i=1,9 do
-		engineFreeModel(MWID_c[i])
+		engineFreeModel(getElementData(source, "models_gate_milkyway_chevron_"..tostring(i)))
 	end
-	-- TODO; free the rest
+	for i=1,12 do
+		engineFreeModel(getElementData(source, "models_gate_milkyway_kawoosh_"..tostring(i)))
+	end
+	for i=1,6 do
+		engineFreeModel(getElementData(source, "models_gate_milkyway_horizon_"..tostring(i)))
+	end
 end
---addEventHandler("onClientResourceStop", resourceRoot, endClient)
-
-function testCall(text)
-	outputChatBox(text)
-end
-
----
----
----
+addEventHandler("onClientResourceStop", resourceRoot, endClient)
 
 function handleProjectileCreation(creator)
 	local t = setTimer(
@@ -93,4 +71,27 @@ function isProjectileInHorizon(projectile, horizon, positionError)
 		end
 	end
 	return false
+end
+
+
+--- GETTERS/SETTERS
+
+function stargate_getID(stargate)
+    return (getElementID(stargate))
+end
+
+function stargate_getRingElement(id)
+    return (stargate_ring_getElement(id.."R"))
+end
+
+function stargate_getChevron(id, chevronNumber)
+    return getElementByID(id.."C"..tostring(chevronNumber))
+end
+
+function stargate_getKawoosh(id, kawooshNumber)
+    return getElementByID(id.."V"..tostring(kawooshNumber))
+end
+
+function stargate_getHorizon(id, horizonNumber)
+    return getElementByID(id.."H"..tostring(horizonNumber))
 end

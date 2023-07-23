@@ -3,6 +3,7 @@
 function stargate_marker_create(x, y, z, markerType, markerSize, r, g, b, a, markerFunction, stargateID)
     local marker = createMarker(x, y, z, markerType, markerSize, r, g, b, a)
     stargate_marker_setSource(marker, stargateID)
+    setElementData(marker, "active", true)
     if markerFunction == enum_markerType.EVENTHORIZON then
         stargate_marker_setAttributes(marker, "TPM", "isHorizon", true, stargate_wormhole_transport, stargateID)
     elseif markerFunction == enum_markerType.VORTEX then
@@ -37,6 +38,9 @@ function stargate_marker_remove(stargateID, markerFunction)
     return destroyElement(stargate_marker_get(stargateID, markerFunction))
 end
 
+function stargate_marker_deactivate(stargateID, markerFunction)
+    return setElementData(stargate_marker_get(stargateID, markerFunction), "active", false)
+end
 
 function stargate_marker_isEventHorizon(marker)
     if getElementData(marker, "isHorizon") == nil then

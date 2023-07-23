@@ -1,15 +1,13 @@
 # TO BE DONE
 
 Functional related, medium priority:
-- Stargate object rotation
-- On player join -> models are scuffed (sg; ring; chevron 1 is fine)
-- Use XML/External file instead arrays for important stargate data such as list of created stargates
-    - related: after this is done, do not createStargate() every time resource-gamemode will run (load instead)
-- Iris (or Atlantis gate shield)
-- Implement DHD; and/or DHD dial mode (or: use fast dial)
-- Galaxies and other gate types (Pegasus, Universe); use of 8th and 9th chevron
+- Fix: Gate ring is not rotating and weird lightning [after attachElement]
 
 Functional related but lower priority:
+- Iris (or Atlantis gate shield)
+- Galaxies and other gate types (Pegasus, Universe); use of 8th and 9th chevron
+- Use XML/External file instead arrays for important stargate data such as list of created stargates
+    - related: after this is done, do not createStargate() every time resource-gamemode will run (load instead)
 - Support transport of all elements
     - Supporting: Player, Ped, Vehicle, Projectile
     - Not Supporting: Weapon bullet

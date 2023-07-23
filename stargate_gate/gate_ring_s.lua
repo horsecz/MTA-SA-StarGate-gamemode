@@ -1,10 +1,12 @@
 -- ring_s.lua_ Gate ring module
 
 function stargate_ring_create(gateID, x, y, z, rx, ry, rz)
-    local ring = createObject(1377, x, y, z, rx, ry, rz)
+    local ring = createObject(1337, x, y, z, rx, ry, rz)
+    local sg = stargate_getElement(gateID)
     local id = stargate_ring_assignID(ring, gateID)
     setElementCollisionsEnabled(ring, true)
     setElementData(ring, "rotationTime", 0)
+    attachElements(ring, sg)
 end
 
 -- precalculate ring rotation time on MWSG
@@ -40,10 +42,6 @@ function stargate_ring_getElement(id)
     return (getElementByID(id))
 end
 
-function stargate_ring_setModel(id, modelID)
-    triggerClientEvent("setElementModelClient", resourceRoot, stargate_ring_getElement(id), modelID)
-end
-
 function stargate_ring_isRotating(stargateID)
     return (getElementData(getElementByID(stargateID), "isRotating"))
 end
@@ -59,6 +57,6 @@ end
 function stargate_ring_getCurrentSymbol(stargateID)
     local ring = stargate_ring_getElement(stargateID.."R")
     local oneSymbolAngle = 360/39
-    local tmp, ringRotation, tmp2 = getElementRotation(ring)
+    local tmpx, tmpy, tmpz, tmprx, ringRotation, tmprz = getElementAttachedOffsets(ring)
     return (ringRotation/oneSymbolAngle)
 end

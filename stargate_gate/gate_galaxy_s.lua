@@ -9,12 +9,7 @@ end
 
 function stargate_galaxy_set(id, galaxy)
     setElementData(stargate_getElement(id), "galaxy", galaxy)
-    if galaxy == "milkyway" then
-        if SG_MW == nil then
-            SG_MW = array_new()
-        end
-        SG_MW = array_push(SG_MW, stargate_getElement(id))
-    end
+    spawner_gateList_add(stargate_getElement(id))
 end
 
 function stargate_galaxy_get(id)
@@ -24,7 +19,7 @@ end
 -- returns all existing gates in current gate's galaxy in form of array-list of IDs
 function stargate_galaxy_getAllElements(id)
     if stargate_galaxy_get(id) == "milkyway" then
-        return SG_MW
+        return (global_getData("SG_MW"))
     end
     return nil
 end

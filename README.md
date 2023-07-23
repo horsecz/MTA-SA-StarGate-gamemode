@@ -11,7 +11,14 @@ Features, updates here are not the newest, but more up-to-date unlike **release*
 
 # Current release
 
-- Release 0.1
+- Release 0.2
+- New Features:
+    - A lot of fixes
+    - Stargate object can be rotated
+    - Better animations
+    - Separated model loading into models script
+    - DHD element (dial ability, attaching to gates)
+    - Global element (used for storing data across whole gamemode; both client and server)
 - Features:
     - Skeleton scripts (energy, lifesupport, etc.)
     - Basic gamemode script (spawn, respawn, join)
@@ -22,10 +29,13 @@ Features, updates here are not the newest, but more up-to-date unlike **release*
 
 # Script list
 
+- stargate_dhd
+    - dhd creation, removal, attaching, etc.
 - stargate_energy
     - energy creation, consumption, "factories" and ZPMs
 - stargate_exports
     - functions that are used in all stargate_* scripts
+    - global element
 - stargate_gamemode
     - resource type 'gamemode' which runs all other stargate scripts
     - initialization, beginning
@@ -33,18 +43,18 @@ Features, updates here are not the newest, but more up-to-date unlike **release*
     - global server and client events (player connect; join; respawn; ...), commands and actions
 - stargate_gate
     - stargate, its physics, model(s), behavior
-    - dhd
 - stargate_lifesupport
     - planet atmosphere
     - oxygen, nitrogen, water, vacuum; event&actions related to LS
 - stargate_map
     - resource type 'map' containing all maps used in this gamemode
     - map specific scripts included
+- stargate_models
+    - texture, model, collision models loading
 - stargate_planets
     - planets, dimensions, their stats (behavior, events)
     - list of existing planets
 - stargate_rings
     - transport rings element
 - stargate_spawner
-    - spawns all elements (stargates, rings, etc.) which can be spawned/created at gamemode start
-    - including gatespawner script
+    - spawns all elements (stargates, dhds, rings, etc.) which can be spawned/created at gamemode start

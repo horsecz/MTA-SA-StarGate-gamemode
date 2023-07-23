@@ -7,13 +7,20 @@
     <export function="wait" type="server" />
     <export function="import_variable" type="server" />
 
-    <export function="array_get" type="server" />
-    <export function="array_set" type="server" />
-    <export function="array_new" type="server" />
-    <export function="array_equal" type="server" />
-    <export function="array_clear" type="server" />
-    <export function="array_size" type="server" />
-    <export function="array_push" type="server" />
-    <export function="array_pop" type="server" />
+    <export function="global_addData" type="shared" />
+    <export function="global_getData" type="shared" />
+    <export function="global_setData" type="shared" />
+    <export function="global_removeData" type="shared" />
+
+    <export function="array_get" type="shared" />
+    <export function="array_set" type="shared" />
+    <export function="array_new" type="shared" />
+    <export function="array_equal" type="shared" />
+    <export function="array_clear" type="shared" />
+    <export function="array_size" type="shared" />
+    <export function="array_push" type="shared" />
+    <export function="array_pop" type="shared" />
+    <export function="array_remove" type="shared" />
+    <export function="array_contains" type="shared" />
 
 </meta>

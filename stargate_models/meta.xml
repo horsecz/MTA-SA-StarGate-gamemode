@@ -1,0 +1,80 @@
+<meta>
+    <min_mta_version server="1.5.8-9.20957"></min_mta_version>
+    <info type="stargate_models" version="1.0.0"></info>
+
+    <script src="models_s.lua" type="server"></script>
+    <script src="models_c.lua" type="client"></script>
+    <script src="models_imports_s.lua" type="server"></script>
+    <script src="models_imports_c.lua" type="client"></script>
+
+    <export function="setElementModelClient" type="client" />
+
+    <file src="models/mw.txd" />
+    <file src="models/mw.dff" />
+    <file src="models/mw_ring.dff" />
+
+    <file src="models/dhd.dff" />
+    <file src="models/dhd.txd" />
+
+    <file src="models/chevs1.dff" />
+    <file src="models/chevs2.dff" />
+    <file src="models/chevs3.dff" />
+    <file src="models/chevs4.dff" />
+    <file src="models/chevs5.dff" />
+    <file src="models/chevs6.dff" />
+    <file src="models/chevs7.dff" />
+    <file src="models/chevs8.dff" />
+    <file src="models/chevs9.dff" />
+    <file src="models/9chevs.txd" />
+
+    <file src="models/1.txd" />
+    <file src="models/1.dff" />
+    <file src="models/2.txd" />
+    <file src="models/2.dff" />
+    <file src="models/3.txd" />
+    <file src="models/3.dff" />
+    <file src="models/4.txd" />
+    <file src="models/4.dff" />
+    <file src="models/5.txd" />
+    <file src="models/5.dff" />
+    <file src="models/6.txd" />
+    <file src="models/6.dff" />
+
+    <file src="models/Kawoosh.txd" />
+    <file src="models/Kawoosh1.dff" />
+    <file src="models/Kawoosh2.dff" />
+    <file src="models/Kawoosh3.dff" />
+    <file src="models/Kawoosh4.dff" />
+    <file src="models/Kawoosh5.dff" />
+    <file src="models/Kawoosh6.dff" />
+    <file src="models/Kawoosh7.dff" />
+    <file src="models/Kawoosh8.dff" />
+    <file src="models/Kawoosh9.dff" />
+    <file src="models/Kawoosh10.dff" />
+    <file src="models/Kawoosh11.dff" />
+    <file src="models/Kawoosh12.dff" />
+
+    <file src="collisions/Kawoosh1.col" />
+    <file src="collisions/Kawoosh2.col" />
+    <file src="collisions/Kawoosh3.col" />
+    <file src="collisions/Kawoosh4.col" />
+    <file src="collisions/Kawoosh5.col" />
+    <file src="collisions/Kawoosh6.col" />
+    <file src="collisions/Kawoosh7.col" />
+    <file src="collisions/Kawoosh8.col" />
+    <file src="collisions/Kawoosh9.col" />
+    <file src="collisions/Kawoosh10.col" />
+    <file src="collisions/Kawoosh11.col" />
+    <file src="collisions/Kawoosh12.col" />
+
+    <file src="collisions/mw.col" />
+    <file src="collisions/dhd.col" />
+    <file src="collisions/mw_ring.col" />
+    <file src="collisions/chevs.col" />
+    <file src="collisions/1.col" />
+    <file src="collisions/2.col" />
+    <file src="collisions/3.col" />
+    <file src="collisions/4.col" />
+    <file src="collisions/5.col" />
+    <file src="collisions/6.col" />
+</meta>

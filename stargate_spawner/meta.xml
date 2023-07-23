@@ -5,4 +5,6 @@
     <script src="spawner_s.lua" type="server"></script>
     <script src="spawner_c.lua" type="client"></script>
     <script src="spawner_imports_s.lua" type="server"></script>
+
+    <export function="spawner_gateList_add" type="server" />
 </meta>

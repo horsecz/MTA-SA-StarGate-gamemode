@@ -9,3 +9,7 @@ function callClientFunction(funcname, ...)
 end
 addEvent("onServerCallsClientFunction", true)
 addEventHandler("onServerCallsClientFunction", resourceRoot, callClientFunction)
+
+function setElementModelClient(...)
+    return (exports.stargate_models:setElementModelClient(...))
+end

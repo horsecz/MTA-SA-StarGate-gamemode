@@ -1,34 +1,46 @@
 -- vortex_s.lua_ Vortex (Kawoosh) module
 
--- warning_ does not set element model (model is set in 'animate()' function instead)
-function stargate_vortex_create(stargateID, x, y, z)
+function stargate_vortex_create(stargateID, frame)
     local vortex = createObject(1337, x, y, z)
-    setElementID(vortex, stargateID.."V")
+    setElementID(vortex, stargateID.."V"..tostring(frame))
     setElementCollisionsEnabled(vortex, false)
+    setElementAlpha(vortex, 0)
+    attachElements(vortex, getElementByID(stargateID))
     return vortex
 end
 
-function stargate_vortex_getElement(stargateID)
-    return getElementByID(stargateID.."V")
+function stargate_vortex_getElement(stargateID, frame)
+    return (getElementByID(stargateID.."V"..tostring(frame)))
 end
 
 function stargate_vortex_remove(stargateID)
-    local vortex = stargate_vortex_getElement(stargateID)
+    local vortex = nil
     local killZone = stargate_marker_get(stargateID, enum_markerType.VORTEX)
-    destroyElement(vortex)
     destroyElement(killZone)
+end
+
+function stargate_vortex_setActive(stargateID, frame, active)
+    local vortex = nil
+    for i=1,12 do
+        vortex = stargate_vortex_getElement(stargateID, frame)    
+        if active then
+            setElementAlpha(vortex, 255)
+        else
+            setElementAlpha(vortex, 0)
+        end
+    end
 end
 
 -- animate vortex-kawoosh; returns time needed for animation
 function stargate_vortex_animate(stargateID)
-    local vortex = stargate_vortex_getElement(stargateID)
     local last = 50
     for i=1,12 do
-        setTimer(triggerClientEvent, last, 1, "setElementModelClient", resourceRoot, vortex, SG_Kawoosh[i])
+        setTimer(stargate_vortex_setActive, last, 1, stargateID, i, true)
         last = last + SG_VORTEX_ANIM_SPEED
     end
+    last = last + SG_VORTEX_ANIM_TOP_DELAY
     for i=12,1,-1 do
-        setTimer(triggerClientEvent, last, 1, "setElementModelClient", resourceRoot, vortex, SG_Kawoosh[i])
+        setTimer(stargate_vortex_setActive, last, 1, stargateID, i, false)
         last = last + SG_VORTEX_ANIM_SPEED
     end
 
