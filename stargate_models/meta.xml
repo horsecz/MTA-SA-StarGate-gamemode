@@ -40,6 +40,19 @@
     <file src="models/6.txd" />
     <file src="models/6.dff" />
 
+    <file src="models/act1.txd" />
+    <file src="models/act1.dff" />
+    <file src="models/act2.txd" />
+    <file src="models/act2.dff" />
+    <file src="models/act3.txd" />
+    <file src="models/act3.dff" />
+    <file src="models/act4.txd" />
+    <file src="models/act4.dff" />
+    <file src="models/act5.txd" />
+    <file src="models/act5.dff" />
+    <file src="models/act6.txd" />
+    <file src="models/act6.dff" />
+
     <file src="models/Kawoosh.txd" />
     <file src="models/Kawoosh1.dff" />
     <file src="models/Kawoosh2.dff" />

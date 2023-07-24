@@ -11,10 +11,9 @@ Features, updates here are not the newest, but more up-to-date unlike **release*
 
 # Current release
 
-- Release 0.2a
+- Release 0.2b
 - New Features:
-    - Fixed gate ring; attached ring to gate
-    - Better gate ring rotation when dialling
+    - Ehnanced stargate animations
 - Features:
     - Skeleton scripts (energy, lifesupport, etc.)
     - Basic gamemode script (spawn, respawn, join)

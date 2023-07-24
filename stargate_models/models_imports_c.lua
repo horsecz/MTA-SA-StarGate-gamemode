@@ -50,3 +50,7 @@ end
 function stargate_getHorizon(...)
     return (exports.stargate_gate:stargate_getHorizon(...))
 end
+
+function stargate_getHorizonActivation(...)
+    return (exports.stargate_gate:stargate_getHorizonActivation(...))
+end

@@ -79,3 +79,7 @@ end
 function stargate_getHorizon(id, horizonNumber)
     return getElementByID(id.."H"..tostring(horizonNumber))
 end
+
+function stargate_getHorizonActivation(id, horizonNumber)
+    return getElementByID(id.."HA"..tostring(horizonNumber))
+end

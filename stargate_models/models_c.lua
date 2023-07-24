@@ -30,6 +30,9 @@ function loadModels(player)
 	for i=1,6 do
 		modelID = loadModel("object", "models/"..tostring(i)..".txd", "models/"..tostring(i)..".dff", "collisions/"..tostring(i)..".col")
 		setElementData(player, "models_gate_milkyway_horizon_"..tostring(i), modelID)
+
+		modelID = loadModel("object", "models/act"..tostring(i)..".txd", "models/act"..tostring(i)..".dff")
+		setElementData(player, "models_gate_milkyway_horizon_activation_"..tostring(i), modelID)
 	end
 
 	initModels(player)
@@ -57,6 +60,8 @@ function initModels(player)
 
 	outputDebugString("[GATE_MODELS] Begin loading client models.")
     for i,sg in pairs(SG_MW) do
+		local x, y, z = getElementPosition(sg)
+		local rx, ry, rz = getElementRotation(sg)
         local id = stargate_getID(sg)
 		outputDebugString("[GATE_MODELS] Loading model for element '"..id.."'")
         local ring = stargate_getRingElement(id)
@@ -73,6 +78,7 @@ function initModels(player)
 		end
 		for i=1,6 do
 			setElementModel(stargate_getHorizon(id, i), getElementData(player, "models_gate_milkyway_horizon_"..tostring(i)))
+			setElementModel(stargate_getHorizonActivation(id, i), getElementData(player, "models_gate_milkyway_horizon_activation_"..tostring(i)))
 		end
     end
 
@@ -92,8 +98,10 @@ function loadModel(modelType, txdPath, dffPath, colPath)
 	engineImportTXD(txd, modelID)
 	local dff = engineLoadDFF(dffPath)
 	engineReplaceModel(dff, modelID)
-	col = engineLoadCOL(colPath)
-	engineReplaceCOL(col, modelID)
+	if col then
+		col = engineLoadCOL(colPath)
+		engineReplaceCOL(col, modelID)
+	end
 	return modelID
 end
 

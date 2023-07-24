@@ -3,10 +3,16 @@
 function stargate_horizon_create(stargateID, frame)
     local x, y, z = stargate_getPosition(stargateID)
     local horizon = createObject(1337, x, y, z)
-    setElementCollisionsEnabled(horizon, false)
+    setElementCollisionsEnabled(horizon, true)
     setElementID(horizon, stargateID.."H"..tostring(frame))
     setElementAlpha(horizon, 0)
     attachElements(horizon, getElementByID(stargateID))
+
+    local horizonActivation = createObject(1337, x, y, z)
+    setElementCollisionsEnabled(horizonActivation, false)
+    setElementID(horizonActivation, stargateID.."HA"..tostring(frame))
+    setElementAlpha(horizonActivation, 0)
+    attachElements(horizonActivation, getElementByID(stargateID))
     return horizon
 end
 
@@ -30,6 +36,45 @@ function stargate_horizon_setActive(stargateID, frame, active)
     end
 end
 
+function stargate_horizon_activationAnimation(stargateID)
+    local ha = nil
+    local t = SG_HORIZON_ACTIVATE_SPEED
+
+    for i=6,1,-1 do
+        local ha = stargate_getHorizonActivation(stargateID, i)
+        setTimer(setElementAlpha, t, 1, ha, 255)
+        t = t + SG_HORIZON_ACTIVATE_SPEED
+    end
+    return t
+end
+
+function stargate_horizon_activationSet(stargateID, active)
+    if active then 
+        for i=1,6 do
+            local ha = stargate_getHorizonActivation(stargateID, i)
+            setElementAlpha(ha, 255)
+        end
+    else
+        for i=1,6 do
+            local ha = stargate_getHorizonActivation(stargateID, i)
+            setElementAlpha(ha, 0)
+        end
+    end
+end
+
+function stargate_horizon_deactivationAnimation(stargateID)
+    local ha = nil
+    local t = SG_HORIZON_ACTIVATE_SPEED
+    stargate_horizon_activationSet(stargateID, true)
+    
+    for i=1,6 do
+        local ha = stargate_getHorizonActivation(stargateID, i)
+        setTimer(setElementAlpha, t, 1, ha, 0)
+        t = t + SG_HORIZON_ACTIVATE_SPEED
+    end
+    return t
+end
+
 -- animate disengaging event horizon when shutting down gate
 function stargate_horizon_animateRemove(stargateID)
     local sg = stargate_getElement(stargateID)
@@ -40,6 +85,10 @@ function stargate_horizon_animateRemove(stargateID)
             killTimer(tF)
         end
     end
+    stargate_horizon_activationSet(stargateID, true)
+    setTimer(stargate_horizon_remove, 1000, 1, stargateID)
+    setTimer(stargate_horizon_deactivationAnimation, 1750, 1, stargateID)
+    setTimer(stargate_marker_remove, 1750, 1, stargateID, enum_markerType.EVENTHORIZON)
 end
 
 function stargate_horizon_remove(stargateID)

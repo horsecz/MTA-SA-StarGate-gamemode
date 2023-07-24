@@ -33,7 +33,8 @@ end
 
 -- animate vortex-kawoosh; returns time needed for animation
 function stargate_vortex_animate(stargateID)
-    local last = 50
+    local last = 50 + stargate_horizon_activationAnimation(stargateID)
+
     for i=1,12 do
         setTimer(stargate_vortex_setActive, last, 1, stargateID, i, true)
         last = last + SG_VORTEX_ANIM_SPEED
@@ -45,6 +46,7 @@ function stargate_vortex_animate(stargateID)
     end
 
     setTimer(stargate_vortex_remove, last, 1, stargateID)
+    setTimer(stargate_horizon_activationSet, last, 1, stargateID, false)
     return last
 end
 

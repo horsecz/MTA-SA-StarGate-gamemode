@@ -28,6 +28,7 @@
     <export function="stargate_getChevron" type="shared" />
     <export function="stargate_getKawoosh" type="shared" />
     <export function="stargate_getHorizon" type="shared" />
+    <export function="stargate_getHorizonActivation" type="shared" />
 
     <export function="stargate_dial" type="server" />
     <export function="stargate_dialByID" type="server" />

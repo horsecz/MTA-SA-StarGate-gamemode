@@ -23,6 +23,7 @@ SG_WORMHOLE_OPEN_TIME = 38  -- stargate classic wormhole open time [s]; default 
 SG_VORTEX_ANIM_SPEED = 85 -- stargate vortex opening animation speed [ms]; default 115
 SG_VORTEX_ANIM_TOP_DELAY = 300 -- stargate vortex opening animation delay (when vortex is greatest) [ms]; default 200
 SG_HORIZON_ANIMATION_SPEED = 100 -- stargate horizon animation change speed [ms]; default 100; recommended 100-200
+SG_HORIZON_ACTIVATE_SPEED = 50 -- stargate horizon opening/activation speed [ms]; default 150
 SG_HORIZON_OPACITY = 65 -- stargate horizon object transparency [0-100]; default 75
 
 -- variable constants
@@ -355,9 +356,9 @@ function stargate_animateOutgoingDial(stargateID, symbol, chevron, lastChevron)
         clockWise = false
     end
     -- start rotating
-    stargate_sound_play(stargateID, enum_soundDescription.GATE_RING_ROTATE)
     stargate_ring_setRotating(stargateID, true)
     local timeTook = stargate_ring_rotateSymbols(ring, clockWise, symbolDistance)
+    setTimer(stargate_sound_play, MW_RING_SPEED, 1, stargateID, enum_soundDescription.GATE_RING_ROTATE)
     setElementData(ring, "rotationTime", MW_RING_CHEVRON_LOCK_SLOW_DELAY+timeTook+MW_RING_CHEVRON_LOCK+MW_RING_CHEVRON_LOCK_AE+MW_RING_ROTATE_PAUSE)
 
     -- top chevron after symbol reached
@@ -393,7 +394,7 @@ function stargate_diallingAnimation(stargateID, stargateDialType)
                 timer = setTimer(stargate_animateOutgoingDial, t, 1, stargateID, symbol_target, i)
             end
             setElementData(stargate_getElement(stargateID), "rot_anim_timer_"..tostring(i), timer)
-            t = t + stargate_ring_getSymbolRotationTime(symbol_f_current, symbol_target) + MW_RING_CHEVRON_LOCK_SLOW_DELAY*1.66
+            t = t + stargate_ring_getSymbolRotationTime(symbol_f_current, symbol_target) + MW_RING_CHEVRON_LOCK_SLOW_DELAY*1.5
             if i == 7 then
                 t = t - MW_RING_CHEVRON_LOCK_SLOW_DELAY/7
             end
@@ -425,7 +426,7 @@ function stargate_diallingAnimation(stargateID, stargateDialType)
             clockWise = false
         end
         -- start rotating
-        stargate_sound_play(stargateID, enum_soundDescription.GATE_RING_ROTATE)
+        setTimer(stargate_sound_play, MW_RING_SPEED*2, 1, stargateID, enum_soundDescription.GATE_RING_ROTATE)
         stargate_ring_setRotating(stargateID, true)
         local timeTook = stargate_ring_rotateSymbols(ring, clockWise, symbolDistance)
         setElementData(ring, "rotationTime", timeTook+MW_RING_CHEVRON_LOCK+MW_RING_CHEVRON_LOCK_AE+MW_RING_ROTATE_PAUSE)
@@ -436,7 +437,7 @@ function stargate_diallingAnimation(stargateID, stargateDialType)
             delay = delay + MW_FASTDIAL_CHEVRON_DELAY
         end
         setTimer(stargate_ring_setRotating, timeTook+MW_RING_CHEVRON_LOCK+MW_RING_CHEVRON_LOCK_AE+MW_RING_ROTATE_PAUSE, 1, stargateID, false)
-        setTimer(stargate_sound_stop, timeTook+MW_RING_CHEVRON_LOCK+MW_RING_CHEVRON_LOCK_AE+MW_RING_ROTATE_PAUSE, 1, stargateID, enum_soundDescription.GATE_RING_ROTATE)
+        setTimer(stargate_sound_stop, MW_RING_CHEVRON_LOCK_FAST_DELAY+timeTook+MW_RING_CHEVRON_LOCK+MW_RING_CHEVRON_LOCK_AE+MW_RING_ROTATE_PAUSE, 1, stargateID, enum_soundDescription.GATE_RING_ROTATE)
         setTimer(stargate_sound_play, timeTook+MW_RING_CHEVRON_LOCK+MW_RING_CHEVRON_LOCK_AE+MW_RING_ROTATE_PAUSE+MW_RING_CHEVRON_LOCK_FAST_DELAY, 1, stargateID, enum_soundDescription.GATE_CHEVRON_LOCK)
         t = timeTook + MW_RING_CHEVRON_LOCK+MW_RING_CHEVRON_LOCK_AE+MW_RING_ROTATE_PAUSE+ MW_WORMHOLE_CREATE_DELAY*6
     else
@@ -504,6 +505,10 @@ end
 
 function stargate_getHorizon(id, horizonNumber)
     return getElementByID(id.."H"..tostring(horizonNumber))
+end
+
+function stargate_getHorizonActivation(id, horizonNumber)
+    return getElementByID(id.."HA"..tostring(horizonNumber))
 end
 
 function stargate_isActive(stargateID)
