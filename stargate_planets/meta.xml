@@ -1,0 +1,21 @@
+<meta>
+    <min_mta_version server="1.5.8-9.20957"></min_mta_version>
+    <info type="stargate_planets" version="1.0.0"></info>
+    <script src="planets_s.lua" type="server" />
+    <script src="planets_c.lua" type="client" />
+    <script src="planets_imports_s.lua" type="server" />
+
+    <export function="planet_getPlanetElement" type="shared" />
+    <export function="planet_getDimensionPlanet" type="shared" />
+    <export function="planet_getPlanetElement" type="shared" />
+
+    <export function="planet_getPlanetDimension" type="shared" />
+    <export function="planet_getPlanetGalaxy" type="shared" />
+    <export function="planet_getPlanetName" type="shared" />
+    <export function="planet_getPlanetAtmosphere" type="shared" />
+
+    <export function="planet_setElementOccupiedPlanet" type="shared" />
+    <export function="planet_getElementOccupiedPlanet" type="shared" />
+    <export function="planet_isElementOnPlanet" type="shared" />
+
+</meta>

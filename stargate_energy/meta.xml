@@ -1,0 +1,10 @@
+<meta>
+    <min_mta_version server="1.5.8-9.20957"></min_mta_version>
+    <info type="stargate_energy" version="1.0.0"></info>
+
+    <script src="energy_s.lua" type="server" />
+    <script src="energy_device_s.lua" type="server" />
+    <script src="energy_battery_s.lua" type="server" />
+    <script src="energy_imports_s.lua" type="server" />
+
+</meta>
