@@ -4,12 +4,26 @@
 
 ## This is release branch
 
-This project - gamemode is not completed yet. When there will be *first* **final version**, it will be here, in this branch. Until then, see development branch or partial development branches. For releasing final version, the gamemode must be:
+This project - gamemode is not completed yet. When there will be *first* **final version**, it will be here, in this branch. Until then, see development branch, development-alpha or partial development branches. For releasing final version, the gamemode must be:
 - stable
 - completed
 - tested
 
 to some extent.
+
+## Branch differences
+
+- **release**
+    - best stability, only final, completed and tested features
+- **development**
+    - less stable, more new features which are mostly tested and (to some point) stable
+- **development-alpha**
+    - mostly unstable, and untested, a lot of bugs but the newest features
+- **previews**
+    - contains screenshots or recorded videos from development (for feature and progress preview)
+- **stargate_\* branches**
+    - other branches that start their name with *stargate_*
+    - partial development of every part script of this project
 
 
 # Script list
