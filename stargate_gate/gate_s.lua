@@ -109,12 +109,6 @@ function setAllStargatesIntoDevMode()
     SG_WORMHOLE_OPEN_TIME = 5  -- stargate classic wormhole open time [s]; default 38
 end
 
-function testFunc(playerSource, commandName, arg1, arg2, arg3)
-    outputChatBox("Doin nothin'")
-end
-addCommandHandler("work", testFunc)
-    
-
 -----
 ----- INIT
 -----
@@ -177,6 +171,7 @@ function stargate_create(gateType, dimension, x, y, z, address, defaultDialType,
     stargate_setForceDialType(id, forceDefaultDialType)
     stargate_addCollisions(id)
     planet_setElementOccupiedPlanet(stargate, "PLANET_"..dimension)
+    
 
     if gateType == enum_galaxy.MILKYWAY then
         stargate_ring_create(id, x, y, z, rx, ry, rz)
@@ -230,6 +225,7 @@ end
 
 function stargate_addCollisionObject(id, x, y, z, rx, ry, rz, desc)
     local collisionObject = createObject(9131, 0, 0, -1000, rx, ry, rz)
+    local stargate = stargate_getElement(id)
     setElementID(collisionObject, id.."COLOBJ."..desc)
     setElementAlpha(collisionObject, 0)
     local dimension = getElementDimension(getElementByID(id))

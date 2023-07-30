@@ -4,4 +4,7 @@
     
     <script src="ls_s.lua" type="server" />
     <script src="ls_imports_s.lua" type="server" />
+
+    <export function="lifesupport_create" type="server" />
+    <export function="lifesupport_getValues" type="server" />
 </meta>

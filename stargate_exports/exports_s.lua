@@ -29,11 +29,14 @@ function array_equal(array1, array2)
     return (table.concat(array1) == table.concat(array2))
 end
 
-function array_get(array, index)
+function array_get(array, index, resourceStop)
+    if resourceStop then
+        return nil
+    end
     if index >= 1 and index <= array_size(array) then
         return array[index]
     else
-        outputDebugString("[ARRAY_GET] Accessing value at index "..tostring(index).." in array "..tostring(array).." of size "..tostring(array_size(array)"."))
+        outputDebugString("[ARRAY_GET] Accessing value at index "..tostring(index).." in array "..tostring(array).." of size "..tostring(array_size(array).."."),2)
     end
     return nil
 end
@@ -43,7 +46,7 @@ function array_set(array, index, value)
         array[index] = value
         return true
     else
-        outputDebugString("[ARRAY_SET] Modifying value at index "..tostring(index).." in array "..tostring(array).." of size "..tostring(array_size(array)"."))
+        outputDebugString("[ARRAY_SET] Modifying value at index "..tostring(index).." in array "..tostring(array).." of size "..tostring(array_size(array).."."), 2)
     return false
     end
 end
@@ -59,7 +62,7 @@ function array_new()
 end
 
 function array_size(array)
-    if array == nil then
+    if array == nil or array == false then
         return 0
     end
     return (table.getn(array))
@@ -71,6 +74,9 @@ function array_pop(array)
 end
 
 function array_remove(array, index)
+    if array == nil or array == false then
+        return nil
+    end
     table.remove(array, index)
     return array
 end

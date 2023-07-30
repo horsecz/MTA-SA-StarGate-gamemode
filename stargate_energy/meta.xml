@@ -7,4 +7,9 @@
     <script src="energy_battery_s.lua" type="server" />
     <script src="energy_imports_s.lua" type="server" />
 
+    <export function="energy_consume" type="server" />
+    <export function="energy_produce" type="server" />
+
+    <export function="energy_device_create" type="server" />
+    <export function="energy_device_attachToElement" type="server" />
 </meta>

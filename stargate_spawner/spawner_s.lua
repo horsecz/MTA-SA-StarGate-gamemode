@@ -2,11 +2,13 @@
 
 function initServer()
     -- PLANET SPAWNER
+    global_setData("PLANET_LIST", {})
     local newPL = nil
+    local ls_stats = lifesupport_create(100, 20, 0, 1)
     newPL = planet_create(0, enum_galaxy.MILKYWAY, "San Andreas")
     newPL = planet_create(1, enum_galaxy.MILKYWAY, "Earth")
-    newPL = planet_create(6969, enum_galaxy.MILKYWAY)   -- Development planet
-    newPL = planet_create(4242, enum_galaxy.MILKYWAY)   -- Sandbox planet
+    newPL = planet_create(6969, enum_galaxy.MILKYWAY, nil, ls_stats)   -- Development planet
+    newPL = planet_create(4242, enum_galaxy.MILKYWAY, nil, ls_stats)   -- Sandbox planet
         
     -- GATE SPAWNER
     local newSG = nil

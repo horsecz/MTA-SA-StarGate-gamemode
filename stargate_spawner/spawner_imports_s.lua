@@ -7,6 +7,10 @@ function planet_create(...)
     return (exports.stargate_planets:planet_create(...))
 end
 
+function lifesupport_create(...)
+    return (exports.stargate_lifesupport:lifesupport_create(...))
+end
+
 function stargate_create(...)
     return (exports.stargate_gate:stargate_create(...))
 end

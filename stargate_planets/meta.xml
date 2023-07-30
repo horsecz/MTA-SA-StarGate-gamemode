@@ -5,6 +5,8 @@
     <script src="planets_c.lua" type="client" />
     <script src="planets_imports_s.lua" type="server" />
 
+    <export function="planet_create" type="server" />
+
     <export function="planet_getPlanetElement" type="shared" />
     <export function="planet_getDimensionPlanet" type="shared" />
     <export function="planet_getPlanetElement" type="shared" />
@@ -13,9 +15,9 @@
     <export function="planet_getPlanetGalaxy" type="shared" />
     <export function="planet_getPlanetName" type="shared" />
     <export function="planet_getPlanetAtmosphere" type="shared" />
+    <export function="planet_getPlanetCenterPosition" type="shared" />
 
     <export function="planet_setElementOccupiedPlanet" type="shared" />
     <export function="planet_getElementOccupiedPlanet" type="shared" />
     <export function="planet_isElementOnPlanet" type="shared" />
-
 </meta>

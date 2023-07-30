@@ -2,12 +2,14 @@
 
 -- apply lifesupport effects from resource start
 function lifesupport_start()
-    for i,p in ipairs(getElementsByType("player")) do
-        lifesupport_applyStatsOnElement(p)
-    end
-    for i,p in ipairs(getElementsByType("ped")) do
-        lifesupport_applyStatsOnElement(p)
-    end
+    setTimer(function()
+        for i,p in ipairs(getElementsByType("player")) do
+            lifesupport_applyStatsOnElement(p)
+        end
+        for i,p in ipairs(getElementsByType("ped")) do
+            lifesupport_applyStatsOnElement(p)
+        end
+    end, 1000, 0)
 end
 addEventHandler("onResourceStart", resourceRoot, lifesupport_start)
 
@@ -19,32 +21,57 @@ function lifesupport_applyStatsOnElement(element)
 
     local ls = lifesupport_getElementLifesupport(element)
     local o, t, tx, g = lifesupport_getValues(ls)
+    local ct = getElementData(ls, "ls_slowkill_timer")
 
     if o <= 1 then
         lifesupport_elementSlowKill(element, 1000*30, "oxygen")
+        return true
     end
     if tx >= 5 then
         lifesupport_elementSlowKill(element, 1000*300, "toxicity")
+        return true
     end
     if t > 60 then
-        if t > 150 then
+        if t > 250 then
             if getElementType(element) == "ped" or getElementType(element) == "player" then
                 killPed(element)
             else
                 destroyElement(element)
             end
+            outputChatBox("Extreme temperature! Death is immitent.", element)
         else
             lifesupport_elementSlowKill(element, 1000*120, "temperature")
         end
+        return true
     end
     if g > 3 then
-        lifesupport_elementSlowKill(element, 1000*30, "gravity")
+        lifesupport_elementSlowKill(element, 1000*10, "gravity")
+        return true
+    end
+
+    if isTimer(ct) then -- all ok, stop killing
+        killTimer(ct)
     end
 end
 
 -- slowly kills/destroys element
-function lifesupport_elementSlowKill(element, time)
-    local hmodif = getElementHealth(element) / (time/1000)
+function lifesupport_elementSlowKill(element, time, reason)
+    local ls = lifesupport_getElementLifesupport(element)
+    local ct = getElementData(ls, "ls_slowkill_timer")
+    if isTimer(ct) then
+        return true
+    end
+
+    if reason == "oxygen" then
+        outputChatBox("Dangerous levels of oxygen! You will die in 30 seconds", element)
+    elseif reason == "temperature" then
+        outputChatBox("Dangerous temperature levels! You will burn to death in 2 minutes", element)
+    elseif reason == "toxicity" then
+        outputChatBox("Toxic atmoshpere! Death in 5 minutes", element)
+    elseif reason == "gravity" then
+        outputChatBox("Extremely strong planet gravity! You die in 10 seconds", element)
+    end
+    local hmodif = math.floor(getElementHealth(element) / (time/1000))
     local t = setTimer(function(element, hmodif)
                             local h = getElementHealth(element) - hmodif
                             setElementHealth(element, h)
@@ -54,12 +81,6 @@ function lifesupport_elementSlowKill(element, time)
                                 end
                             end
                         end, 1000, time/1000, element, hmodif)
-    local ls = lifesupport_getElementLifesupport(element)
-    local ct = getElementData(ls, "ls_slowkill_timer")
-
-    if not ct == nil then
-        killTimer(ct)
-    end
     setElementData(ls, "ls_slowkill_timer", t)    
 end
 
@@ -92,6 +113,7 @@ function lifesupport_create(oxygen, temperature, toxicity, gravity)
     setElementData(ls, "gravity", gravity)
     setElementData(ls, "temperature", temperature)
     setElementData(ls, "toxicity", toxicity)
+    --outputDebugString("[LS] Created lifesupport element with values ("..tostring(oxygen)..","..tostring(temperature)..","..tostring(toxicity)..","..tostring(gravity)..")")
     return ls
 end
 
@@ -191,7 +213,8 @@ function lifesupport_getElementLifesupport(element)
 end
 
 function lifesupport_hasElementLifesupportStats(element)
-    if getElementData(element, "lifesupport") == nil then
+    local ls = getElementData(element, "lifesupport")
+    if ls == nil or ls == false then
         return false
     else
         return true

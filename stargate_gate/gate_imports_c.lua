@@ -13,3 +13,15 @@ addEventHandler("onServerCallsClientFunction", resourceRoot, callClientFunction)
 function setElementModelClient(...)
     return (exports.stargate_models:setElementModelClient(...))
 end
+
+function planet_getElementOccupiedPlanet(...)
+    return (exports.stargate_planets:planet_getElementOccupiedPlanet(...))
+end
+
+function planet_setElementOccupiedPlanet(...)
+    return (exports.stargate_planets:planet_setElementOccupiedPlanet(...))
+end
+
+function planet_getPlanetDimension(...)
+    return (exports.stargate_planets:planet_getPlanetDimension(...))
+end

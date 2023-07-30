@@ -1,7 +1,7 @@
 # TO BE DONE GLOBALLY
 
 All:
-- Test lastest changes related to _lifesupport; _planets and _energy creation
+- Test lastest changes related to _energy creation
 
 Focus features at stargate_gate:
 - Iris (or Atlantis gate shield)

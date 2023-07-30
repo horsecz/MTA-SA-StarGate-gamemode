@@ -3,7 +3,7 @@
 function stargate_horizon_create(stargateID, frame)
     local x, y, z = stargate_getPosition(stargateID)
     local horizon = createObject(1337, x, y, z)
-    setElementCollisionsEnabled(horizon, true)
+    setElementCollisionsEnabled(horizon, false)
     setElementID(horizon, stargateID.."H"..tostring(frame))
     setElementAlpha(horizon, 0)
     local planet = planet_getElementOccupiedPlanet(stargate_getElement(stargateID))

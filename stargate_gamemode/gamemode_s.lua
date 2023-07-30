@@ -2,7 +2,9 @@ RESOURCE_STOP = false
 
 function onPlayerSpawn(x, y, z, r, temp1, temp2, temp3, dimension)
     setElementAlpha(source, 255)
-    planet_setElementOccupiedPlanet(source, "PLANET_0", true)
+    if not RESOURCE_STOP then
+        planet_setElementOccupiedPlanet(source, "PLANET_6969", true)
+    end
 end
 addEventHandler ( "onPlayerSpawn", getRootElement(), onPlayerSpawn)
 
@@ -27,12 +29,12 @@ end
 addEventHandler( "onPlayerJoin", getRootElement(), onPlayerJoin)
 
 function onPlayerLeave()
-    local PLAYERS_JOINED = global_getData("var_players_joined")
     if not RESOURCE_STOP then
+        local PLAYERS_JOINED = global_getData("var_players_joined")
         local id = tonumber(getElementID(source))
-        PLAYERS_JOINED = array_remove(PLAYERS_JOINED, array_get(PLAYERS_JOINED, id))
+        PLAYERS_JOINED = array_remove(PLAYERS_JOINED, array_get(PLAYERS_JOINED, id, true))
+        global_setData("var_players_joined", PLAYERS_JOINED)
     end
-    global_setData("var_players_joined", PLAYERS_JOINED)
 end
 addEventHandler( "onPlayerQuit", getRootElement(), onPlayerLeave)
 

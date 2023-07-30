@@ -119,7 +119,8 @@ function stargate_wormhole_transport(hitElement)
             end
             setElementPosition(hitElement, x2, y2, z2)
             setElementRotation(hitElement, erx, ery, rz)
-            planet_setElementOccupiedPlanet(hitElement, planet_getElementOccupiedPlanet(stargate_getElement(stargateIDTo)), true)
+            local planet = planet_getElementOccupiedPlanet(stargate_getElement(stargateIDTo))
+            planet_setElementOccupiedPlanet(hitElement, planet, true)
             stargate_sound_play(stargateIDFrom, enum_soundDescription.GATE_HORIZON_TOUCH, 75)
             stargate_sound_play(stargateIDTo, enum_soundDescription.GATE_HORIZON_TOUCH, 75)
         else
