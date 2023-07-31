@@ -11,6 +11,35 @@ function callClientFunction(client, funcname, ...)
     triggerClientEvent(client, "onServerCallsClientFunction", resourceRoot, funcname, unpack(arg or {}))
 end
 
+
+
+function energy_device_create(...)
+    return (exports.stargate_energy:energy_device_create(...))
+end
+
+function energy_device_attachToElement(...)
+    return (exports.stargate_energy:energy_device_attachToElement(...))
+end
+
+function energy_device_energyRequirementsMet(...)
+    return (exports.stargate_energy:energy_device_energyRequirementsMet(...))
+end
+
+function energy_device_setConsumption(...)
+    return (exports.stargate_energy:energy_device_setConsumption(...))
+end
+
+function energy_device_getMaxProduction(...)
+    return (exports.stargate_energy:energy_device_getMaxProduction(...))
+end
+
+function energy_beginTransfer(...)
+    return (exports.stargate_energy:energy_beginTransfer(...))
+end
+
+
+
+
 function planet_getElementOccupiedPlanet(...)
     return (exports.stargate_planets:planet_getElementOccupiedPlanet(...))
 end
@@ -19,9 +48,15 @@ function planet_setElementOccupiedPlanet(...)
     return (exports.stargate_planets:planet_setElementOccupiedPlanet(...))
 end
 
+
+
+
 function spawner_gateList_add(...)
     return (exports.stargate_spawner:spawner_gateList_add(...))
 end
+
+
+
 
 function array_equal(a, b)
     return (exports.stargate_exports:array_equal(a, b))

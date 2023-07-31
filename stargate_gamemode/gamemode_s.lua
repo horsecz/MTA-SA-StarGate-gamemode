@@ -54,32 +54,6 @@ function onResourceStop()
 end
 addEventHandler( "onResourceStop", resourceRoot, onResourceStop)
 
--- fake explosion
-function explosion_create(src, cmdName, type)
-    local bombTime = 5000
-    local bombDelay = 2000
-    local bombRange = 1000
-
-    local dimension = 6969
-    local x, y, z = 0, 0, 4
-
-    if type == "nuclear" or type == "stargate" then
-        setTimer(function(x, y, z, d, r)
-            for i,p in ipairs(getElementsByType("player")) do
-                if isElementInCoordinatesRange(p, x, y, z, r) and getElementDimension(p) == d then
-                    local px, py, pz = getElementPosition(p)
-                    fadeCamera(p, false, 0.3, 255, 255, 255)
-                    setElementAlpha(p, 0)
-                    setElementHealth(p, 0)
-                    createExplosion(px, py, pz, 7, p)
-                    createExplosion(px, py, pz+1, 7, p)
-                    createExplosion(px, py, pz-1, 7, p)
-                end
-            end
-        end, 100, (bombTime+bombDelay+255*10)/100, x, y, z, dimension, bombRange)
-    end
-end
-
 -- returns true/false
 -- if given element1 is in range of element2 (within specifieed radius)
 function isElementInRange(element1, element2, radius)
@@ -112,8 +86,36 @@ function isElementInCoordinatesRange(element1, x2, y2, z2, radius)
     return false
 end
 
-addCommandHandler("work", explosion_create)
-
 addCommandHandler("pos", function(src, cmd, x, y, z)
     setElementPosition(src, tonumber(x), tonumber(y), tonumber(z))
 end)
+
+---
+--- DOES NOT BELONG HERE
+---
+
+-- fake explosion
+function explosion_create(src, cmdName, type)
+    local bombTime = 5000
+    local bombDelay = 2000
+    local bombRange = 1000
+
+    local dimension = 6969
+    local x, y, z = 0, 0, 4
+
+    if type == "nuclear" or type == "stargate" then
+        setTimer(function(x, y, z, d, r)
+            for i,p in ipairs(getElementsByType("player")) do
+                if isElementInCoordinatesRange(p, x, y, z, r) and getElementDimension(p) == d then
+                    local px, py, pz = getElementPosition(p)
+                    fadeCamera(p, false, 0.3, 255, 255, 255)
+                    setElementAlpha(p, 0)
+                    setElementHealth(p, 0)
+                    createExplosion(px, py, pz, 7, p)
+                    createExplosion(px, py, pz+1, 7, p)
+                    createExplosion(px, py, pz-1, 7, p)
+                end
+            end
+        end, 100, (bombTime+bombDelay+255*10)/100, x, y, z, dimension, bombRange)
+    end
+end

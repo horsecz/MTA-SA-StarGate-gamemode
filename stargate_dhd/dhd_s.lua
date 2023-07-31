@@ -1,6 +1,6 @@
 -- dhd_s.lua: Module implementing dial home device
-
--- create dhd
+DHD_ENERGY_STORAGE = 1000000
+DHD_ENERGY_PRODUCTION = 1000000
 
 -- REQUIRED PARAMETERS:
 --> type    dhd model; type
@@ -27,6 +27,7 @@ function dhd_create(type, dimension, x, y, z, rx, ry, rz, stargateID, galaxyDial
     planet_setElementOccupiedPlanet(dhd_marker, "PLANET_"..dimension)
     addEventHandler("onMarkerHit", dhd_marker, dhd_activate)
     addEventHandler("onMarkerLeave", dhd_marker, dhd_leave)
+    energy_device_create(DHD_ENERGY_STORAGE, DHD_ENERGY_PRODUCTION, DHD_ENERGY_STORAGE, dhd, 0, DHD_ENERGY_PRODUCTION, "dhd_energy_device")
 
     if not isBroken then
         isBroken = false
@@ -44,6 +45,7 @@ function dhd_create(type, dimension, x, y, z, rx, ry, rz, stargateID, galaxyDial
     if not stargateID == nil or not stargateID == false then
         dhd_attachToStargate(id, stargateID)
     end
+    setElementData(dhd, "type", type)
     setElementData(dhd, "isBroken", isBroken)
     setElementData(dhd, "isDamaged", isDamaged)
     setElementData(dhd, "canDialGalaxy", galaxyDial)
@@ -110,7 +112,7 @@ function dhd_activate(player)
         else
             --
             -- TEMPORARY :::
-            outputChatBox("[DHD] You can now dial with command: /dial [Stargate ID number]")
+            outputChatBox("["..tostring(getElementID(dhd)).."] You can now dial with command: /dial [Stargate ID number]")
             setElementData(player, "atDHD", dhd)
             addCommandHandler("dial", dhd_dialStart)
             -- TEMPORARY ^^^

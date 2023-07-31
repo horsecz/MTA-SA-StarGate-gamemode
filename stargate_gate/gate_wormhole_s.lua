@@ -2,6 +2,8 @@
 
 -- create wormhole between stargates
 function stargate_wormhole_create(stargateIDFrom, stargateIDTo)
+    energy_device_setConsumption(stargate_getEnergyElement(stargateIDFrom), GATE_ENERGY_WORMHOLE)
+    energy_device_setConsumption(stargate_getEnergyElement(stargateIDTo), GATE_ENERGY_WORMHOLE)
     stargate_setOpen(stargateIDFrom, true)
     stargate_setOpen(stargateIDTo, true)
     -- opening, vortex
@@ -36,6 +38,26 @@ function stargate_wormhole_create(stargateIDFrom, stargateIDTo)
     local closeTimer = setTimer(stargate_wormhole_close, vortexTime + SG_WORMHOLE_OPEN_TIME*1000, 1, stargateIDFrom, stargateIDTo)
     stargate_setCloseTimer(stargateIDFrom, closeTimer)
     stargate_setCloseTimer(stargateIDTo, closeTimer)
+
+    -- energy check
+    setTimer(function(stargateIDFrom, stargateIDTo)
+        local energyTimer = setTimer(stargate_wormhole_energyCheck, 1000, 0, stargateIDFrom, stargateIDTo)
+        stargate_setEnergyTimer(stargateIDFrom, energyTimer)
+    end, vortexTime+100, 1, stargateIDFrom, stargateIDTo)
+end
+
+function stargate_wormhole_energyCheck(stargateIDFrom, stargateIDTo)
+    local fE = stargate_getEnergyElement(stargateIDFrom)
+    local tE = stargate_getEnergyElement(stargateIDTo)
+    local fE_status = energy_device_energyRequirementsMet(fE)
+    local tE_status = energy_device_energyRequirementsMet(tE)
+    if fE_status == true or tE_status == true then
+        -- energy OK so is wormhole
+    else
+        killTimer(stargate_getCloseTimer(stargateIDFrom))
+        stargate_wormhole_close(stargateIDFrom, stargateIDTo)
+        outputChatBox("["..stargateIDFrom.."] Wormhole unstable due to insufficent energy! Stargate's disconnected.")
+    end
 end
 
 -- prepare for creation of wormhole between stargates; check if it is possible to connect both gates,
@@ -50,6 +72,9 @@ function stargate_wormhole_checkAvailability(stargateIDFrom, stargateIDTo)
     if stargate_isActive(stargateIDTo) or stargate_isOpen(stargateIDTo) then -- second sg dialling or open
         return enum_stargateStatus.GATE_ACTIVE
     end
+    if stargate_isOpen(stargateIDFrom) then
+        return enum_stargateStatus.DIAL_GATE_INCOMING
+    end
     if stargate_getGrounded(stargateIDTo) then
         return enum_stargateStatus.GATE_GROUNDED
     end
@@ -62,14 +87,18 @@ end
 -- 
 -- connected SG == all chevrons on outgoing SG locked/encoded & any chevron on incoming SG is locked/encoded
 function stargate_wormhole_secureConnection(stargateIDFrom, stargateIDTo)
+    local sg_en = stargate_getEnergyElement(stargateIDFrom)
     if stargate_isOpen(stargateIDTo) then -- second stargate dialed out faster
         stargate_diallingFailed(stargateIDFrom, stargateIDTo, enum_stargateStatus.GATE_OPEN)
         return nil
-    elseif stargate_isOpen(stargateIDFrom)then
+    elseif stargate_isOpen(stargateIDFrom) then
         stargate_diallingFailed(stargateIDTo, stargateIDFrom, enum_stargateStatus.GATE_OPEN)
         return nil
     elseif getElementData(stargate_getElement(stargateIDFrom), "dial_failed") then
         --stargate_diallingFailed(stargateIDFrom, stargate_getConnectionID(stargateIDFrom), enum_stargateStatus.DIAL_GATE_INCOMING_TOGATE, true)
+        return nil
+    elseif energy_device_energyRequirementsMet(sg_en) == false then
+        stargate_diallingFailed(stargateIDFrom, stargateIDTo, enum_stargateStatus.WORMHOLE_CREATE_NO_ENERGY)
         return nil
     elseif stargate_isActive(stargateIDTo) and not stargate_isOpen(stargateIDTo) then -- second stargate not open but dialling (slower)
         if stargate_getConnectionID(stargateIDTo) then
@@ -78,11 +107,33 @@ function stargate_wormhole_secureConnection(stargateIDFrom, stargateIDTo)
             setElementData(stargate_getElement(stargateIDTo), "dial_failed", true)
             for i=1,7 do
                 local t = getElementData(stargate_getElement(stargateIDTo), "rot_anim_timer_"..tostring(i))
+                local ts = getElementData(stargate_getElement(stargateIDTo), "rot_anim_timer_"..tostring(i).."_semitimers")
+                
+                if not ts == nil or not ts == false then
+                    for i,v in ipairs(ts) do
+                        if isTimer(v) then
+                            killTimer(v)
+                        end
+                    end
+                end
+
+                local ts2 = getElementData(stargate_getElement(stargateIDTo), "rot_anim_timer_semitimers")
+                if isTimer(ts2) then
+                    killTimer(ts2)
+                end
                 if isTimer(t) then
                     killTimer(t)
                 end
+                local st = getElementData(stargate_getElement(stargateIDTo), "secureTimer")
+                if isTimer(st) then
+                    killTimer(st)
+                end
+
+                stargate_sound_stop(stargateIDTo, enum_soundDescription.GATE_RING_ROTATE)
+
             end
-            GATE_OPEN_DELAY = GATE_OPEN_DELAY + 1000
+            GATE_OPEN_DELAY = GATE_OPEN_DELAY + GATE_ACTIVE_INCOMING_OPEN_DELAY
+            stargate_sound_play(stargateIDTo, enum_soundDescription.GATE_DIAL_FAIL)
         end
     end
     setTimer(stargate_setAllChevronsActive, GATE_OPEN_DELAY, 1, stargateIDTo, false, true)
@@ -136,6 +187,7 @@ end
 
 -- close active wormhole between two SGs
 function stargate_wormhole_close(stargateIDFrom, stargateIDTo)
+    killTimer(stargate_getEnergyTimer(stargateIDFrom))
     -- prepare, disable teleportation
     stargate_marker_deactivate(stargateIDFrom, enum_markerType.EVENTHORIZON)
     stargate_marker_deactivate(stargateIDTo, enum_markerType.EVENTHORIZON)
