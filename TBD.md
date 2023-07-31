@@ -1,12 +1,9 @@
 # TO BE DONE GLOBALLY
 
-All:
-- Test lastest changes related to _energy creation
-
 Focus features at stargate_gate:
+- Integration with _energy script
 - Iris (or Atlantis gate shield)
 - Support of galaxies and other gate types
-- Integration with _energy script
 
 Focus features at stargate_dhd:
 - Integration with _energy script 

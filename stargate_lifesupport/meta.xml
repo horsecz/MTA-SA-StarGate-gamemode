@@ -7,4 +7,5 @@
 
     <export function="lifesupport_create" type="server" />
     <export function="lifesupport_getValues" type="server" />
+    <export function="lifesupport_setElementLifesupport" type="server" />
 </meta>

@@ -74,7 +74,8 @@ function energy_store(energyDeviceElement, energy)
     elseif max_storage < 0 then
         result_energy = -1
     elseif storage + energy <= max_storage then
-        energy_device_transferToStorage(energyDeviceElement, result_energy)
+        result_energy = storage + energy
+        energy_device_setStorage(energyDeviceElement, result_energy)
     else
         result_energy = max_storage - storage
         energy_device_setStorage(energyDeviceElement, max_storage)

@@ -169,8 +169,8 @@ function stargate_create(gateType, dimension, x, y, z, address, defaultDialType,
     stargate_setAddress(id, address)
     stargate_setDefaultDialType(id, dt)
     stargate_setForceDialType(id, forceDefaultDialType)
-    stargate_addCollisions(id)
     planet_setElementOccupiedPlanet(stargate, "PLANET_"..dimension)
+    stargate_addCollisions(id)
     
 
     if gateType == enum_galaxy.MILKYWAY then
@@ -228,8 +228,8 @@ function stargate_addCollisionObject(id, x, y, z, rx, ry, rz, desc)
     local stargate = stargate_getElement(id)
     setElementID(collisionObject, id.."COLOBJ."..desc)
     setElementAlpha(collisionObject, 0)
-    local dimension = getElementDimension(getElementByID(id))
-    planet_setElementOccupiedPlanet(stargate, "PLANET_"..dimension)
+    local dimension = getElementDimension(stargate)
+    planet_setElementOccupiedPlanet(collisionObject, "PLANET_"..dimension)
     attachElements(collisionObject, getElementByID(id), x, y, z, rx, ry, rz)
     return collisionObject
 end

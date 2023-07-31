@@ -6,4 +6,4 @@
 - Basic connection and co-working between resources
     - DHD creates automatically enough energy for stargate to operate (not broken)
     - Gates without DHD have 0 energy unless connected somehow else
-- Test: everything
+    - OPTION: ability to enable/disable the need of energy at Stargates

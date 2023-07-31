@@ -7,6 +7,15 @@
 --> battery:    no energy production (max_production is 0)
 ---             receiving energy and storing into storage (max_storage)
 
+-- stats:
+--> production      current device production (also exists: min/max)
+--> storage         current device storage status (also exists: max)
+--> transfer_rate   how much energy can device transfer (store/send) in 1 second
+--> consumption     device consumption
+--> test_result     were energy requirements (consumption) for this device met last second? 
+---                 aka: storage > consumption last second
+---                 also: energy_device_getEnergyRequirementsTestResult(...)
+
 --- REQUIRED PARAMETERS:
 --> element to which element will be this energy element attachedTo
 --> max_storage     amount of energy device can store
@@ -40,51 +49,53 @@
 --- RETURNS:
 --> Energy device element
 function energy_device_create(max_storage, max_production, transfer_rate, sourceElement, consumption_rate, min_production, name)
-    local energyElement = createElement("energy")
-    if not min_production then
-        min_production = max_production -- currently all devices produce max_production
+    local energyElement = createElement("energy", 0)
+    local min_prod = min_produciton
+    local cons_rate = consumption_rate
+    local nam = name
+    if not min_production or min_produciton == nil or min_produciton == false then
+        min_prod = max_production -- currently all devices produce max_production
     elseif min_production > max_production then -- min_produciton cannot exceed max_production
-        min_produciton = max_production
+        min_prod = max_production
     end
-    if not consumption_rate then
-        consumption_rate = 0
+    if not consumption_rate or consumption_rate == nil or consumption_rate == false then
+        cons_rate = 0
     end
-    if not name then
-        name = nil
+    if not name or name == nil or name == false then
+        nam = nil
     end
 
     if transfer_rate > max_storage then
         transfer_rate = max_storage
     elseif transfer_rate == 0 then
-        outputDebugString("[ENERGY] New energy device (for element '"..getElementID(element)"') transfers energy at zero speed.", 2)
+        outputDebugString("[ENERGY] New energy device (for element '"..getElementID(sourceElement).."') transfers energy at zero speed.", 2)
     elseif transfer_rate < 0 then
         transfer_rate = max_storage
-        outputDebugString("[ENERGY] New energy device (for element '"..getElementID(element)"') was set to transfer energy at infinite speed (corrected to max_storage).", 2)
+        outputDebugString("[ENERGY] New energy device (for element '"..getElementID(sourceElement).."') was set to transfer energy at infinite speed (corrected to max_storage).", 2)
     end
 
-    if consumption_rate < 0 then
-        consumption_rate = max_storage
-        outputDebugString("[ENERGY] New energy device (for element '"..getElementID(element)"') was set to consume energy at infinite speed (corrected to max_storage).", 2)
-    elseif consumption_rate > max_storage then
-        consumption_rate = max_storage
+    if cons_rate < 0 then
+        cons_rate = max_storage
+        outputDebugString("[ENERGY] New energy device (for element '"..getElementID(sourceElement).."') was set to consume energy at infinite speed (corrected to max_storage).", 2)
+    elseif cons_rate > max_storage then
+        cons_rate = max_storage
     end
 
-    energy_device_setName(energyElement, name)
-    energy_device_setMinProduction(energyElement, min_production)
+    energy_device_setName(energyElement, nam)
+    energy_device_setMinProduction(energyElement, min_prod)
     energy_device_setMaxProduction(energyElement, max_production)
     energy_device_setMaxStorage(energyElement, max_storage)
-    energy_device_setProduction(energyElement, min_produciton)
+    energy_device_setProduction(energyElement, min_prod)
     energy_device_setStorage(energyElement, 0)
-    energy_device_setProductionBuffer(energyElement, 0)
     energy_device_setTransferRate(energyElement, transfer_rate)
-    energy_device_setConsumption(energyElement, consumption_rate)
-    if not max_production == 0 then
+    energy_device_setConsumption(energyElement, cons_rate)
+    if max_production > 0 then
         energy_device_startProductionTimer(energyElement)
     end
-    if not consumption_rate == 0 then
+    if cons_rate > 0 then
         energy_device_startConsumptionTimer(energyElement)
     end
-    if not sourceElement == nil then
+    if sourceElement then
         energy_device_attachToElement(sourceElement, energyElement)
     end
     return energyElement
@@ -116,10 +127,10 @@ end
 function energy_device_startConsumptionTimer(energyDevice)
     local c_timer = setTimer(function(energyDevice)
         local consumption = energy_device_getConsumption(energyDevice)
-        local r = energy_consume(energyDevice)
+        local r = energy_consume(energyDevice, consumption)
         setElementData(energyDevice, "timer_consumption_result", r)
 
-        local er_test = consumption - r
+        local er_test = r - consumption
         if r < 0 then
             er_test = 0
         end
@@ -134,13 +145,19 @@ end
 
 function energy_device_addTransferTimer(energyDevice, timer)
     local timers = energy_device_getTransferTimers(energyDevice)
-    timer = array_push(timers, timer)
+    if timers == nil or timers == false then
+        timers = {}
+    end
+    timers = array_push(timers, timer)
     setElementData(energyDevice, "array_timers", timers)
 end
 
 function energy_device_removeTransferTimer(energyDevice, timer)
     local timers = energy_device_getTransferTimers(energyDevice)
-    timer = array_remove(timers, timer)
+    if timers == nil or timers == false then
+        timers = {}
+    end
+    timers = array_remove(timers, timer)
     setElementData(energyDevice, "array_timers", timers)
 end
 
@@ -188,6 +205,11 @@ end
 
 -- checks if energy requirements for device were met
 function energy_device_energyRequirementsMet(energyDevice)
+    -- no energy consumption/requirements => automatically true
+    if energy_device_getEnergyRequirementsTestResult(energyDevice) == false or energy_device_getEnergyRequirementsTestResult(energyDevice) == nil then
+        return true
+    end
+
     if energy_device_getEnergyRequirementsTestResult(energyDevice) >= 0 then
         return true
     else

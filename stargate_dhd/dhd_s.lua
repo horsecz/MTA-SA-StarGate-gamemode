@@ -102,7 +102,7 @@ function dhd_activate(player)
     -- if source element is dhd colshape/marker
         -- open dhd gui
     local marker = getElementByID(getElementID(source))
-    if getElementData(marker, "isDHDMarker") == true then
+    if getElementData(marker, "isDHDMarker") == true and getElementDimension(marker) == getElementDimension(player) then
         local dhd = getElementData(marker, "DHD")
         if getElementData(dhd, "attachedStargate") == false or getElementData(dhd, "attachedStargate") == nil then
             outputChatBox("[DHD] Not attached to any stargate yet.")
