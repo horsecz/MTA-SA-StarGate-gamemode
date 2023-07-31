@@ -1,5 +1,10 @@
 # TO BE DONE GLOBALLY
 
+Complete to release 0.3:
+- Integrations stargate_gate; stargate_dhd with stargate_energy
+- DHD GUI
+- Optional: Stargate MilkyWay Iris
+
 Focus features at stargate_gate:
 - Integration with _energy script
 - Iris (or Atlantis gate shield)
