@@ -41,14 +41,15 @@ function dhd_create(type, dimension, x, y, z, rx, ry, rz, stargateID, galaxyDial
     if not stargateID then
         stargateID = nil
     end
-
-    if not stargateID == nil or not stargateID == false then
-        dhd_attachToStargate(id, stargateID)
-    end
     setElementData(dhd, "type", type)
     setElementData(dhd, "isBroken", isBroken)
     setElementData(dhd, "isDamaged", isDamaged)
     setElementData(dhd, "canDialGalaxy", galaxyDial)
+
+    if not stargateID == nil or not stargateID == false then
+        dhd_attachToStargate(id, stargateID)
+    end
+    
     outputDebugString("Created DHD (ID="..tostring(getElementID(dhd)).." galaxy="..tostring(type)..") at "..tostring(x)..","..tostring(y)..","..tostring(z).."")
     return dhd
 end
@@ -106,15 +107,21 @@ function dhd_activate(player)
     local marker = getElementByID(getElementID(source))
     if getElementData(marker, "isDHDMarker") == true and getElementDimension(marker) == getElementDimension(player) then
         local dhd = getElementData(marker, "DHD")
-        if getElementData(dhd, "attachedStargate") == false or getElementData(dhd, "attachedStargate") == nil then
+        local dhd_sg_id = getElementData(dhd, "attachedStargate")
+        local energy = getElementData(dhd, "energy")
+        if dhd_sg_id == false or dhd_sg_id == nil then
             outputChatBox("[DHD] Not attached to any stargate yet.")
             return nil
         else
+            local dhd_sg = getElementByID(dhd_sg_id)
+            local energy_sg = getElementData(dhd_sg, "energy")
             --
             -- TEMPORARY :::
             outputChatBox("["..tostring(getElementID(dhd)).."] You can now dial with command: /dial [Stargate ID number]")
             setElementData(player, "atDHD", dhd)
             addCommandHandler("dial", dhd_dialStart)
+            outputChatBox("[ENERGY] DHD: "..tostring(energy_device_getStorage(energy)))
+            outputChatBox("[ENERGY] SG: "..tostring(energy_device_getStorage(energy_sg)))
             -- TEMPORARY ^^^
             --
         end

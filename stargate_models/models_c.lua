@@ -35,6 +35,11 @@ function loadModels(player)
 		setElementData(player, "models_gate_milkyway_horizon_activation_"..tostring(i), modelID)
 	end
 
+	for i=1,10 do
+		modelID = loadModel("object", "models/iris.txd", "models/iris"..tostring(i)..".dff", "collisions/iris"..tostring(i)..".col")
+		setElementData(player, "models_gate_milkyway_iris_"..tostring(i), modelID)
+	end
+
 	initModels(player)
 end
 
@@ -79,6 +84,12 @@ function initModels(player)
 		for i=1,6 do
 			setElementModel(stargate_getHorizon(id, i), getElementData(player, "models_gate_milkyway_horizon_"..tostring(i)))
 			setElementModel(stargate_getHorizonActivation(id, i), getElementData(player, "models_gate_milkyway_horizon_activation_"..tostring(i)))
+		end
+
+		if stargate_hasIris(id) then
+			for i=1,10 do
+				setElementModel(stargate_getIris(id, i), getElementData(player, "models_gate_milkyway_iris_"..tostring(i)))
+			end
 		end
     end
 

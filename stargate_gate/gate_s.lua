@@ -18,14 +18,15 @@ MW_FASTDIAL_START_DELAY = 2500  -- milkyway gate fast dial begin delay [ms]; def
 MW_FASTDIAL_CHEVRON_DELAY = 1000 -- milkway gate fast dial chevron encode delay [ms]; default 1000
 
 GATE_OPEN_DELAY = 200   -- delay when stargate completed dialling and is about to open wormhole [ms]; default 200
-GATE_ACTIVE_INCOMING_OPEN_DELAY = 3000 -- stargate
+GATE_ACTIVE_INCOMING_OPEN_DELAY = 3000 -- stargate open delay when dialling out and incoming wormhole happens [ms]; default 3000
+GATE_IRIS_ACTIVATION_SPEED = 120 -- stargate milkyway iris de/activation (frame) speed [ms]; default 120
 
 -- energy values
 GATE_ENERGY_IDLE = 1
 GATE_ENERGY_DIAL = 1000
 GATE_ENERGY_WORMHOLE = 100000
 
-SG_WORMHOLE_OPEN_TIME = 38  -- stargate classic wormhole open time [s]; default 38
+SG_WORMHOLE_OPEN_TIME = 5  -- stargate classic wormhole open time [s]; default 38
 SG_VORTEX_ANIM_SPEED = 85 -- stargate vortex opening animation speed [ms]; default 115
 SG_VORTEX_ANIM_TOP_DELAY = 300 -- stargate vortex opening animation delay (when vortex is greatest) [ms]; default 200
 SG_HORIZON_ANIMATION_SPEED = 100 -- stargate horizon animation change speed [ms]; default 100; recommended 100-200
@@ -150,6 +151,8 @@ addEventHandler("clientStartedEvent", resourceRoot, initServer)
 --- sn represents one symbol on SG in number from 0 to 38 (beginning from point of origin)
 
 -- OPTIONAL PARAMETERS:
+--> irisType    type of iris on this stargate
+--- default if not specified: nil (no iris)
 --> defaultDialType refers to dial type this gate will use by default
 --- default if not specified: enum_stargateDialType.FAST
 --> rx, ry, rz gate rotation
@@ -161,7 +164,7 @@ addEventHandler("clientStartedEvent", resourceRoot, initServer)
 --- default if not specified: false or true if rx is between 240 and 300
 --> forceDefaultDialType - if this is enabled, defaultDialType will be forced
 --- default if not specified: true
-function stargate_create(gateType, dimension, x, y, z, address, defaultDialType, rx, ry, rz, isGrounded, forceDefaultDialType)
+function stargate_create(gateType, dimension, x, y, z, address, irisType, defaultDialType, rx, ry, rz, isGrounded, forceDefaultDialType)
     if not rx then
         rx = 0
     end
@@ -170,6 +173,9 @@ function stargate_create(gateType, dimension, x, y, z, address, defaultDialType,
     end
     if not rz then
         rz = 0
+    end
+    if not irisType then
+        irisType = nil
     end
     
     local dt = defaultDialType
@@ -183,7 +189,7 @@ function stargate_create(gateType, dimension, x, y, z, address, defaultDialType,
     local stargate = createObject(1337, x, y, z, rx, ry, rz)
     local id = stargate_assignID(stargate)
     local existing = stargate_convertAddressToID(id, address)
-    if not existing == false then
+    if not existing == false or not exiting == nil then
         outputDebugString("[STARGATE] Attempt to create Stargate (at "..tostring(x)..","..tostring(y)..","..tostring(z)..") with same address as existing stargate ("..existing..")")
         destroyElement(stargate)
         return nil
@@ -212,6 +218,16 @@ function stargate_create(gateType, dimension, x, y, z, address, defaultDialType,
         stargate_horizon_create(id, i)
     end
 
+    setElementData(stargate, "hasIris", false)
+    if not irisType == nil or not irisType == false then
+        setElementData(stargate, "hasIris", true)
+        -- if irisType == "sgc" then
+        for i=1,10 do
+            stargate_iris_create(id, i)
+        end
+        -- end
+    end
+
     if not isGrounded then
         isGrounded = false
     end
@@ -224,7 +240,11 @@ function stargate_create(gateType, dimension, x, y, z, address, defaultDialType,
     end
     stargate_setGrounded(id, isGrounded)
     stargate_setAssignedDHD(id, nil)
-    outputDebugString("[STARGATE] Created Stargate (ID="..tostring(getElementID(stargate)).." galaxy="..tostring(stargate_galaxy_get(id))..") at "..tostring(x)..","..tostring(y)..","..tostring(z).."")
+    local irisText = ""
+    if not (irisType == nil or irisType == false) then
+        irisText = " iris="..irisType
+    end
+    outputDebugString("[STARGATE] Created Stargate (ID="..tostring(getElementID(stargate)).." galaxy="..tostring(stargate_galaxy_get(id))..""..irisText..") at "..tostring(x)..","..tostring(y)..","..tostring(z).."")
     return stargate
 end
 
@@ -263,7 +283,11 @@ end
 -- expecting addressArray {} index represents numerical value of one symbol; indexing from 1
 -- returning ID of StarGate or false if invalid
 function stargate_convertAddressToID(id, addressArray)
-    for i, sg in pairs(stargate_galaxy_getAllElements(id)) do
+    local all_gates = stargate_galaxy_getAllElements(id)
+    if all_gates == nil then
+        return false
+    end
+    for i, sg in pairs(all_gates) do
         local sg_id = stargate_getID(sg)
         local sg_addr = stargate_getAddress(sg_id)
         if array_equal(addressArray, sg_addr) then
@@ -555,6 +579,10 @@ function stargate_getKawoosh(id, kawooshNumber)
     return getElementByID(id.."V"..tostring(kawooshNumber))
 end
 
+function stargate_getIris(id, irisNumber)
+    return getElementByID(id.."I"..tostring(irisNumber))
+end
+
 function stargate_getHorizon(id, horizonNumber)
     return getElementByID(id.."H"..tostring(horizonNumber))
 end
@@ -676,6 +704,10 @@ function stargate_getForceDialType(id)
     return (getElementData(stargate_getElement(id), "forceDialType"))
 end
 
+function stargate_hasIris(id)
+    return (getElementData(stargate_getElement(id), "hasIris"))
+end
+
 function stargate_getEnergyElement(id)
     return (getElementData(stargate_getElement(id), "energy"))
 end
@@ -684,12 +716,15 @@ function stargate_setAssignedDHD(id, v)
     if not v == nil or not v == false then
         local stargate = stargate_getElement(id)
         local dhd = getElementByID(v)
-        if not getElementData(dhd, "type") == "base" then
+        local dhdType = getElementData(dhd, "type")
+        if dhdType == enum_galaxy.MILKYWAY or dhdType == enum_galaxy.PEGASUS or dhdType == enum_galaxy.UNIVERSE then
             local sg_energy = getElementData(stargate, "energy")
             local dhd_energy = getElementData(dhd, "energy")
             local eTT = setTimer(energy_beginTransfer, 1000, 0, dhd_energy, sg_energy, GATE_ENERGY_WORMHOLE)
-        end
-        setElementData(dhd, "energy_transfer_timer", eTT)
+            setElementData(dhd, "energy_transfer_timer", eTT)
+        else
+            -- do nothing
+        end        
     end
     return (setElementData(stargate_getElement(id), "assignedDHD", v))
 end

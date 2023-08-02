@@ -87,3 +87,11 @@ end
 function stargate_getHorizonActivation(id, horizonNumber)
     return getElementByID(id.."HA"..tostring(horizonNumber))
 end
+
+function stargate_getIris(id, irisNumber)
+    return getElementByID(id.."I"..tostring(irisNumber))
+end
+
+function stargate_hasIris(id)
+    return (getElementData(stargate_getElement(id), "hasIris"))
+end

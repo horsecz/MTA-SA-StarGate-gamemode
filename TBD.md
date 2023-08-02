@@ -2,10 +2,8 @@
 
 Complete to release 0.3:
 - DHD GUI
-- Stargate MilkyWay Iris
 
 Focus features at stargate_gate:
-- Iris (or Atlantis gate shield)
 - Support of galaxies and other gate types
 
 Focus features at stargate_dhd:

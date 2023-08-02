@@ -11,7 +11,10 @@ enum_soundDescription = {
     GATE_HORIZON_TOUCH = 5,
     GATE_HORIZON = 6,
 
-    GATE_CLOSE = 7
+    GATE_CLOSE = 7,
+
+    GATE_MW_IRIS_CLOSE = 8,
+    GATE_MW_IRIS_OPEN = 9
 }
 
 -- play sound at stargate; default distance 150
@@ -41,6 +44,12 @@ function stargate_sound_convertDescription(soundDescription)
     elseif soundDescription == enum_soundDescription.GATE_CHEVRON_INCOMING then
         soundPath = "sounds/mw_chevron_incoming.mp3"
         soundAttrib = "sound_chevron_lock_incoming"
+    elseif soundDescription == enum_soundDescription.GATE_MW_IRIS_CLOSE then
+        soundPath = "sounds/mw_iris_close.mp3"
+        soundAttrib = "sound_mw_iris_close"
+    elseif soundDescription == enum_soundDescription.GATE_MW_IRIS_OPEN then
+        soundPath = "sounds/mw_iris_open.mp3"
+        soundAttrib = "sound_mw_iris_open"
     elseif soundDescription == enum_soundDescription.GATE_VORTEX_OPEN then
         soundPath = "sounds/vortex.mp3"
         soundAttrib = "sound_vortex"

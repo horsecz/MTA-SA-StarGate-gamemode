@@ -21,13 +21,13 @@ function initServer()
     global_setData("DHD_PG", {})
     global_setData("DHD_UN", {})
 
-    newSG = stargate_create(enum_galaxy.MILKYWAY, 0, 0, 0, 2.25, {15,11,9,19,25,32,39}, enum_stargateDialType.FAST, 90, 0, 0, false)
+    newSG = stargate_create(enum_galaxy.MILKYWAY, 0, 0, 0, 2.25, {15,11,9,19,25,32,39}, nil, enum_stargateDialType.FAST, 90, 0, 0, false)
     newDHD = dhd_create(enum_galaxy.MILKYWAY, 0, -2, 6, 1.7, 0, 0, 180, getElementID(newSG))
 
-    newSG = stargate_create(enum_galaxy.MILKYWAY, 6969, 20, 0, 4, {1,3,5,7,9,11,39}, enum_stargateDialType.SLOW, 0, 0, 0, false, true)
+    newSG = stargate_create(enum_galaxy.MILKYWAY, 6969, 20, 0, 4, {1,3,5,7,9,11,39}, "sgc", enum_stargateDialType.SLOW, 0, 0, 0, false, true)
     newDHD = dhd_create(enum_galaxy.MILKYWAY, 6969, 22, 6, 1.7, 0, 0, 210, getElementID(newSG))
 
-    newSG = stargate_create(enum_galaxy.MILKYWAY, 6969, -20, 0, 3, {1,2,3,4,5,6,39}, enum_stargateDialType.FAST, 45, 20, 45)
+    newSG = stargate_create(enum_galaxy.MILKYWAY, 6969, -20, 0, 3, {1,2,3,4,5,6,39}, "sgc", enum_stargateDialType.FAST, 45, 20, 45)
     newDHD = dhd_create(enum_galaxy.MILKYWAY, 6969, -20, 6, 1.7, 0, 0, 165, getElementID(newSG))
 
     newDHD = dhd_create(enum_galaxy.MILKYWAY, 6969, 10, 10, 1.7, 0, 0, 150)

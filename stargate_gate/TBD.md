@@ -1,7 +1,6 @@
 # TO BE DONE
 
 Medium priority (needed but can be skipped for now):
-- Iris (or Atlantis gate shield)
 - Support of galaxies and other gate types
     - 8th chevron; dialling to another galaxy; support of galaxies
     - 9th chevron; dialling to Destiny;
@@ -9,6 +8,7 @@ Medium priority (needed but can be skipped for now):
     - Universe gate model
 
 Lower priority (good to have):
+- (Better) collisions for stargate iris
 - Support transport of all elements
     - Supporting: Player, Ped, Vehicle, Projectile
     - Not Supporting: Weapon bullet

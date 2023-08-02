@@ -67,6 +67,18 @@
     <file src="models/Kawoosh11.dff" />
     <file src="models/Kawoosh12.dff" />
 
+    <file src="models/iris.txd" />
+    <file src="models/iris1.dff" />
+    <file src="models/iris2.dff" />
+    <file src="models/iris3.dff" />
+    <file src="models/iris4.dff" />
+    <file src="models/iris5.dff" />
+    <file src="models/iris6.dff" />
+    <file src="models/iris7.dff" />
+    <file src="models/iris8.dff" />
+    <file src="models/iris9.dff" />
+    <file src="models/iris10.dff" />
+
     <file src="collisions/Kawoosh1.col" />
     <file src="collisions/Kawoosh2.col" />
     <file src="collisions/Kawoosh3.col" />
@@ -79,6 +91,17 @@
     <file src="collisions/Kawoosh10.col" />
     <file src="collisions/Kawoosh11.col" />
     <file src="collisions/Kawoosh12.col" />
+
+    <file src="collisions/iris1.col" />
+    <file src="collisions/iris2.col" />
+    <file src="collisions/iris3.col" />
+    <file src="collisions/iris4.col" />
+    <file src="collisions/iris5.col" />
+    <file src="collisions/iris6.col" />
+    <file src="collisions/iris7.col" />
+    <file src="collisions/iris8.col" />
+    <file src="collisions/iris9.col" />
+    <file src="collisions/iris10.col" />
 
     <file src="collisions/mw.col" />
     <file src="collisions/dhd.col" />

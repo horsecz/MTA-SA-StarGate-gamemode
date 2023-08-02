@@ -2,21 +2,28 @@
 
 -- create wormhole between stargates
 function stargate_wormhole_create(stargateIDFrom, stargateIDTo)
-    energy_device_setConsumption(stargate_getEnergyElement(stargateIDFrom), GATE_ENERGY_WORMHOLE)
-    energy_device_setConsumption(stargate_getEnergyElement(stargateIDTo), GATE_ENERGY_WORMHOLE)
     stargate_setOpen(stargateIDFrom, true)
     stargate_setOpen(stargateIDTo, true)
+    energy_device_setConsumption(stargate_getEnergyElement(stargateIDFrom), GATE_ENERGY_WORMHOLE)
+    energy_device_setConsumption(stargate_getEnergyElement(stargateIDTo), GATE_ENERGY_WORMHOLE)
     -- opening, vortex
     stargate_sound_play(stargateIDFrom, enum_soundDescription.GATE_VORTEX_OPEN)
     stargate_sound_play(stargateIDTo, enum_soundDescription.GATE_VORTEX_OPEN)
     stargate_vortex_animate(stargateIDFrom)
     local vortexTime = stargate_vortex_animate(stargateIDTo)
-    local killZoneF = stargate_marker_create(x, y, z, "corona", 3.4, 25, 90 , 200, 10, enum_markerType.VORTEX, stargateIDFrom)
-    local killZoneT = stargate_marker_create(x, y, z, "corona", 3.4, 25, 90 , 200, 10, enum_markerType.VORTEX, stargateIDTo)
-    attachElements(killZoneF, getElementByID(stargateIDFrom))
-    attachElements(killZoneT, getElementByID(stargateIDTo))
-    setElementAttachedOffsets(killZoneF, 0, 2.3, 0)
-    setElementAttachedOffsets(killZoneT, 0, 2.3, 0)
+    local killZoneF = nil
+    local killZoneT = nil
+
+    if stargate_iris_isActive(stargateIDFrom) == false or stargate_iris_isActive(stargateIDTo) == nil then
+        local killZoneF = stargate_marker_create(0, 0, -1000, "corona", 3.4, 20, 90 , 250, 10, enum_markerType.VORTEX, stargateIDFrom)
+        attachElements(killZoneF, getElementByID(stargateIDFrom))
+        setElementAttachedOffsets(killZoneF, 0, 2.3, 0)
+    end
+    if stargate_iris_isActive(stargateIDTo) == false or stargate_iris_isActive(stargateIDTo) == nil then
+        local killZoneT = stargate_marker_create(0, 0, -1000, "corona", 3.4, 20, 90 , 250, 10, enum_markerType.VORTEX, stargateIDTo)
+        attachElements(killZoneT, getElementByID(stargateIDTo))
+        setElementAttachedOffsets(killZoneT, 0, 2.3, 0)
+    end
 
     -- horizon
     setTimer(stargate_horizon_setActive, vortexTime, 1, stargateIDFrom, 0, false)
@@ -33,6 +40,13 @@ function stargate_wormhole_create(stargateIDFrom, stargateIDTo)
     local x, y, z = stargate_getPosition(stargateIDTo)
     local rpm = stargate_marker_create(x, y, z, "corona", 2, 25, 90, 200, 190, enum_markerType.EVENTHORIZON, stargateIDTo)
     setElementData(rpm, "incoming", true)
+
+    if stargate_iris_isActive(stargateIDFrom) then
+        setElementAlpha(tpm, 0)
+    end
+    if stargate_iris_isActive(stargateIDTo) then
+        setElementAlpha(rpm, 0)
+    end
 
     -- autoclose in 38/given seconds
     local closeTimer = setTimer(stargate_wormhole_close, vortexTime + SG_WORMHOLE_OPEN_TIME*1000, 1, stargateIDFrom, stargateIDTo)
@@ -139,14 +153,17 @@ function stargate_wormhole_secureConnection(stargateIDFrom, stargateIDTo)
     setTimer(stargate_setAllChevronsActive, GATE_OPEN_DELAY, 1, stargateIDTo, false, true)
     setTimer(stargate_setConnectionID, GATE_OPEN_DELAY, 1, stargateIDTo, stargateIDFrom)
     setTimer(stargate_setActive, GATE_OPEN_DELAY, 1, stargateIDTo, true)
+    setTimer(stargate_setIncomingStatus, GATE_OPEN_DELAY, 1, stargateIDTo, true)
     setTimer(stargate_wormhole_create, GATE_OPEN_DELAY + MW_WORMHOLE_CREATE_DELAY, 1, stargateIDFrom, stargateIDTo)
 end
 
 -- teleport function for stargate horizon markers; source = marker
 function stargate_wormhole_transport(hitElement)
     if stargate_marker_isEventHorizon(source) and getElementDimension(hitElement) == getElementDimension(source) then
+        local stargateIDFrom = stargate_marker_getSource(source)
         if getElementData(source, "active") == false then -- closing gate
             setElementAlpha(hitElement, 0)
+            outputChatBox("["..stargateIDFrom.."] Unstable event horizon killed you!")
             if getElementType(hitElement) == "ped" or getElementType(hitElement) == "player" then
                 killPed(hitElement) -- stargate open but (active and) horizon marker is present = unstable vortex still present
             else
@@ -158,9 +175,22 @@ function stargate_wormhole_transport(hitElement)
         if getElementData(source, "incoming") == true then -- incoming gate wont teleport 
             return true
         end
-        local stargateIDFrom = stargate_marker_getSource(source)
         if stargate_isOpen(stargateIDFrom) then
+            if stargate_iris_isActive(stargateIDFrom) then
+                return true
+            end
             local stargateIDTo = stargate_getConnectionID(stargateIDFrom)
+            if stargate_iris_isActive(stargateIDTo) then
+                setElementAlpha(hitElement, 0)
+                if getElementType(hitElement) == "ped" or getElementType(hitElement) == "player" then
+                    killPed(hitElement) -- stargate open but (active and) horizon marker is present = unstable vortex still present
+                else
+                    destroyElement(hitElement)
+                end
+                outputChatBox("["..stargateIDFrom.."] Destination stargate has active Iris! You have died in wormhole.")
+                return true
+            end
+
             local x2, y2, z2 = stargate_getPosition(stargateIDTo)
             local rx, ry, rz = stargate_getRotation(stargateIDTo)
             local erx, ery, erz = getElementRotation(hitElement)
@@ -208,6 +238,7 @@ function stargate_wormhole_close(stargateIDFrom, stargateIDTo)
         stargate_setActive(stargateIDTo, false)
         stargate_setOpen(stargateIDFrom, false)
         stargate_setOpen(stargateIDTo, false)
+        stargate_setIncomingStatus(stargateIDTo, false)
         setElementData(stargate_getElement(stargateIDFrom), "dial_failed", false)
         setElementData(stargate_getElement(stargateIDTo), "dial_failed", false)
     end, 3000, 1, stargateIDFrom, stargateIDTo)

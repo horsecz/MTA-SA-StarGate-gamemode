@@ -44,6 +44,21 @@ function stargate_marker_deactivate(stargateID, markerFunction)
     return setElementData(stargate_marker_get(stargateID, markerFunction), "active", false)
 end
 
+function stargate_marker_setActive(stargateID, markerFunction, active)
+    return setElementData(stargate_marker_get(stargateID, markerFunction), "active", active)
+end
+
+function stargate_marker_setHidden(stargateID, markerFunction, hidden)
+    local a = 255
+    if hidden == false then
+        a = 0
+    elseif hidden == true then
+        a = 255
+    end
+    setElementAlpha(stargate_marker_get(stargateID, markerFunction), a)
+    return 
+end
+
 function stargate_marker_isEventHorizon(marker)
     if getElementData(marker, "isHorizon") == nil then
         return false

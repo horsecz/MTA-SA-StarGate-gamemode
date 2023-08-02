@@ -54,3 +54,11 @@ end
 function stargate_getHorizonActivation(...)
     return (exports.stargate_gate:stargate_getHorizonActivation(...))
 end
+
+function stargate_getIris(...)
+    return (exports.stargate_gate:stargate_getIris(...))
+end
+
+function stargate_hasIris(...)
+    return (exports.stargate_gate:stargate_hasIris(...))
+end
