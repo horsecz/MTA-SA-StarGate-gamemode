@@ -26,7 +26,7 @@ GATE_ENERGY_IDLE = 1
 GATE_ENERGY_DIAL = 1000
 GATE_ENERGY_WORMHOLE = 100000
 
-SG_WORMHOLE_OPEN_TIME = 5  -- stargate classic wormhole open time [s]; default 38
+SG_WORMHOLE_OPEN_TIME = 38  -- stargate classic wormhole open time [s]; default 38
 SG_VORTEX_ANIM_SPEED = 85 -- stargate vortex opening animation speed [ms]; default 115
 SG_VORTEX_ANIM_TOP_DELAY = 300 -- stargate vortex opening animation delay (when vortex is greatest) [ms]; default 200
 SG_HORIZON_ANIMATION_SPEED = 100 -- stargate horizon animation change speed [ms]; default 100; recommended 100-200
@@ -204,6 +204,7 @@ function stargate_create(gateType, dimension, x, y, z, address, irisType, defaul
     
 
     if gateType == enum_galaxy.MILKYWAY then
+        models_setElementModelAttribute(stargate, "innerring")
         stargate_ring_create(id, x, y, z, rx, ry, rz)
         stargate_galaxy_set(id, "milkyway")
     end
@@ -232,12 +233,13 @@ function stargate_create(gateType, dimension, x, y, z, address, irisType, defaul
         isGrounded = false
     end
 
-    if not isGrounded then
+    if isGrounded == nil then
         isGrounded = false
         if rx > 240 and rx < 300 then
             isGrounded = true
         end
     end
+
     stargate_setGrounded(id, isGrounded)
     stargate_setAssignedDHD(id, nil)
     local irisText = ""
@@ -388,7 +390,8 @@ function stargate_diallingFailed(stargateIDFrom, stargateIDTo, reason, dontPlayS
         stargate_sound_play(id, enum_soundDescription.GATE_DIAL_FAIL)
     end
     
-    setTimer(stargate_setAllChevronsActive, MW_DIAL_FAIL_CHVRN_DELAY, 1, id, false, false)
+    local t = setTimer(stargate_setAllChevronsActive, MW_DIAL_FAIL_CHVRN_DELAY, 1, id, false, false)
+    setElementData(stargate_getElement(id), "timer_shutdownChevrons", t)
     stargate_setDialAddress(id, nil)
     stargate_setActive(id, false)
     energy_device_setConsumption(stargate_getEnergyElement(id), GATE_ENERGY_IDLE)

@@ -3,7 +3,12 @@
 -- create wormhole between stargates
 function stargate_wormhole_create(stargateIDFrom, stargateIDTo)
     stargate_setOpen(stargateIDFrom, true)
-    stargate_setOpen(stargateIDTo, true)
+    if stargate_isOpen(stargateIDTo) then
+        outputDebugString("[STARGATE] HANDLED RARE CASE: Both stargates (F:"..stargateIDFrom..", T:"..stargateIDTo..") dialed themselves at the same time. Stargate T did not create wormhole.")
+        return false
+    else
+        stargate_setOpen(stargateIDTo, true)
+    end
     energy_device_setConsumption(stargate_getEnergyElement(stargateIDFrom), GATE_ENERGY_WORMHOLE)
     energy_device_setConsumption(stargate_getEnergyElement(stargateIDTo), GATE_ENERGY_WORMHOLE)
     -- opening, vortex
@@ -119,6 +124,9 @@ function stargate_wormhole_secureConnection(stargateIDFrom, stargateIDTo)
             stargate_setDialAddress(stargateIDTo, nil)
             stargate_diallingFailed(stargateIDFrom, stargateIDTo, enum_stargateStatus.DIAL_GATE_INCOMING, true)
             setElementData(stargate_getElement(stargateIDTo), "dial_failed", true)
+            if isTimer(getElementData(stargate_getElement(stargateIDTo), "timer_shutdownChevrons")) then
+                killTimer(getElementData(stargate_getElement(stargateIDTo), "timer_shutdownChevrons"))
+            end
             for i=1,7 do
                 local t = getElementData(stargate_getElement(stargateIDTo), "rot_anim_timer_"..tostring(i))
                 local ts = getElementData(stargate_getElement(stargateIDTo), "rot_anim_timer_"..tostring(i).."_semitimers")

@@ -2,6 +2,7 @@
 
 function stargate_vortex_create(stargateID, frame)
     local vortex = createObject(1337, x, y, z)
+    models_setElementModelAttribute(vortex, "Kawoosh"..tostring(frame))
     setElementID(vortex, stargateID.."V"..tostring(frame))
     setElementCollisionsEnabled(vortex, false)
     setElementAlpha(vortex, 0)

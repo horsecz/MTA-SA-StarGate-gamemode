@@ -23,8 +23,16 @@ function array_size(...)
     return (exports.stargate_exports:array_size(...))
 end
 
+function array_push(...)
+    return (exports.stargate_exports:array_push(...))
+end
+
 function global_getData(...)
     return (exports.stargate_exports:global_getData(...))
+end
+
+function global_setData(...)
+    return (exports.stargate_exports:global_setData(...))
 end
 
 function stargate_getID(...)

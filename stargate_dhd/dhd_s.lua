@@ -18,6 +18,7 @@ DHD_ENERGY_PRODUCTION = 1000000
 --- default if not specified: false
 function dhd_create(type, dimension, x, y, z, rx, ry, rz, stargateID, galaxyDial, isBroken, isDamaged)
     local dhd = createObject(1337, x, y, z, rx, ry, rz)
+    models_setElementModelAttribute(dhd, "dhd")
     local id = dhd_assignID(dhd, type)
     local dhd_marker = createMarker(x, y, z+1, "corona", 1.7, 0, 0, 0, 0)
     setElementID(dhd_marker, id.."_EM")

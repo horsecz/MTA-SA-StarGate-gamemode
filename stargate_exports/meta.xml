@@ -12,6 +12,9 @@
     <export function="global_setData" type="shared" />
     <export function="global_removeData" type="shared" />
 
+    <export function="models_setElementModelAttribute" type="shared" />
+	<export function="models_getElementModelAttribute" type="shared" />
+
     <export function="array_get" type="shared" />
     <export function="array_set" type="shared" />
     <export function="array_new" type="shared" />

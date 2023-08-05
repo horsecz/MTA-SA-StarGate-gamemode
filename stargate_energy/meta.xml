@@ -20,6 +20,8 @@
     <export function="energy_device_getConsumption" type="shared" />
 
     <export function="energy_device_setConsumption" type="shared" />
+    <export function="energy_device_setStorage" type="shared" />
+    <export function="energy_device_setProduction" type="shared" />
     <export function="energy_device_setMaxProduction" type="shared" />
     <export function="energy_device_setName" type="shared" />
 

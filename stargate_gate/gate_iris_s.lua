@@ -3,6 +3,7 @@
 function stargate_iris_create(stargateID, frame)
     local x, y, z = stargate_getPosition(stargateID)
     local iris = createObject(1337, x, y, z)
+    models_setElementModelAttribute(iris, "iris"..tostring(frame))
     setElementCollisionsEnabled(iris, false)
     setElementID(iris, stargateID.."I"..tostring(frame))
     setElementAlpha(iris, 0)

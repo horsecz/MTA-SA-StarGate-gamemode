@@ -21,6 +21,20 @@ end
 
 ---
 ---
+--- stargate_models
+---
+---
+
+function models_setElementModelAttribute(element, modelDescription)
+	setElementData(element, "element_model_data", modelDescription)
+end
+
+function models_getElementModelAttribute(element)
+	return getElementData(element, "element_model_data")
+end
+
+---
+---
 --- Array functions
 --- 
 ---

@@ -2,6 +2,15 @@
 
 enum_galaxy = (exports.stargate_gate:import_enum_galaxy())
 
+
+function models_getElementModelAttribute(...)
+    return (exports.stargate_exports:models_getElementModelAttribute(...))
+end
+
+function models_setElementModelAttribute(...)
+    return (exports.stargate_exports:models_setElementModelAttribute(...))
+end
+
 function energy_device_create(...)
     return (exports.stargate_energy:energy_device_create(...))
 end

@@ -10,6 +10,14 @@ end
 addEvent("onServerCallsClientFunction", true)
 addEventHandler("onServerCallsClientFunction", resourceRoot, callClientFunction)
 
+function models_getElementModelAttribute(...)
+    return (exports.stargate_exports:models_getElementModelAttribute(...))
+end
+
+function models_setElementModelAttribute(...)
+    return (exports.stargate_exports:models_setElementModelAttribute(...))
+end
+
 function setElementModelClient(...)
     return (exports.stargate_models:setElementModelClient(...))
 end

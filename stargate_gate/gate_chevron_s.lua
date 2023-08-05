@@ -4,6 +4,7 @@
 function stargate_chevron_create(stargateID, chevron)
     local x, y, z = stargate_getPosition(stargateID)
     local newChevron = createObject(1337, x, y, z)
+    models_setElementModelAttribute(newChevron, "chevs"..tostring(chevron))
     local chevronID = stargate_chevron_assignID(newChevron, stargateID, chevron)
     setElementData(newChevron, "number", chevron)
     setElementData(newChevron, "active", false)
