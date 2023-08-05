@@ -4,11 +4,15 @@
 function stargate_chevron_create(stargateID, chevron)
     local x, y, z = stargate_getPosition(stargateID)
     local newChevron = createObject(1337, x, y, z)
+    models_setElementModelAttribute(newChevron, "chevs"..tostring(chevron))
     local chevronID = stargate_chevron_assignID(newChevron, stargateID, chevron)
     setElementData(newChevron, "number", chevron)
     setElementData(newChevron, "active", false)
-    setElementCollisionsEnabled(newChevron, true)
+    setElementCollisionsEnabled(newChevron, false)
     setElementAlpha(newChevron, 0)
+    local sg = stargate_getElement(stargateID)
+    local planet = planet_getElementOccupiedPlanet(sg)
+    planet_setElementOccupiedPlanet(newChevron, planet)
     attachElements(newChevron, getElementByID(stargateID))
     return newChevron
 end

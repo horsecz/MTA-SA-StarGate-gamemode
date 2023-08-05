@@ -64,6 +64,10 @@ function stargate_getID(stargate)
     return (getElementID(stargate))
 end
 
+function stargate_getElement(stargateID)
+    return (getElementByID(stargateID))
+end
+
 function stargate_getRingElement(id)
     return (stargate_ring_getElement(id.."R"))
 end
@@ -82,4 +86,12 @@ end
 
 function stargate_getHorizonActivation(id, horizonNumber)
     return getElementByID(id.."HA"..tostring(horizonNumber))
+end
+
+function stargate_getIris(id, irisNumber)
+    return getElementByID(id.."I"..tostring(irisNumber))
+end
+
+function stargate_hasIris(id)
+    return (getElementData(stargate_getElement(id), "hasIris"))
 end

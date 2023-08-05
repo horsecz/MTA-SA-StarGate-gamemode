@@ -1,5 +1,21 @@
 -- imports_s.lua: Importing functions from other gate_* resources
 
+function planet_setElementOccupiedPlanet(...)
+    return (exports.stargate_planets:planet_setElementOccupiedPlanet(...))
+end
+
+function lifesupport_create(...)
+    return (exports.stargate_lifesupport:lifesupport_create(...))
+end
+
+function lifesupport_setElementLifesupport(...)
+    return (exports.stargate_lifesupport:lifesupport_setElementLifesupport(...))
+end
+
+function array_push(...)
+    return (exports.stargate_exports:array_push(...))
+end
+
 function array_push(...)
     return (exports.stargate_exports:array_push(...))
 end

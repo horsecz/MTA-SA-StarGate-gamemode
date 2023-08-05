@@ -3,6 +3,11 @@
 -- plays3d sound from server
 function playSound3DFromServerSG(stargateID, soundpath, x, y, z, distance, soundAttrib)
 	local s = playSound3D(soundpath, x, y, z)
+	local planet = planet_getElementOccupiedPlanet(stargate_getElement(stargateID))
+	setElementDimension(s, planet_getPlanetDimension(planet)) -- need to use immediately
+    planet_setElementOccupiedPlanet(s, planet)		
+
+
 	if distance then
 		setSoundMaxDistance(s, distance)
 	else
@@ -14,6 +19,8 @@ function playSound3DFromServerSG(stargateID, soundpath, x, y, z, distance, sound
 		local beginSoundLength = getSoundLength(s)*1000
 		local continueRotationSound = setTimer(function(stargateID, distance)
 			local ls = playSound3D("sounds/mw_ring_rotate.mp3", x, y, z)
+			setElementDimension(ls, planet_getPlanetDimension(planet)) -- need to use immediately
+			planet_setElementOccupiedPlanet(ls, planet)		
 			setSoundMaxDistance(ls, distance)
 			setElementData(getElementByID(stargateID), "sound_ring_rotate_long", ls)
 		end
@@ -27,7 +34,7 @@ addEventHandler("clientPlaySound3D", root, playSound3DFromServerSG)
 -- stops sound from server
 function stopSoundFromServerSG(stargateID, soundAttribute)
 	local sound = getElementData(getElementByID(stargateID), soundAttribute)
-	if isElement(sound) and getElemenType(sound) == "sound" then
+	if isElement(sound) and getElementType(sound) == "sound" then
 		stopSound(sound)
 	end
 	if soundAttribute == "sound_ring_rotate" then

@@ -1,0 +1,29 @@
+<meta>
+    <min_mta_version server="1.5.8-9.20957"></min_mta_version>
+    <info type="stargate_energy" version="1.0.0"></info>
+
+    <script src="energy_s.lua" type="server" />
+    <script src="energy_device_s.lua" type="server" />
+    <script src="energy_device_c.lua" type="client" />
+    <script src="energy_battery_s.lua" type="server" />
+    <script src="energy_imports_s.lua" type="server" />
+
+    <export function="energy_device_create" type="server" />
+    <export function="energy_device_attachToElement" type="server" />
+    <export function="energy_device_energyRequirementsMet" type="server" />
+
+    <export function="energy_device_getMaxStorage" type="shared" />
+    <export function="energy_device_getMaxProduction" type="shared" />
+    <export function="energy_device_getStorage" type="shared" />
+    <export function="energy_device_getProduction" type="shared" />
+    <export function="energy_device_getTransferRate" type="shared" />
+    <export function="energy_device_getConsumption" type="shared" />
+
+    <export function="energy_device_setConsumption" type="shared" />
+    <export function="energy_device_setStorage" type="shared" />
+    <export function="energy_device_setProduction" type="shared" />
+    <export function="energy_device_setMaxProduction" type="shared" />
+    <export function="energy_device_setName" type="shared" />
+
+    <export function="energy_beginTransfer" type="server" />
+</meta>

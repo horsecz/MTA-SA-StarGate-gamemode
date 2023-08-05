@@ -1,0 +1,7 @@
+# Stargate PLANETS script
+
+Script for creating planets (as in dimensions). Every game dimension represents one planet. Each planet has its unique parameters, map, time, atmosphere - life support, ...
+
+# To be done
+
+- none

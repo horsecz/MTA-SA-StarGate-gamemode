@@ -1,6 +1,6 @@
 -- dhd_s.lua: Module implementing dial home device
-
--- create dhd
+DHD_ENERGY_STORAGE = 1000000
+DHD_ENERGY_PRODUCTION = 1000000
 
 -- REQUIRED PARAMETERS:
 --> type    dhd model; type
@@ -16,15 +16,19 @@
 --- default if not specified: false
 --> isDamaged   is DHD damaged? (able to dial, receive, but wormhole is unstable)
 --- default if not specified: false
-function dhd_create(type, x, y, z, rx, ry, rz, stargateID, galaxyDial, isBroken, isDamaged)
+function dhd_create(type, dimension, x, y, z, rx, ry, rz, stargateID, galaxyDial, isBroken, isDamaged)
     local dhd = createObject(1337, x, y, z, rx, ry, rz)
+    models_setElementModelAttribute(dhd, "dhd")
     local id = dhd_assignID(dhd, type)
     local dhd_marker = createMarker(x, y, z+1, "corona", 1.7, 0, 0, 0, 0)
     setElementID(dhd_marker, id.."_EM")
     setElementData(dhd_marker, "isDHDMarker", true)
     setElementData(dhd_marker, "DHD", dhd)
+    planet_setElementOccupiedPlanet(dhd, "PLANET_"..dimension)
+    planet_setElementOccupiedPlanet(dhd_marker, "PLANET_"..dimension)
     addEventHandler("onMarkerHit", dhd_marker, dhd_activate)
     addEventHandler("onMarkerLeave", dhd_marker, dhd_leave)
+    energy_device_create(DHD_ENERGY_STORAGE, DHD_ENERGY_PRODUCTION, DHD_ENERGY_STORAGE, dhd, 0, DHD_ENERGY_PRODUCTION, "dhd_energy_device")
 
     if not isBroken then
         isBroken = false
@@ -38,13 +42,15 @@ function dhd_create(type, x, y, z, rx, ry, rz, stargateID, galaxyDial, isBroken,
     if not stargateID then
         stargateID = nil
     end
+    setElementData(dhd, "type", type)
+    setElementData(dhd, "isBroken", isBroken)
+    setElementData(dhd, "isDamaged", isDamaged)
+    setElementData(dhd, "canDialGalaxy", galaxyDial)
 
     if not stargateID == nil or not stargateID == false then
         dhd_attachToStargate(id, stargateID)
     end
-    setElementData(dhd, "isBroken", isBroken)
-    setElementData(dhd, "isDamaged", isDamaged)
-    setElementData(dhd, "canDialGalaxy", galaxyDial)
+    
     outputDebugString("Created DHD (ID="..tostring(getElementID(dhd)).." galaxy="..tostring(type)..") at "..tostring(x)..","..tostring(y)..","..tostring(z).."")
     return dhd
 end
@@ -100,17 +106,23 @@ function dhd_activate(player)
     -- if source element is dhd colshape/marker
         -- open dhd gui
     local marker = getElementByID(getElementID(source))
-    if getElementData(marker, "isDHDMarker") == true then
+    if getElementData(marker, "isDHDMarker") == true and getElementDimension(marker) == getElementDimension(player) then
         local dhd = getElementData(marker, "DHD")
-        if getElementData(dhd, "attachedStargate") == false or getElementData(dhd, "attachedStargate") == nil then
+        local dhd_sg_id = getElementData(dhd, "attachedStargate")
+        local energy = getElementData(dhd, "energy")
+        if dhd_sg_id == false or dhd_sg_id == nil then
             outputChatBox("[DHD] Not attached to any stargate yet.")
             return nil
         else
+            local dhd_sg = getElementByID(dhd_sg_id)
+            local energy_sg = getElementData(dhd_sg, "energy")
             --
             -- TEMPORARY :::
-            outputChatBox("[DHD] You can now dial with command: /dial [Stargate ID number]")
+            outputChatBox("["..tostring(getElementID(dhd)).."] You can now dial with command: /dial [Stargate ID number]")
             setElementData(player, "atDHD", dhd)
             addCommandHandler("dial", dhd_dialStart)
+            outputChatBox("[ENERGY] DHD: "..tostring(energy_device_getStorage(energy)))
+            outputChatBox("[ENERGY] SG: "..tostring(energy_device_getStorage(energy_sg)))
             -- TEMPORARY ^^^
             --
         end

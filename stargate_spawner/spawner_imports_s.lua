@@ -3,6 +3,14 @@
 enum_galaxy = (exports.stargate_gate:import_enum_galaxy())
 enum_stargateDialType = (exports.stargate_gate:import_enum_stargateDialType())
 
+function planet_create(...)
+    return (exports.stargate_planets:planet_create(...))
+end
+
+function lifesupport_create(...)
+    return (exports.stargate_lifesupport:lifesupport_create(...))
+end
+
 function stargate_create(...)
     return (exports.stargate_gate:stargate_create(...))
 end

@@ -3,15 +3,21 @@
 function stargate_horizon_create(stargateID, frame)
     local x, y, z = stargate_getPosition(stargateID)
     local horizon = createObject(1337, x, y, z)
-    setElementCollisionsEnabled(horizon, true)
+    models_setElementModelAttribute(horizon, tostring(frame))
+    setElementCollisionsEnabled(horizon, false)
     setElementID(horizon, stargateID.."H"..tostring(frame))
     setElementAlpha(horizon, 0)
+    local planet = planet_getElementOccupiedPlanet(stargate_getElement(stargateID))
+    planet_setElementOccupiedPlanet(horizon, planet)
     attachElements(horizon, getElementByID(stargateID))
 
     local horizonActivation = createObject(1337, x, y, z)
+    models_setElementModelAttribute(horizonActivation, "act"..tostring(frame))
     setElementCollisionsEnabled(horizonActivation, false)
     setElementID(horizonActivation, stargateID.."HA"..tostring(frame))
     setElementAlpha(horizonActivation, 0)
+    local planet = planet_getElementOccupiedPlanet(stargate_getElement(stargateID))
+    planet_setElementOccupiedPlanet(horizonActivation, planet)
     attachElements(horizonActivation, getElementByID(stargateID))
     return horizon
 end

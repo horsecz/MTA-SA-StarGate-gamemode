@@ -17,7 +17,14 @@ MW_DIAL_FAIL_CHVRN_DELAY = 3000 -- milkyway gate chevrons turn off delay after d
 MW_FASTDIAL_START_DELAY = 2500  -- milkyway gate fast dial begin delay [ms]; default 2500
 MW_FASTDIAL_CHEVRON_DELAY = 1000 -- milkway gate fast dial chevron encode delay [ms]; default 1000
 
-GATE_OPEN_DELAY = 200
+GATE_OPEN_DELAY = 200   -- delay when stargate completed dialling and is about to open wormhole [ms]; default 200
+GATE_ACTIVE_INCOMING_OPEN_DELAY = 3000 -- stargate open delay when dialling out and incoming wormhole happens [ms]; default 3000
+GATE_IRIS_ACTIVATION_SPEED = 120 -- stargate milkyway iris de/activation (frame) speed [ms]; default 120
+
+-- energy values
+GATE_ENERGY_IDLE = 1
+GATE_ENERGY_DIAL = 1000
+GATE_ENERGY_WORMHOLE = 100000
 
 SG_WORMHOLE_OPEN_TIME = 38  -- stargate classic wormhole open time [s]; default 38
 SG_VORTEX_ANIM_SPEED = 85 -- stargate vortex opening animation speed [ms]; default 115
@@ -42,6 +49,7 @@ function import_enum_markerType()
 end
 
 enum_stargateStatus = {
+    DIAL_NO_ENERGY = -6,
     DIAL_SELF = -5,
     DIAL_GATE_INCOMING_TOGATE = -4,
     DIAL_GATE_INCOMING = -3,
@@ -52,7 +60,10 @@ enum_stargateStatus = {
     GATE_ACTIVE = 1,
     GATE_OPEN = 2,
     GATE_DISABLED = 3,
-    GATE_GROUNDED = 4
+    GATE_GROUNDED = 4,
+
+    WORMHOLE_NO_ENERGY = 5,
+    WORMHOLE_CREATE_NO_ENERGY = 6
 }
 
 function import_enum_stargateStatus()
@@ -78,6 +89,12 @@ function enum_stargateStatus.toString(v)
         return "Incoming wormhole"
     elseif v == enum_stargateStatus.DIAL_GATE_INCOMING_TOGATE then
         return "Incoming wormhole (fromgate)"
+    elseif v == enum_stargateStatus.DIAL_NO_ENERGY then
+        return "Not enough energy to dial"
+    elseif v == enum_stargateStatus.WORMHOLE_NO_ENERGY then
+        return "Not enough energy to maintain wormhole"
+    elseif v == enum_stargateStatus.WORMHOLE_CREATE_NO_ENERGY then
+        return "Not enough energy to estabilish wormhole"
     elseif v == enum_stargateStatus.DIAL_SELF then
         return "Dialed itself"    
     end
@@ -109,12 +126,6 @@ function setAllStargatesIntoDevMode()
     SG_WORMHOLE_OPEN_TIME = 5  -- stargate classic wormhole open time [s]; default 38
 end
 
-function testFunc(playerSource, commandName, arg1, arg2, arg3)
-    outputChatBox("Doin nothin'")
-end
-addCommandHandler("work", testFunc)
-    
-
 -----
 ----- INIT
 -----
@@ -140,6 +151,8 @@ addEventHandler("clientStartedEvent", resourceRoot, initServer)
 --- sn represents one symbol on SG in number from 0 to 38 (beginning from point of origin)
 
 -- OPTIONAL PARAMETERS:
+--> irisType    type of iris on this stargate
+--- default if not specified: nil (no iris)
 --> defaultDialType refers to dial type this gate will use by default
 --- default if not specified: enum_stargateDialType.FAST
 --> rx, ry, rz gate rotation
@@ -151,7 +164,7 @@ addEventHandler("clientStartedEvent", resourceRoot, initServer)
 --- default if not specified: false or true if rx is between 240 and 300
 --> forceDefaultDialType - if this is enabled, defaultDialType will be forced
 --- default if not specified: true
-function stargate_create(gateType, x, y, z, address, defaultDialType, rx, ry, rz, isGrounded, forceDefaultDialType)
+function stargate_create(gateType, dimension, x, y, z, address, irisType, defaultDialType, rx, ry, rz, isGrounded, forceDefaultDialType)
     if not rx then
         rx = 0
     end
@@ -160,6 +173,9 @@ function stargate_create(gateType, x, y, z, address, defaultDialType, rx, ry, rz
     end
     if not rz then
         rz = 0
+    end
+    if not irisType then
+        irisType = nil
     end
     
     local dt = defaultDialType
@@ -172,12 +188,23 @@ function stargate_create(gateType, x, y, z, address, defaultDialType, rx, ry, rz
 
     local stargate = createObject(1337, x, y, z, rx, ry, rz)
     local id = stargate_assignID(stargate)
+    local existing = stargate_convertAddressToID(id, address)
+    if not existing == false or not exiting == nil then
+        outputDebugString("[STARGATE] Attempt to create Stargate (at "..tostring(x)..","..tostring(y)..","..tostring(z)..") with same address as existing stargate ("..existing..")")
+        destroyElement(stargate)
+        return nil
+    end
+
     stargate_setAddress(id, address)
     stargate_setDefaultDialType(id, dt)
     stargate_setForceDialType(id, forceDefaultDialType)
+    energy_device_create(GATE_ENERGY_WORMHOLE, 0, GATE_ENERGY_WORMHOLE, stargate, GATE_ENERGY_IDLE, 0, "stargate_energy_device")
+    planet_setElementOccupiedPlanet(stargate, "PLANET_"..dimension)
     stargate_addCollisions(id)
+    
 
     if gateType == enum_galaxy.MILKYWAY then
+        models_setElementModelAttribute(stargate, "innerring")
         stargate_ring_create(id, x, y, z, rx, ry, rz)
         stargate_galaxy_set(id, "milkyway")
     end
@@ -192,19 +219,34 @@ function stargate_create(gateType, x, y, z, address, defaultDialType, rx, ry, rz
         stargate_horizon_create(id, i)
     end
 
+    setElementData(stargate, "hasIris", false)
+    if not irisType == nil or not irisType == false then
+        setElementData(stargate, "hasIris", true)
+        -- if irisType == "sgc" then
+        for i=1,10 do
+            stargate_iris_create(id, i)
+        end
+        -- end
+    end
+
     if not isGrounded then
         isGrounded = false
     end
 
-    if not isGrounded then
+    if isGrounded == nil then
         isGrounded = false
         if rx > 240 and rx < 300 then
             isGrounded = true
         end
     end
+
     stargate_setGrounded(id, isGrounded)
     stargate_setAssignedDHD(id, nil)
-    outputDebugString("Created Stargate (ID="..tostring(getElementID(stargate)).." galaxy="..tostring(stargate_galaxy_get(id))..") at "..tostring(x)..","..tostring(y)..","..tostring(z).."")
+    local irisText = ""
+    if not (irisType == nil or irisType == false) then
+        irisText = " iris="..irisType
+    end
+    outputDebugString("[STARGATE] Created Stargate (ID="..tostring(getElementID(stargate)).." galaxy="..tostring(stargate_galaxy_get(id))..""..irisText..") at "..tostring(x)..","..tostring(y)..","..tostring(z).."")
     return stargate
 end
 
@@ -229,8 +271,11 @@ end
 
 function stargate_addCollisionObject(id, x, y, z, rx, ry, rz, desc)
     local collisionObject = createObject(9131, 0, 0, -1000, rx, ry, rz)
+    local stargate = stargate_getElement(id)
     setElementID(collisionObject, id.."COLOBJ."..desc)
     setElementAlpha(collisionObject, 0)
+    local dimension = getElementDimension(stargate)
+    planet_setElementOccupiedPlanet(collisionObject, "PLANET_"..dimension)
     attachElements(collisionObject, getElementByID(id), x, y, z, rx, ry, rz)
     return collisionObject
 end
@@ -240,7 +285,11 @@ end
 -- expecting addressArray {} index represents numerical value of one symbol; indexing from 1
 -- returning ID of StarGate or false if invalid
 function stargate_convertAddressToID(id, addressArray)
-    for i, sg in pairs(stargate_galaxy_getAllElements(id)) do
+    local all_gates = stargate_galaxy_getAllElements(id)
+    if all_gates == nil then
+        return false
+    end
+    for i, sg in pairs(all_gates) do
         local sg_id = stargate_getID(sg)
         local sg_addr = stargate_getAddress(sg_id)
         if array_equal(addressArray, sg_addr) then
@@ -268,6 +317,11 @@ end
 -- returns true if ok; false if stargate is already active (and wont dial)
 function stargate_dial(stargateIDFrom, addressArray, stargateDialType)
     local stargateIDTo = stargate_convertAddressToID(stargateIDFrom, addressArray)
+    local sg_energy = stargate_getEnergyElement(stargateIDFrom)
+    if energy_device_energyRequirementsMet(sg_energy) == false then
+        stargate_diallingFailed(stargateIDFrom, stargateIDTo, enum_stargateStatus.DIAL_NO_ENERGY, false)
+        return false
+    end
 
     if stargate_isActive(stargateIDFrom) then
         outputChatBox("[STARGATE ("..stargateIDFrom..")]: WHOA! I wont dial, im doing something rn!")
@@ -291,6 +345,7 @@ function stargate_dial(stargateIDFrom, addressArray, stargateDialType)
         return false
     end
 
+    energy_device_setConsumption(stargate_getEnergyElement(stargateIDFrom), GATE_ENERGY_DIAL)
     stargate_setConnectionID(stargateIDFrom, stargateIDTo)
     if stargateIDTo then -- may success
         local result = stargate_wormhole_checkAvailability(stargateIDFrom, stargateIDTo)
@@ -300,8 +355,11 @@ function stargate_dial(stargateIDFrom, addressArray, stargateDialType)
             setTimer(stargate_diallingFailed, totalTime+MW_WORMHOLE_CREATE_DELAY, 1, stargateIDFrom, stargateIDTo, result)
         elseif result == enum_stargateStatus.DIAL_SELF then
             setTimer(stargate_diallingFailed, totalTime+MW_WORMHOLE_CREATE_DELAY, 1, stargateIDFrom, stargateIDTo, result)
+        elseif result == enum_stargateStatus.DIAL_GATE_INCOMING then
+            -- dont do anything
         else
-            setTimer(stargate_wormhole_secureConnection, totalTime, 1, stargateIDFrom, stargateIDTo)
+            local anotherTimer = setTimer(stargate_wormhole_secureConnection, totalTime, 1, stargateIDFrom, stargateIDTo)
+            setElementData(stargate_getElement(stargateIDFrom), "secureTimer", anotherTimer)
         end
     else -- will surely fail
         setTimer(stargate_diallingFailed, totalTime, 1, stargateIDFrom, stargateIDTo, enum_stargateStatus.DIAL_UNKNOWN_ADDRESS)
@@ -318,6 +376,9 @@ end
 
 -- dial failed
 function stargate_diallingFailed(stargateIDFrom, stargateIDTo, reason, dontPlaySound)
+    if stargate_isOpen(stargateIDFrom) then
+        return nil
+    end
     local id = stargateIDFrom
     local arrow = "to"
     if reason == enum_stargateStatus.DIAL_GATE_INCOMING then
@@ -329,9 +390,11 @@ function stargate_diallingFailed(stargateIDFrom, stargateIDTo, reason, dontPlayS
         stargate_sound_play(id, enum_soundDescription.GATE_DIAL_FAIL)
     end
     
-    setTimer(stargate_setAllChevronsActive, MW_DIAL_FAIL_CHVRN_DELAY, 1, id, false, false)
+    local t = setTimer(stargate_setAllChevronsActive, MW_DIAL_FAIL_CHVRN_DELAY, 1, id, false, false)
+    setElementData(stargate_getElement(id), "timer_shutdownChevrons", t)
     stargate_setDialAddress(id, nil)
     stargate_setActive(id, false)
+    energy_device_setConsumption(stargate_getEnergyElement(id), GATE_ENERGY_IDLE)
     outputChatBox("[STARGATE ("..tostring(stargateIDFrom)..")] Dialling "..arrow.." "..tostring(stargateIDTo).." failed. ("..enum_stargateStatus.toString(reason)..")")
 end
 
@@ -342,6 +405,8 @@ end
 
 -- milkyway gate ring rotation
 function stargate_animateOutgoingDial(stargateID, symbol, chevron, lastChevron)
+    local t = {}
+    local tm = nil
     local ring = stargate_getRingElement(stargateID)
     local stargate = stargate_getElement(stargateID)
     local x, y, z, rx, ry, rz = getElementAttachedOffsets(ring)
@@ -358,19 +423,25 @@ function stargate_animateOutgoingDial(stargateID, symbol, chevron, lastChevron)
     -- start rotating
     stargate_ring_setRotating(stargateID, true)
     local timeTook = stargate_ring_rotateSymbols(ring, clockWise, symbolDistance)
-    setTimer(stargate_sound_play, MW_RING_SPEED, 1, stargateID, enum_soundDescription.GATE_RING_ROTATE)
+    tm = setTimer(stargate_sound_play, MW_RING_SPEED, 1, stargateID, enum_soundDescription.GATE_RING_ROTATE)
     setElementData(ring, "rotationTime", MW_RING_CHEVRON_LOCK_SLOW_DELAY+timeTook+MW_RING_CHEVRON_LOCK+MW_RING_CHEVRON_LOCK_AE+MW_RING_ROTATE_PAUSE)
-
+    t = array_push(t, tm)
     -- top chevron after symbol reached
-    setTimer(stargate_chevron_setActive, MW_RING_CHEVRON_LOCK_SLOW_DELAY+timeTook, 1, stargateID, 7, true)
+    tm = setTimer(stargate_chevron_setActive, MW_RING_CHEVRON_LOCK_SLOW_DELAY+timeTook, 1, stargateID, 7, true)
+    t = array_push(t, tm)
     if not lastChevron then
-        setTimer(stargate_chevron_setActive, MW_RING_CHEVRON_LOCK_SLOW_DELAY+timeTook+MW_RING_CHEVRON_LOCK+MW_RING_CHEVRON_LOCK_AE, 1, stargateID, 7, false)
-        setTimer(stargate_chevron_setActive, MW_RING_CHEVRON_LOCK_SLOW_DELAY+timeTook+MW_RING_CHEVRON_LOCK, 1, stargateID, chevron, true)
+        tm = setTimer(stargate_chevron_setActive, MW_RING_CHEVRON_LOCK_SLOW_DELAY+timeTook+MW_RING_CHEVRON_LOCK+MW_RING_CHEVRON_LOCK_AE, 1, stargateID, 7, false)
+        t = array_push(t, tm)
+        tm = setTimer(stargate_chevron_setActive, MW_RING_CHEVRON_LOCK_SLOW_DELAY+timeTook+MW_RING_CHEVRON_LOCK, 1, stargateID, chevron, true)
+        t = array_push(t, tm)
     end
     -- engaged chevron after symbol reached
-    setTimer(stargate_ring_setRotating, MW_RING_CHEVRON_LOCK_SLOW_DELAY+timeTook+MW_RING_CHEVRON_LOCK+MW_RING_CHEVRON_LOCK_AE+MW_RING_ROTATE_PAUSE, 1, stargateID, false)
+    tm = setTimer(stargate_ring_setRotating, MW_RING_CHEVRON_LOCK_SLOW_DELAY+timeTook+MW_RING_CHEVRON_LOCK+MW_RING_CHEVRON_LOCK_AE+MW_RING_ROTATE_PAUSE, 1, stargateID, false)
+    t = array_push(t, tm)
     setTimer(stargate_sound_stop, MW_RING_CHEVRON_LOCK_SLOW_DELAY+timeTook, 1, stargateID, enum_soundDescription.GATE_RING_ROTATE)
-    setTimer(stargate_sound_play, MW_RING_CHEVRON_LOCK_SLOW_DELAY+timeTook, 1, stargateID, enum_soundDescription.GATE_CHEVRON_LOCK)
+    tm = setTimer(stargate_sound_play, MW_RING_CHEVRON_LOCK_SLOW_DELAY+timeTook, 1, stargateID, enum_soundDescription.GATE_CHEVRON_LOCK)
+    t = array_push(t, tm)
+    setElementData(stargate, "rot_anim_timer_"..tostring(chevron).."_semitimers", t)
 end
 
 -- stargate address dialling animation
@@ -425,20 +496,28 @@ function stargate_diallingAnimation(stargateID, stargateDialType)
             symbolDistance = currentSymbol-symbol
             clockWise = false
         end
+        local t_arr = {}
+        local tm = nil
         -- start rotating
-        setTimer(stargate_sound_play, MW_RING_SPEED*2, 1, stargateID, enum_soundDescription.GATE_RING_ROTATE)
+        tm = setTimer(stargate_sound_play, MW_RING_SPEED*2, 1, stargateID, enum_soundDescription.GATE_RING_ROTATE)
+        t_arr = array_push(t_arr, tm)
         stargate_ring_setRotating(stargateID, true)
         local timeTook = stargate_ring_rotateSymbols(ring, clockWise, symbolDistance)
         setElementData(ring, "rotationTime", timeTook+MW_RING_CHEVRON_LOCK+MW_RING_CHEVRON_LOCK_AE+MW_RING_ROTATE_PAUSE)
     
         local delay = MW_FASTDIAL_START_DELAY
         for i=1,7 do
-            setTimer(stargate_chevron_setActive, delay, 1, stargateID, i, true, true)
+            tm = setTimer(stargate_chevron_setActive, delay, 1, stargateID, i, true, true)
+            t_arr = array_push(t_arr, tm)
             delay = delay + MW_FASTDIAL_CHEVRON_DELAY
         end
-        setTimer(stargate_ring_setRotating, timeTook+MW_RING_CHEVRON_LOCK+MW_RING_CHEVRON_LOCK_AE+MW_RING_ROTATE_PAUSE, 1, stargateID, false)
-        setTimer(stargate_sound_stop, MW_RING_CHEVRON_LOCK_FAST_DELAY+timeTook+MW_RING_CHEVRON_LOCK+MW_RING_CHEVRON_LOCK_AE+MW_RING_ROTATE_PAUSE, 1, stargateID, enum_soundDescription.GATE_RING_ROTATE)
-        setTimer(stargate_sound_play, timeTook+MW_RING_CHEVRON_LOCK+MW_RING_CHEVRON_LOCK_AE+MW_RING_ROTATE_PAUSE+MW_RING_CHEVRON_LOCK_FAST_DELAY, 1, stargateID, enum_soundDescription.GATE_CHEVRON_LOCK)
+        tm = setTimer(stargate_ring_setRotating, timeTook+MW_RING_CHEVRON_LOCK+MW_RING_CHEVRON_LOCK_AE+MW_RING_ROTATE_PAUSE, 1, stargateID, false)
+        t_arr = array_push(t_arr, tm)
+        tm = setTimer(stargate_sound_stop, MW_RING_CHEVRON_LOCK_FAST_DELAY+timeTook+MW_RING_CHEVRON_LOCK+MW_RING_CHEVRON_LOCK_AE+MW_RING_ROTATE_PAUSE, 1, stargateID, enum_soundDescription.GATE_RING_ROTATE)
+        t_arr = array_push(t_arr, tm)
+        tm = setTimer(stargate_sound_play, timeTook+MW_RING_CHEVRON_LOCK+MW_RING_CHEVRON_LOCK_AE+MW_RING_ROTATE_PAUSE+MW_RING_CHEVRON_LOCK_FAST_DELAY, 1, stargateID, enum_soundDescription.GATE_CHEVRON_LOCK)
+        t_arr = array_push(t_arr, tm)
+        setElementData(stargate_getElement(stargateID), "rot_anim_timer_semitimers", t_arr)
         t = timeTook + MW_RING_CHEVRON_LOCK+MW_RING_CHEVRON_LOCK_AE+MW_RING_ROTATE_PAUSE+ MW_WORMHOLE_CREATE_DELAY*6
     else
         outputDebugString("Stargate "..stargateID.." tried to dial in unsupported dial mode "..tostring(stargate_dialType))
@@ -501,6 +580,10 @@ end
 
 function stargate_getKawoosh(id, kawooshNumber)
     return getElementByID(id.."V"..tostring(kawooshNumber))
+end
+
+function stargate_getIris(id, irisNumber)
+    return getElementByID(id.."I"..tostring(irisNumber))
 end
 
 function stargate_getHorizon(id, horizonNumber)
@@ -585,11 +668,19 @@ function stargate_setPosition(stargateID, nx, ny, nz)
 end
 
 function stargate_setCloseTimer(stargateID, timer)
-    setElementData(getElementByID(stargateID), "closeTimer", timer)
+    return setElementData(getElementByID(stargateID), "closeTimer", timer)
 end
 
 function stargate_getCloseTimer(stargateID)
-    getElementData(getElementByID(stargateID), "closeTimer")
+    return getElementData(getElementByID(stargateID), "closeTimer")
+end
+
+function stargate_setEnergyTimer(stargateID, timer)
+    return setElementData(getElementByID(stargateID), "energyTimer", timer)
+end
+
+function stargate_getEnergyTimer(stargateID)
+    return getElementData(getElementByID(stargateID), "energyTimer")
 end
 
 function stargate_setDefaultDialType(id, defaultDialType)
@@ -616,7 +707,28 @@ function stargate_getForceDialType(id)
     return (getElementData(stargate_getElement(id), "forceDialType"))
 end
 
+function stargate_hasIris(id)
+    return (getElementData(stargate_getElement(id), "hasIris"))
+end
+
+function stargate_getEnergyElement(id)
+    return (getElementData(stargate_getElement(id), "energy"))
+end
+
 function stargate_setAssignedDHD(id, v)
+    if not v == nil or not v == false then
+        local stargate = stargate_getElement(id)
+        local dhd = getElementByID(v)
+        local dhdType = getElementData(dhd, "type")
+        if dhdType == enum_galaxy.MILKYWAY or dhdType == enum_galaxy.PEGASUS or dhdType == enum_galaxy.UNIVERSE then
+            local sg_energy = getElementData(stargate, "energy")
+            local dhd_energy = getElementData(dhd, "energy")
+            local eTT = setTimer(energy_beginTransfer, 1000, 0, dhd_energy, sg_energy, GATE_ENERGY_WORMHOLE)
+            setElementData(dhd, "energy_transfer_timer", eTT)
+        else
+            -- do nothing
+        end        
+    end
     return (setElementData(stargate_getElement(id), "assignedDHD", v))
 end
 

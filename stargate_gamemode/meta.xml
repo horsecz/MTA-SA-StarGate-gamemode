@@ -3,12 +3,16 @@
     <info type="stargate_gamemode" version="1.0.0"></info>
 
     <script src="gamemode_s.lua" type="server" />
+    <script src="gamemode_c.lua" type="client" />
     <script src="gamemode_imports_s.lua" type="server" />
 
     <export function="import_players_joined" type="server" />
 
     <include resource="stargate_exports" />
     <include resource="stargate_gate" />
+    <include resource="stargate_energy" />
+    <include resource="stargate_lifesupport" />
+    <include resource="stargate_planets" />
     <include resource="stargate_dhd" />
     <include resource="stargate_spawner" />
     <include resource="stargate_models" />

@@ -6,16 +6,53 @@
 
 This project - gamemode is not completed yet. All scripts and parts of gamemode are gathered here, in this branch - they are tested to some extent, however they still probably have some issues, bugs and incomplete parts. Development branch can be considered as **Beta** version - somehow stable, have some (new) features, however needs more testing, fixing and implementing.
 
-Features, updates here are not the newest, but more up-to-date unlike **release** branch, which is considered to be (mostly) fully stable release. If you want the newest features, use partial development branches (beginning with *stargate_*).
+Features, updates here are not the newest, but more up-to-date unlike **release** branch, which is considered to be (mostly) fully stable release. If you want the newest features, try **development-alpha** branch.
 
+## Branch notes
+
+From this release, there will be no partial development branches *stargate_\**.
 
 # Current release
 
-- Release 0.2b
+- Release 0.3
+- Note: **Probably** last release with mostly functional-only updates (aka most of the changes are not visible)
+- **Gamemode size has been increased dramatically (to 1.4 GB) due to all Horizon of the Universe V2.0 models that are included from now on.**
 - New Features:
-    - Ehnanced stargate animations
+    - Models 
+        - Completely rewritten models script
+        - All (or atleast 99%) models from STARGATE:Horizon of the Universe V2.0 mode are contained (script size increased to 1.4 GB)
+            - not all models can be loaded now (many great TXD files [size > 15MB] fail to load)
+        - Easy loading models based on 'element_model_data' attribute
+    - Stargate Iris
+        - for MilkyWay Stargate; SGC Iris model
+        - Iris autoclose option (when incoming wormhole) and autoopen (when gate closes)
+        - If element is passing through stargate and destination gate has iris active, this element is destroyed
+    - DHD separated into default (dhd device) and base (SGC 'custom' DHD, Atlantis DHD, ...) types
+        - default DHD gives enough energy for stargate to operate (non broken DHD)
+        - base DHD gives no energy (stargate gets energy from external source instead)
+            - Note: currently no external sources are present, as well as base DHD's or SGC/Atlantis map
+    - Energy system
+        - every element can have element data "energy" with all required statuses, on which can the element change its behavior; they can produce, store or transfer energy between themselves
+        - integration with stargate and dhd scripts
+            - stargates require energy to operate
+            - dhds generate energy and transfer it to stargate (currently all dhds are non breakable => automatically work)
+            - stargates without de
+            - without enough energy stargate won't:
+                - dial out (not enough energy when started dialling)
+                - estabilish connection (not enough energy when last chevron locked)
+                - continue maintaining wormhole (not enough energy when wormhole is created)
+    - Planet system
+        - each dimension represents one planet with own atmosphere
+        - integrated with stargates, spawner, etc.
+    - Lifesupport system
+        - each player/ped has its own lifesupport stats depending on occupied planet (and its atmosphere)
+        - very basic application of lifesupport stats (dying of low oxygen/high temperature/...)
+        - integrated with planet system
+    - Bugfixes
+        - Incoming wormhole when dialling out
+        - Dialling animations and effects
+    - Player is now spawning at development "world"
 - Features:
-    - Skeleton scripts (energy, lifesupport, etc.)
     - Basic gamemode script (spawn, respawn, join)
     - Stargate element (MilkyWay model)
         - dialling, dial modes;

@@ -10,6 +10,26 @@ end
 addEvent("onServerCallsClientFunction", true)
 addEventHandler("onServerCallsClientFunction", resourceRoot, callClientFunction)
 
+function models_getElementModelAttribute(...)
+    return (exports.stargate_exports:models_getElementModelAttribute(...))
+end
+
+function models_setElementModelAttribute(...)
+    return (exports.stargate_exports:models_setElementModelAttribute(...))
+end
+
 function setElementModelClient(...)
     return (exports.stargate_models:setElementModelClient(...))
+end
+
+function planet_getElementOccupiedPlanet(...)
+    return (exports.stargate_planets:planet_getElementOccupiedPlanet(...))
+end
+
+function planet_setElementOccupiedPlanet(...)
+    return (exports.stargate_planets:planet_setElementOccupiedPlanet(...))
+end
+
+function planet_getPlanetDimension(...)
+    return (exports.stargate_planets:planet_getPlanetDimension(...))
 end

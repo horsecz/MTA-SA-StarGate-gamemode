@@ -2,9 +2,12 @@
 
 function stargate_ring_create(gateID, x, y, z, rx, ry, rz)
     local ring = createObject(1337, x, y, z, rx, ry, rz)
+    models_setElementModelAttribute(ring, "outerring")
     local sg = stargate_getElement(gateID)
     local id = stargate_ring_assignID(ring, gateID)
     setElementCollisionsEnabled(ring, false)
+    local planet = planet_getElementOccupiedPlanet(sg)
+    planet_setElementOccupiedPlanet(ring, planet)
     setElementData(ring, "rotationTime", 0)
     setElementAlpha(ring, 254)
     attachElements(ring, sg)
