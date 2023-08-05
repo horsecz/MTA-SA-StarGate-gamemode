@@ -1,33 +1,31 @@
-# TO BE DONE GLOBALLY
+# TO BE DONE
 
-Complete to release 0.3:
+## Complete to next release 0.3a
+
 - DHD GUI
 
-Focus features at stargate_gate:
-- Support of galaxies and other gate types
+## Complete to release 0.4
 
-Focus features at stargate_dhd:
-- DHD GUI, DHD base GUI
+- HOTU maps
+    - Spawned stargates/dhds
+    - Loading from IPL
+    - Handling and integration with planet system
+    - Note: *no map functionality* in *this release* (except: Stargates, DHDs)
+- San Andreas map
+    - Make spawn
+    - Complete stargate base
+    - Partial map functionality (spawn, SG base)
 
-Focus features at stargate_lifesupport:
-- Better lifesupport actions/applying stats on element
-- Optional: integration with _energy script (lifesupport devices)
+## To be done in scripts
 
-Focus features at stargate_planets:
-- More presets (needs more planets => more maps)
+Every script has its own **TBD.md** file containing what needs to be done there.
 
-Focus features at stargate_map:
-- Complete SA gate base
-    - Where spawn
-- Earth planet
-    - SGC
-    - Outside
-- Other planets ...
+## Complete skeleton scripts
 
-Make skeleton scripts real scripts:
 - stargate_rings
 
-Possible new scripts:
+## Possible new scripts
+
 - stargate_explosion
     - Handling explosions (strength)
     - Stronger explosions with effects, etc.
