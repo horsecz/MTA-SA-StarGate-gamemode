@@ -11,46 +11,34 @@ This project - gamemode is not completed yet. When there will be *first* **final
 
 to some extent.
 
+## Lastest release
+
+Branch **release** is intended for final releases. Currently there is **no final release**, however you can look up into other branches (such as *development*) - there you can find *playable* versions of this gamemode.
+
 ## Branch differences
 
 - **release**
-    - best stability, only final, completed and tested features
+    - stable
+    - may contain bugs, however it's the most tested release, so there should be minimum of them
+    - completed and complex features
+    - gamemode must be able to load, start and work without crashing client or server
+    - *this release is intended for playing and running on live server* and has full 'gamemode experience' (events, missions, map/ped/vehicle interactions, etc.)
 - **development**
-    - less stable, more new features which are mostly tested and (to some point) stable
+    - less stable than release, but still more stable than development-alpha
+    - still needs some testing
+    - new features completed (to some extent)
+    - chances of game crash or gamemode not loading is low
+    - *until first final release: this release is intended mostly for testing, there won't be any 'gamemode experience' until final release*
 - **development-alpha**
-    - mostly unstable, and untested, a lot of bugs but the newest features
+    - unstable version
+    - needs a lot of testing
+    - contains the newest features - they may be incompleted or buggy
+    - possibility of game crashing or gamemode not loading is high
+    - *this release is intended mostly for testing and development*
 - **previews**
     - contains screenshots or recorded videos from development (for feature and progress preview)
-- **stargate_\* branches**
-    - other branches that start their name with *stargate_*
-    - partial development of every part script of this project
 
 
 # Script list
 
-- stargate_energy
-    - energy creation, consumption, "factories" and ZPMs
-- stargate_exports
-    - functions that are used in all stargate_* scripts
-- stargate_gamemode
-    - resource type 'gamemode' which runs all other stargate scripts
-    - initialization, beginning
-    - run script
-    - global server and client events (player connect; join; respawn; ...), commands and actions
-- stargate_gate
-    - stargate, its physics, model(s), behavior
-    - dhd
-- stargate_lifesupport
-    - planet atmosphere
-    - oxygen, nitrogen, water, vacuum; event&actions related to LS
-- stargate_map
-    - resource type 'map' containing all maps used in this gamemode
-    - map specific scripts included
-- stargate_planets
-    - planets, dimensions, their stats (behavior, events)
-    - list of existing planets
-- stargate_rings
-    - transport rings element
-- stargate_spawner
-    - spawns all elements (stargates, rings, etc.) which can be spawned/created at gamemode start
-    - including gatespawner script
+Will be provided on final release.
