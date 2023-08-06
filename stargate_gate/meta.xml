@@ -40,7 +40,7 @@
     <export function="stargate_hasIris" type="shared" />
 
     <export function="import_enum_markerType" type="server" />
-    <export function="import_enum_galaxy" type="server" />
+    <export function="import_enum_galaxy" type="shared" />
     <export function="import_enum_stargateStatus" type="server" />
     <export function="import_enum_stargateDialType" type="server" />
     <export function="import_sg_mw" type="shared" />

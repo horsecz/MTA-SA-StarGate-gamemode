@@ -1,3 +1,5 @@
+enum_galaxy = (exports.stargate_gate:import_enum_galaxy())
+
 function callClientFunction(funcname, ...)
     local arg = { ... }
     if (arg[1]) then
@@ -23,12 +25,26 @@ function array_size(...)
     return (exports.stargate_exports:array_size(...))
 end
 
-function array_push(...)
-    return (exports.stargate_exports:array_push(...))
+function array_push(array, value)
+    if array == nil or array == {} or array == false then
+        array = {}
+        table.insert(array, 1, value)
+    else
+        table.insert(array, value)
+    end
+    return array
 end
 
 function global_getData(...)
     return (exports.stargate_exports:global_getData(...))
+end
+
+function planet_getElementOccupiedGalaxy(...)
+    return (exports.stargate_planets:planet_getElementOccupiedGalaxy(...))
+end
+
+function planet_getElementOccupiedPlanet(...)
+    return (exports.stargate_planets:planet_getElementOccupiedPlanet(...))
 end
 
 function global_setData(...)

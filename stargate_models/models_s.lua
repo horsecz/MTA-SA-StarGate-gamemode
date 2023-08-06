@@ -14,6 +14,17 @@ function models_getObjectID(playerElement, objectName)
 	return nil
 end
 
+function models_getUnloadedObjectID(playerElement, objectName)
+	local model_delayed = getElementData(playerElement, "models_delayed_load")
+	for i,tn in ipairs(model_delayed) do
+		if tn[4] == objectName then
+			return tn[5]
+		end
+	end	-- Table structure: { dffPath, txdPath, colPath, dffFileName, hotuID, size }
+	return nil
+end
+
+
 function models_getObjectHOTUID(playerElement, objectName)
 	local model_data = getElementData(playerElement, "models_data")
 	local tn_objectID = nil
@@ -36,4 +47,8 @@ end
 
 function models_getElementModelAttribute(element)
 	return getElementData(element, "element_model_data")
+end
+
+function models_load_autoPlanetModelsLoad()
+	triggerClientEvent("models_load_autoPlanetModelsLoad_event", resourceRoot)
 end

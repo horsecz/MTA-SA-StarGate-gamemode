@@ -1,6 +1,6 @@
 # TO BE DONE
 
-## Complete to next release 0.3a
+## Complete to next release 0.3b
 
 - DHD GUI
 
@@ -8,9 +8,8 @@
 
 - HOTU maps
     - Spawned stargates/dhds
-    - Loading from IPL
     - Handling and integration with planet system
-    - Note: *no map functionality* in *this release* (except: Stargates, DHDs)
+    - Note: *no map functionality* in *this release* (except: Stargates, DHDs); *maps (for ex. collisions) can be buggy in this release*
 - San Andreas map
     - Make spawn
     - Complete stargate base

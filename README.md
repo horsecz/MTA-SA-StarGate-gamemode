@@ -8,20 +8,30 @@ This project - gamemode is not completed yet. All scripts and parts of gamemode 
 
 Features, updates here are not the newest, but more up-to-date unlike **release** branch, which is considered to be (mostly) fully stable release. If you want the newest features, try **development-alpha** branch.
 
-## Branch notes
-
-From this release, there will be no partial development branches *stargate_\**.
-
 # Current release
 
-- Release 0.3
-- Note: **Probably** last release with mostly functional-only updates (aka most of the changes are not visible)
-- **Gamemode size has been increased dramatically (to 1.4 GB) due to all Horizon of the Universe V2.0 models that are included from now on.**
-- New Features:
-    - Models 
-        - Completely rewritten models script
+- Release 0.3a
+New features:
+    - Gamemode
+        - stargate_gamemode resource was changed from script type to gamemode type
+        - commands: /mypos          - outputs your current position
+                    /mypos x y z    - moves you to new coordinates based on your current position
+                    /dim d          - sets your planet/dimension to d
+                    /poselement eID - teleports you to elements position (eID = elements ID)
+    - Models
+        - Rewritten again, due to MTA SA streamer limitations
+        - Models are now loaded (and unloaded) dynamically depending on client's occupied planet instead loading all of them at server join
+            - Thanks to this, models with size > 15 MB are no longer an issue and **all models from HOTU mod can be loaded**
+    - Map
+        - Earth planet with stargate including (incompleted and buggy) SGC base model [DHD dial command: '/dial 5']
+        - Ability to generate .map file from IPL file (HOTU objects mostly) *development purposes only*
+        - Ability to generate .map file based on players surrounding objects (HOTU objects only) *development purposes only*
+        - Ability to regenerate .IPL file based on if given line contains HOTU object or not *development purposes only*
+        - Note: HOTU object is object with custom model ID from Stargate: Horizon of the Universe v2.0 mod
+        - San Andreas work in progress map is finally included in gamemode (Mount Everest base)
+Features:
+    - Models
         - All (or atleast 99%) models from STARGATE:Horizon of the Universe V2.0 mode are contained (script size increased to 1.4 GB)
-            - not all models can be loaded now (many great TXD files [size > 15MB] fail to load)
         - Easy loading models based on 'element_model_data' attribute
     - Stargate Iris
         - for MilkyWay Stargate; SGC Iris model
@@ -48,11 +58,7 @@ From this release, there will be no partial development branches *stargate_\**.
         - each player/ped has its own lifesupport stats depending on occupied planet (and its atmosphere)
         - very basic application of lifesupport stats (dying of low oxygen/high temperature/...)
         - integrated with planet system
-    - Bugfixes
-        - Incoming wormhole when dialling out
-        - Dialling animations and effects
-    - Player is now spawning at development "world"
-- Features:
+    - Player is currently spawning at development "world"
     - Basic gamemode script (spawn, respawn, join)
     - Stargate element (MilkyWay model)
         - dialling, dial modes;
@@ -63,7 +69,6 @@ From this release, there will be no partial development branches *stargate_\**.
         - attaching to gates
     - Working gatespawner; dhdspawner
     - Work in progress map (San Andreas; Stargate base) not used in gamemode yet 
-    - Global element (used for storing data across whole gamemode; both client and server)
 
 
 # Script list

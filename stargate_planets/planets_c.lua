@@ -51,6 +51,14 @@ function planet_getPlanetCenterPosition(planetID)
     return cx, cy, cz
 end
 
+function planet_isPlanet(planetID)
+    if (planet_getPlanetElement(planetID)) == false or (planet_getPlanetElement(planetID)) == nil then
+        return false
+    else
+        return true
+    end
+end
+
 
 ---
 --- ELEMENT FUNCTIONS
@@ -59,12 +67,36 @@ function planet_getElementOccupiedPlanet(element)
     return (getElementData(element, "planet_occupied"))
 end
 
+function planet_getElementOccupiedGalaxy(element)
+    local planet = planet_getElementOccupiedPlanet(element)
+    return (planet_getPlanetGalaxy(planet))
+end
+
 function planet_isElementOnPlanet(planetID, element)
     return (planet_getElementOccupiedPlanet(element) == planetID)
 end
 
-function planet_setElementOccupiedPlanet(element, planetID)
+function planet_setElementOccupiedPlanet(element, planetID, needsLs, resourceStart)
+    if not planet_isPlanet(planetID) then
+        outputDebugString("[PLANETS] Element "..getElementID(element).." was not set to nonexisting planet dimension "..planetID, 2)
+        return false
+    end
     local ls_stats = planet_getPlanetAtmosphere(planetID)
-    setElementData(element, "lifesupport", ls_stats)
+    local dimension = planet_getPlanetDimension(planetID)
+    
+    if not needsLs then
+        needsLs = false
+    end
+    if needsLs == true then
+        setElementData(element, "lifesupport", ls_stats)
+    end
     setElementData(element, "planet_occupied", planetID)
-end 
+    setElementDimension(element, dimension)
+
+    if getElementType(element) == "player" then
+        if not resourceStart then
+            models_load_autoPlanetModelsLoad()
+        end
+    end
+    return true
+end

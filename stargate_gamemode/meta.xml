@@ -1,6 +1,6 @@
 <meta>
     <min_mta_version server="1.5.8-9.20957"></min_mta_version>
-    <info type="stargate_gamemode" version="1.0.0"></info>
+    <info type="gamemode" name="stargate_gamemode" version="1.0.0"></info>
 
     <script src="gamemode_s.lua" type="server" />
     <script src="gamemode_c.lua" type="client" />
@@ -9,6 +9,7 @@
     <export function="import_players_joined" type="server" />
 
     <include resource="stargate_exports" />
+    <include resource="stargate_map" />
     <include resource="stargate_gate" />
     <include resource="stargate_energy" />
     <include resource="stargate_lifesupport" />

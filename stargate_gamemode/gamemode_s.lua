@@ -7,7 +7,7 @@ function onPlayerSpawn(x, y, z, r, temp1, temp2, temp3, dimension)
     lifesupport_setElementLifesupport(source, ls)
     
     if not RESOURCE_STOP then
-        planet_setElementOccupiedPlanet(source, "PLANET_6969", true)
+        planet_setElementOccupiedPlanet(source, "PLANET_6969", true, true)
     end
 end
 addEventHandler ( "onPlayerSpawn", getRootElement(), onPlayerSpawn)
@@ -88,6 +88,20 @@ end
 
 addCommandHandler("pos", function(src, cmd, x, y, z)
     setElementPosition(src, tonumber(x), tonumber(y), tonumber(z))
+end)
+
+addCommandHandler("dim", function(src, cmd, d)
+    planet_setElementOccupiedPlanet(src, "PLANET_"..tostring(d), true)
+end)
+
+addCommandHandler("mypos", function(src, cmd, x, y, z)
+    local cx, cy, cz = getElementPosition(src)
+    if not x then
+        outputChatBox("Your position is "..tostring(cx)..", "..tostring(cy)..", "..tostring(cz))
+        return true
+    else
+        setElementPosition(src, cx+tonumber(x), cy+tonumber(y), cz+tonumber(z))
+    end
 end)
 
 ---
