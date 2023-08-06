@@ -11,66 +11,69 @@ Features, updates here are not the newest, but more up-to-date unlike **release*
 # Current release
 
 - Release 0.3a
-- New features:
-    - Gamemode
-        - stargate_gamemode resource was changed from script type to gamemode type
-        - commands: /mypos          - outputs your current position
-                    /mypos x y z    - moves you to new coordinates based on your current position
-                    /dim d          - sets your planet/dimension to d
-                    /poselement eID - teleports you to elements position (eID = elements ID)
-    - Models
-        - Rewritten again, due to MTA SA streamer limitations
-        - Models are now loaded (and unloaded) dynamically depending on client's occupied planet instead loading all of them at server join
-            - Thanks to this, models with size > 15 MB are no longer an issue and **all models from HOTU mod can be loaded**
-    - Map
-        - Earth planet with stargate including (incompleted and buggy) SGC base model [DHD dial command: '/dial 5']
-        - Ability to generate .map file from IPL file (HOTU objects mostly) *development purposes only*
-        - Ability to generate .map file based on players surrounding objects (HOTU objects only) *development purposes only*
-        - Ability to regenerate .IPL file based on if given line contains HOTU object or not *development purposes only*
-        - Note: HOTU object is object with custom model ID from Stargate: Horizon of the Universe v2.0 mod
-        - San Andreas work in progress map is finally included in gamemode (Mount Everest base)
+- No release notes
+
+## New features
+- Gamemode
+    - stargate_gamemode resource was changed from script type to gamemode type
+    - commands: 
+        - /mypos          - outputs your current position
+        - /mypos x y z    - moves you to new coordinates based on your current position
+        - /dim d          - sets your planet/dimension to d
+        - /poselement eID - teleports you to elements position (eID = elements ID)
+- Models
+    - Rewritten again, due to MTA SA streamer limitations
+    - Models are now loaded (and unloaded) dynamically depending on client's occupied planet instead loading all of them at server join
+        - Thanks to this, models with size > 15 MB are no longer an issue and **all models from HOTU mod can be loaded**
+- Map
+    - Earth planet with stargate including (incompleted and buggy) SGC base model [DHD dial command: '/dial 5']
+    - Ability to generate .map file from IPL file (HOTU objects mostly) *development purposes only*
+    - Ability to generate .map file based on players surrounding objects (HOTU objects only) *development purposes only*
+    - Ability to regenerate .IPL file based on if given line contains HOTU object or not *development purposes only*
+    - Note: HOTU object is object with custom model ID from Stargate: Horizon of the Universe v2.0 mod
+    - San Andreas work in progress map is finally included in gamemode (Mount Everest base)
 
 ## Features
 
-    - Models
-        - All (or atleast 99%) models from STARGATE:Horizon of the Universe V2.0 mode are contained (script size increased to 1.4 GB)
-        - Easy loading models based on 'element_model_data' attribute
-    - Stargate Iris
-        - for MilkyWay Stargate; SGC Iris model
-        - Iris autoclose option (when incoming wormhole) and autoopen (when gate closes)
-        - If element is passing through stargate and destination gate has iris active, this element is destroyed
-    - DHD separated into default (dhd device) and base (SGC 'custom' DHD, Atlantis DHD, ...) types
-        - default DHD gives enough energy for stargate to operate (non broken DHD)
-        - base DHD gives no energy (stargate gets energy from external source instead)
-            - Note: currently no external sources are present, as well as base DHD's or SGC/Atlantis map
-    - Energy system
-        - every element can have element data "energy" with all required statuses, on which can the element change its behavior; they can produce, store or transfer energy between themselves
-        - integration with stargate and dhd scripts
-            - stargates require energy to operate
-            - dhds generate energy and transfer it to stargate (currently all dhds are non breakable => automatically work)
-            - stargates without de
-            - without enough energy stargate won't:
-                - dial out (not enough energy when started dialling)
-                - estabilish connection (not enough energy when last chevron locked)
-                - continue maintaining wormhole (not enough energy when wormhole is created)
-    - Planet system
-        - each dimension represents one planet with own atmosphere
-        - integrated with stargates, spawner, etc.
-    - Lifesupport system
-        - each player/ped has its own lifesupport stats depending on occupied planet (and its atmosphere)
-        - very basic application of lifesupport stats (dying of low oxygen/high temperature/...)
-        - integrated with planet system
-    - Player is currently spawning at development "world"
-    - Basic gamemode script (spawn, respawn, join)
-    - Stargate element (MilkyWay model)
-        - dialling, dial modes;
-        - animations;
-        - ability to transport all elements (except bullets from weapons)
-    - DHD element (MilkyWay model)
-        - dial ability
-        - attaching to gates
-    - Working gatespawner; dhdspawner
-    - Work in progress map (San Andreas; Stargate base) not used in gamemode yet 
+- Models
+    - All (or atleast 99%) models from STARGATE:Horizon of the Universe V2.0 mode are contained (script size increased to 1.4 GB)
+    - Easy loading models based on 'element_model_data' attribute
+- Stargate Iris
+    - for MilkyWay Stargate; SGC Iris model
+    - Iris autoclose option (when incoming wormhole) and autoopen (when gate closes)
+    - If element is passing through stargate and destination gate has iris active, this element is destroyed
+- DHD separated into default (dhd device) and base (SGC 'custom' DHD, Atlantis DHD, ...) types
+    - default DHD gives enough energy for stargate to operate (non broken DHD)
+    - base DHD gives no energy (stargate gets energy from external source instead)
+    - Note: currently no external sources are present, as well as base DHD's or SGC/Atlantis map
+- Energy system
+    - every element can have element data "energy" with all required statuses, on which can the element change its behavior; they can produce, store or transfer energy between themselves
+    - integration with stargate and dhd scripts
+        - stargates require energy to operate
+        - dhds generate energy and transfer it to stargate (currently all dhds are non breakable => automatically work)
+        - stargates without de
+        - without enough energy stargate won't:
+            - dial out (not enough energy when started dialling)
+            - estabilish connection (not enough energy when last chevron locked)
+            - continue maintaining wormhole (not enough energy when wormhole is created)
+- Planet system
+    - each dimension represents one planet with own atmosphere
+    - integrated with stargates, spawner, etc.
+- Lifesupport system
+    - each player/ped has its own lifesupport stats depending on occupied planet (and its atmosphere)
+    - very basic application of lifesupport stats (dying of low oxygen/high temperature/...)
+    - integrated with planet system
+- Player is currently spawning at development "world"
+- Basic gamemode script (spawn, respawn, join)
+- Stargate element (MilkyWay model)
+    - dialling, dial modes;
+    - animations;
+    - ability to transport all elements (except bullets from weapons)
+- DHD element (MilkyWay model)
+    - dial ability
+    - attaching to gates
+- Working gatespawner; dhdspawner
+- Work in progress map (San Andreas; Stargate base) not used in gamemode yet 
 
 
 # Script list
