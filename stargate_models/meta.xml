@@ -4,13 +4,18 @@
 
     <script src="models_s.lua" type="server"></script>
     <script src="models_c.lua" type="client"></script>
+	<script src="models_load_c.lua" type="client"></script>
     <script src="models_imports_s.lua" type="server"></script>
     <script src="models_imports_c.lua" type="client"></script>
 
     <export function="setElementModelClient" type="client" />
 	<export function="models_getObjectID" type="shared" />
+	<export function="models_loadModelManually" type="client" />
+	<export function="models_getUnloadedObjectID" type="shared" />
+	<export function="models_getObjectHOTUID" type="shared" />
 	<export function="models_setElementModelAttribute" type="shared" />
 	<export function="models_getElementModelAttribute" type="shared" />
+	<export function="models_load_autoPlanetModelsLoad" type="shared" />
 
 	<file src="files/stargate.IDE" type="client" />
 	<file src="files/objects.xml" type="server" />

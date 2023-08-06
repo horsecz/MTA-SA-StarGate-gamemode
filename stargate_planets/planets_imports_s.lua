@@ -22,3 +22,7 @@ function lifesupport_getValues(...)
     a,b,c,d = (exports.stargate_lifesupport:lifesupport_getValues(...))
     return a,b,c,d
 end
+
+function models_load_autoPlanetModelsLoad(...)
+    return (exports.stargate_models:models_load_autoPlanetModelsLoad(...))
+end

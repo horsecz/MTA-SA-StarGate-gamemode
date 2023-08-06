@@ -192,11 +192,16 @@ function planet_getElementOccupiedPlanet(element)
     return (getElementData(element, "planet_occupied"))
 end
 
+function planet_getElementOccupiedGalaxy(element)
+    local planet = planet_getElementOccupiedPlanet(element)
+    return (planet_getPlanetGalaxy(planet))
+end
+
 function planet_isElementOnPlanet(planetID, element)
     return (planet_getElementOccupiedPlanet(element) == planetID)
 end
 
-function planet_setElementOccupiedPlanet(element, planetID, needsLs)
+function planet_setElementOccupiedPlanet(element, planetID, needsLs, resourceStart)
     if not planet_isPlanet(planetID) then
         outputDebugString("[PLANETS] Element "..getElementID(element).." was not set to nonexisting planet dimension "..planetID, 2)
         return false
@@ -212,5 +217,11 @@ function planet_setElementOccupiedPlanet(element, planetID, needsLs)
     end
     setElementData(element, "planet_occupied", planetID)
     setElementDimension(element, dimension)
+
+    if getElementType(element) == "player" then
+        if not resourceStart then
+            models_load_autoPlanetModelsLoad()
+        end
+    end
     return true
 end

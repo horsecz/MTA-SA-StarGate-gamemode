@@ -4,6 +4,16 @@
 --- GLOBALS (CLIENT)
 ---
 
+enum_galaxy = {
+    MILKYWAY = 0,
+    PEGASUS = 1,
+    UNIVERSE = 2
+}
+
+function import_enum_galaxy()
+    return enum_galaxy
+end
+
 ---
 --- INIT
 ---

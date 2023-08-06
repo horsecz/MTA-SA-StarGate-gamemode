@@ -4,6 +4,10 @@ Contains all maps and its related scripts.
 
 # TODO
 
+- IPL to map
+    - implement, test
+    - what about planets?
+
 - Maps
     - Main map & lobby (San Andreas)  -> dimension 0 / planet 0 (not Earth)
     - SGC (Earth)
@@ -21,5 +25,4 @@ Contains all maps and its related scripts.
     - Other map interactions
 - Basic connection and co-working between resources
     - Spawn stargates in map worlds
- 
- 
+

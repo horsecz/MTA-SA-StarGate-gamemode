@@ -21,6 +21,7 @@ function initServer()
     global_setData("DHD_PG", {})
     global_setData("DHD_UN", {})
 
+    -- TEST
     newSG = stargate_create(enum_galaxy.MILKYWAY, 0, 0, 0, 2.25, {15,11,9,19,25,32,39}, nil, enum_stargateDialType.FAST, 90, 0, 0, false)
     newDHD = dhd_create(enum_galaxy.MILKYWAY, 0, -2, 6, 1.7, 0, 0, 180, getElementID(newSG))
 
@@ -29,11 +30,15 @@ function initServer()
     newSG = stargate_create(enum_galaxy.MILKYWAY, 6969, 20, 0, 4, {1,3,5,7,9,11,39}, "sgc", enum_stargateDialType.SLOW, 0, 0, 0, false, true)
     newDHD = dhd_create(enum_galaxy.MILKYWAY, 6969, 22, 6, 1.7, 0, 0, 210, getElementID(newSG))
 
-    newSG = stargate_create(enum_galaxy.MILKYWAY, 6969, -20, 0, 3, {1,2,3,4,5,6,39}, "sgc", enum_stargateDialType.FAST, 45, 20, 45)
+    newSG = stargate_create(enum_galaxy.MILKYWAY, 6969, -20, 0, 3, {1,2,3,4,5,6,39}, "sgc", enum_stargateDialType.INSTANT, 45, 20, 45)
     newDHD = dhd_create(enum_galaxy.MILKYWAY, 6969, -20, 6, 1.7, 0, 0, 165, getElementID(newSG))
-
     newDHD = dhd_create(enum_galaxy.MILKYWAY, 6969, 10, 10, 1.7, 0, 0, 150)
-    
+    -- TEST
+
+    -- Earth
+    newSG = stargate_create(enum_galaxy.MILKYWAY, 1, -66.228576660156, 1873.39, 2220.52, {5, 15, 9, 14, 8, 31, 39}, "sgc", enum_stargateDialType.SLOW, 0, 0, 180, false, true)
+    newDHD = dhd_create(enum_galaxy.MILKYWAY, 1, -66.386734008789, 1855.2181396484, 2217.7, 0, 0, 165, getElementID(newSG))
+
     outputDebugString("[GATE_SPAWNER] Initialized.")
     triggerEvent("gateSpawnerActive", root)
 end

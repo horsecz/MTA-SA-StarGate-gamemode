@@ -1,7 +1,10 @@
 <meta>
     <min_mta_version server="1.5.8-9.20957"></min_mta_version>
     <info type="map" version="1.0.0"></info>
-    <map src="stargate_map_main.map" dimension="0"></map>
+
+    <map src="maps/0_SA.map" dimension="0"></map>
+    <map src="maps/1_Earth.map" dimension="1" />
+
     <settings>
         <setting name="#maxplayers" value="[ 128 ]"></setting>
         <setting name="#useLODs" value="[ false ]"></setting>
@@ -13,6 +16,11 @@
         <setting name="#weather" value="[ 0 ]"></setting>
         <setting name="#time" value="12:0"></setting>
     </settings>
-    <script src="mapEditorScriptingExtension_s.lua" type="server"></script>
-    <script src="mapEditorScriptingExtension_c.lua" type="client" validate="false"></script>
+
+    <script src="map_s.lua" type="server"></script>
+    <script src="map_c.lua" type="client"></script>
+    <script src="map_imports_s.lua" type="server"></script>
+    <script src="map_imports_c.lua" type="client"></script>
+    
+    <file src="files/stargate.IPL" type="client" />
 </meta>

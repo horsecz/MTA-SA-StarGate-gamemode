@@ -19,5 +19,6 @@
 
     <export function="planet_setElementOccupiedPlanet" type="shared" />
     <export function="planet_getElementOccupiedPlanet" type="shared" />
+    <export function="planet_getElementOccupiedGalaxy" type="shared" />
     <export function="planet_isElementOnPlanet" type="shared" />
 </meta>

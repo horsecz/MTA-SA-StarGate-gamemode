@@ -13,14 +13,17 @@ function clientStarted()
 	setElementData(getLocalPlayer(), "models_data", {})
 	-- Table for saving data about object IDs and their names
 	-- MODELS table			= 	{ T1, T2, T3, ..., TN }
-		-- TN				=	{ objectID, objectName, hotuID }
+		-- TN				=	{ objectID, dffFileName, txdFileName, colFileName, hotuID }
 			-- objectID		=	model ID of object (int)
-			-- objectName	=	description name of object; dff file name (string)
+			-- dffFileName	=	description name of object; dff file name (string)
+			-- txdFileName	= 	name of txd
+			-- colFileName	=	name of collision file
 			-- hotuID		=	model ID of object in Horizon of the Universe v2.0 mod
 
 
-	local loadTime = models_load()
+	local loadTime = models_load()	-- only parses, all models have isLoaded == false
 	setTimer(models_loadObjects, loadTime, 1)
+	setTimer(models_loadCore, loadTime+1000, 1)
 end
 addEventHandler("onClientResourceStart", resourceRoot, clientStarted)
 
@@ -34,30 +37,74 @@ function clientStopped()
 end
 addEventHandler("onClientResourceStop", resourceRoot, clientStopped)
 
-function models_loadObjects()
+function models_loadCore()
+	models_load_autoPlanetModelsLoad()
+end
+
+function models_loadObjects(reload)
+	local modelsLoaded = global_getData("MODELS_LOADED")
+	if modelsLoaded == true then
+		if not reload then
+			return true
+		else
+			outputDebugString("[MODELS|C] Reloading object models.")
+		end
+	end
+
 	local model_data = nil
 	local id = nil
 	for i,object in ipairs(getElementsByType("object")) do
 		model_data = models_getElementModelAttribute(object)
 		if model_data then
-			id = models_getObjectID(getLocalPlayer(), model_data)
-			setElementModel(object, id)
+			if getElementData(object, "element_model_modelSet") == true then
+				-- model already set
+			else
+				id = models_getObjectID(getLocalPlayer(), model_data)
+				if id then
+					setElementModel(object, id)
+					local x,y,z = getElementPosition(object)
+					outputDebugString("[MODELS|C] Object element '"..tostring(getElementID(object)).." was assigned model '"..tostring(id).."'")
+					setElementData(object, "element_model_modelSet", true)
+				else
+					id = models_getUnloadedObjectID(getLocalPlayer(), model_data)
+					if id then
+						if getElementData(object, "hotu_object") == true then -- not loaded model
+							--outputDebugString("[MODELS|C] Object element '"..tostring(getElementID(object)).."' is HOTU object, but its model is not loaded.")
+						end
+					else -- not HOTU object
+						outputDebugString("[MODELS|C] Object element '"..tostring(getElementID(object)).."' has unknown objectName '"..tostring(model_data).."' and was not set new model ID.")
+					end
+				end
+			end
 		end
 	end
+	global_setData("MODELS_LOADED", true)
 end
 
-addCommandHandler("work", function(cmd, i)
-	setElementAlpha(getElementByID("SG_MW_3"..i), 255)
-	outputDebugString(tostring(getElementModel(getElementByID("SG_MW_3"..i))))
-end)
-
 -- loads model of one object
-function models_loadObjectModel(txdPath, dffPath, colPath)
-	local rres = engineRequestModel("object")
-	if rres == false or rres == nil then
-		outputDebugString("[MODELS|C] Error in loadModel("..tostring(modelType)..","..tostring(txdPath)..","..tostring(dffPath)..","..tostring(colPath)..") [ENGINE]")
-		return false
+function models_loadObjectModel(txdPath, dffPath, colPath, requestIDOnly, doNotRequestID, id, unload)
+	local rres = nil
+	if doNotRequestID == false or doNotRequestID == nil then
+		rres = engineRequestModel("object")
+	else
+		rres = id
 	end
+	if rres == false or rres == nil then
+		if not doNotRequestID then
+			outputDebugString("[MODELS|C] Error in loadModel("..tostring(txdPath)..","..tostring(dffPath)..","..tostring(colPath)..") [ENGINE]")
+			return false
+		end
+	end
+	if requestIDOnly == true then
+		return true, rres
+	end
+
+	if unload == true then
+		engineRestoreModel(id)
+		engineRestoreCOL(id)
+		return true
+	end
+
 	local objectID = rres
 	local col = nil
 	local rcol = nil
@@ -149,7 +196,6 @@ function models_load()
 		txdFileName = line_split[3]
 		dffPath = PATH_DFF..dffFileName..".dff"
 		txdPath = PATH_TXD..txdFileName..".txd"
-		txdPath = PATH_TXD..txdFileName..".txd"
 		local txdFileDesc = fileOpen(txdPath)
 		if txdFileDesc == false then
 			outputDebugString("[MODELS|C] Unable to open file '"..txdPath.."'. Aborting loading models.")
@@ -182,26 +228,29 @@ function models_load()
 			colPath = nil
 		end
 
-		if txdFileSize > BIG_FILE then
+		--if txdFileSize > BIG_FILE then
+		if 1 == 2 then
 			counter_delayed = counter_delayed + 1
 			setElementData(getLocalPlayer(), "models_load_for_counter_delayed", counter_delayed)
 			bigFile = true
 
+			MODELS_DELAYED_LOAD = getElementData(getLocalPlayer(), "models_delayed_load")
 			DELAYED_TN = { dffPath, txdPath, colPath, dffFileName, hotuID, txdFileSize }
 			MODELS_DELAYED_LOAD = array_push(MODELS_DELAYED_LOAD, DELAYED_TN)
-			--outputDebugString("[MODELS|C] Skipping dff:'"..tostring(dffPath).."' txd: '"..tostring(txdPath).."' col:'"..tostring(colPath).."' HotuID "..tostring(hotuID).." (file too big)", 2)
+			setElementData(getLocalPlayer(), "models_delayed_load", MODELS_DELAYED_LOAD)
+			outputDebugString("[MODELS|C] Skipping dff:'"..tostring(dffPath).."' txd: '"..tostring(txdPath).."' col:'"..tostring(colPath).."' HotuID "..tostring(hotuID).." (file too big)", 2)
 		end
 
 		if bigFile == false then
-			setTimer(function(i, line, stargate_ide_lines, missingFile, dffFileName, hotuID, txdPath, dffPath, colPath)
+			setTimer(function(i, line, stargate_ide_lines, missingFile, dffFileName, hotuID, txdPath, dffPath, colPath, txdFileName)
 				local MODELS = getElementData(getLocalPlayer(), "models_data")
 				if missingFile == false then					
-					result, objectID = models_loadObjectModel(txdPath, dffPath, colPath)
+					result, objectID = models_loadObjectModel(txdPath, dffPath, colPath, true) -- request model ID only
 
 					if result == true then
 						counter_loaded = counter_loaded + 1
 						setElementData(getLocalPlayer(), "models_load_for_counter_loaded", counter_loaded)
-						TN = { tonumber(objectID), dffFileName, tonumber(hotuID) }
+						TN = { tonumber(objectID), dffFileName, txdFileName, colPath, tonumber(hotuID) }
 						MODELS = array_push(MODELS, TN)
 						setElementData(getLocalPlayer(), "models_data", MODELS)
 					else
@@ -216,31 +265,74 @@ function models_load()
 					counter_failed = counter_failed + 1
 					setElementData(getLocalPlayer(), "models_load_for_counter_failed", counter_failed)
 				end
-			end, t, 1, i, line, stargate_ide_lines, missingFile, dffFileName, hotuID, txdPath, dffPath, colPath)
+			end, t, 1, i, line, stargate_ide_lines, missingFile, dffFileName, hotuID, txdPath, dffPath, colPath, txdFileName)
 			t = t + MODEL_LOAD_TIME
 		end
 	end
 
 	fileClose(stargate_ide)
-	setTimer(function()
-		engineRestreamWorld(true)
-		local counter_failed = getElementData(getLocalPlayer(), "models_load_for_counter_failed")
-		local counter_loaded = getElementData(getLocalPlayer(), "models_load_for_counter_loaded")
-		local counter_delayed = getElementData(getLocalPlayer(), "models_load_for_counter_delayed")
-		local result = true
-		if counter_failed > 0 then
-			result = false
-		end
+	--setTimer(function()
+		--local counter_failed = getElementData(getLocalPlayer(), "models_load_for_counter_failed")
+		--local counter_loaded = getElementData(getLocalPlayer(), "models_load_for_counter_loaded")
+		--local counter_delayed = getElementData(getLocalPlayer(), "models_load_for_counter_delayed")
+		--local result = true
+		--if counter_failed > 0 then
+		--	result = false
+		--end
 
-		setElementData(getLocalPlayer(), "models_data_load_result", result)
-		setElementData(getLocalPlayer(), "models_delayed_load", MODELS_DELAYED_LOAD)
-		engineRestreamWorld(true)
-		outputDebugString("[MODELS|C] Loading models completed. ("..tostring(counter_loaded).." OK; "..tostring(counter_failed).." FAILED; "..tostring(counter_delayed).." DELAYED)")
-		setTimer(models_loadBigFiles, 1000, 1)
-	end, t+MODEL_LOAD_TIME*10, 1)
+		--setElementData(getLocalPlayer(), "models_data_load_result", result)
+		--engineRestreamWorld(true)
+		--outputDebugString("[MODELS|C] Loading models completed. ("..tostring(counter_loaded).." OK; "..tostring(counter_failed).." FAILED; "..tostring(counter_delayed).." DELAYED)")
+		--setTimer(models_loadBigFiles, 1000, 1)
+	--end, t+MODEL_LOAD_TIME*10, 1)
 
 	return t+MODEL_LOAD_TIME*10
 end
+
+function models_loadModelManually(objectID, unload, reload)
+	local MODELS_DATA = getElementData(getLocalPlayer(), "models_data")
+	local file = nil
+	for i,tn in ipairs(MODELS_DATA) do -- TN = { objectID, dffFileName, txdFileName, colPath, hotuID }
+		if tn[1] == tonumber(objectID) then
+			file = tn
+			break
+		end
+	end
+
+	if file == false or file == nil then
+		outputDebugString("[MODELS|C] Unable to manually load '"..tostring(objectID).."' (objectID invalid)")
+		return false
+	end
+	local dffFileName = file[2]
+	local txdFileName = file[3]
+	engineStreamingFreeUpMemory(100000000) -- try to free some memory
+
+	local dffPath = PATH_DFF..dffFileName..".dff"
+	local txdPath = PATH_TXD..txdFileName..".txd"
+	local colPath = file[4]
+	result = models_loadObjectModel(txdPath, dffPath, colPath, false, true, file[1], unload)
+
+	if result == true then
+		if unload == true then
+			--outputDebugString("[MODELS|C] Unload model '"..tostring(dffFileName).."' SUCCESS")
+		else
+			--outputDebugString("[MODELS|C] Load model '"..tostring(dffFileName).."' SUCCESS")
+		end
+		if getElementData(getLocalPlayer(), "manual_load_result") then
+			setElementData(getLocalPlayer(), "manual_load_result", getElementData(getLocalPlayer(), "manual_load_result") + 1 )
+		end
+	else
+		if unload == true then
+			outputDebugString("[MODELS|C] Unload model '"..tostring(dffFileName).."' FAIL")
+		else
+			outputDebugString("[MODELS|C] Load model '"..tostring(dffFileName).."' FAIL")
+		end
+	end
+	if reload == true then
+		models_loadObjects(true)
+	end
+end
+
 
 function models_loadBigFiles()
 	local MODELS_DELAYED_LOAD = getElementData(getLocalPlayer(), "models_delayed_load")
@@ -254,10 +346,10 @@ function models_loadBigFiles()
 	---- 
 	---- TO BE DONE
 	if 1 == 1 then
-		for i, tn in ipairs(MODELS_DELAYED_LOAD) do
-			outputDebugString("[MODELS|C] Model '"..tostring(tn[4]).."' was skipped from loading process. (TXD too big)")
-		end
-		outputDebugString("[MODELS|C] Big texture files and models were not loaded. [Work in progress]")
+		--for i, tn in ipairs(MODELS_DELAYED_LOAD) do
+			--outputDebugString("[MODELS|C] Model '"..tostring(tn[4]).."' was skipped from loading process. (TXD too big)")
+		--end
+		--outputDebugString("[MODELS|C] Big texture files and models were not loaded. [Work in progress]")
 		return false
 	end
 	---- TO BE DONE
@@ -343,6 +435,88 @@ function models_getObjectID(playerElement, objectName)
 	end
 	return nil
 end
+
+function models_getUnloadedObjectID(playerElement, objectName)
+	local model_delayed = getElementData(playerElement, "models_delayed_load")
+	for i,tn in ipairs(model_delayed) do
+		if tn[4] == objectName then
+			return tn[5]
+		end
+	end	-- Table structure: { dffPath, txdPath, colPath, dffFileName, hotuID, size }
+	return nil
+end
+
+function models_getObjectHOTUID(playerElement, objectName)
+	local model_data = getElementData(playerElement, "models_data")
+	local tn_objectID = nil
+	local tn_objectName = nil
+	local tn_hotuID = nil
+	for i,tn in ipairs(model_data) do
+		tn_objectID = tn[1]
+		tn_objectName = tn[2]
+		tn_hotuID = tn[3]
+		if tn_objectName == objectName then
+			return tn_hotuID
+		end
+	end
+	return nil
+end
+
+function models_loadHOTUModelsInRangeOfElement(e, range)
+    local x,y,z = getElementPosition(e)
+    local id = 0
+    local cnt = 0
+    local ox,oy,oz = nil
+    local t = 50
+	local loadedModelsList = getElementData(getLocalPlayer(), "loaded_models_list")
+
+    for i,object in ipairs(getElementsByType("object")) do
+        if getElementData(object, "hotu_object") == true or getElementData(object, "hotu_object") == "true" then
+            ox,oy,oz = getElementPosition(object)
+            if math.abs(x - ox) < range and math.abs(y - oy) < range and math.abs(z - oz) < range then
+                id = models_getObjectID(getLocalPlayer(), getElementData(object, "element_model_data"))
+                setTimer(models_loadModelManually, t, 1, id, false)
+				loadedModelsList = array_push(loadedModelsList, object)
+                cnt = cnt + 1
+                t = t + 10
+            end
+        end
+    end
+
+	models_loadObjects(true)
+	setElementData(getLocalPlayer(), "loaded_models_list", loadedModelsList)
+    outputDebugString("[MODELS|C] Loaded "..tostring(cnt).." objects in "..tostring(range).." range of '"..tostring(getElementID(e)).."' ")
+end
+
+function models_loadModelsNearPlayer(playerElement, s_range)
+	local range = tonumber(s_range)
+	if range > 250 then
+		range = 250
+		outputDebugString("models_loadModelsNearPlayer(...) range capped to "..tostring(range), 2)
+	end
+	if not playerElement then
+		outputDebugString("models_loadModelsNearPlayer(...) missing playerElement ("..tostring(playerElement)..")", 1)
+		return false
+	end
+
+	local cnt = 0
+	local id = nil
+	loadedModelsList = getElementData(getLocalPlayer(), "loaded_models_list")
+	if not loadedModelsList == false then  
+		for i,object in ipairs(loadedModelsList) do
+			id = models_getObjectID(getLocalPlayer(), getElementData(object, "element_model_data"))
+			models_loadModelManually(id, true)
+			cnt = cnt + 1
+		end
+		outputDebugString("[MODELS|C] Unloaded "..tostring(cnt).." objects from memory.")
+	end
+
+	setTimer(setElementData, 100, 1, getLocalPlayer(), "loaded_models_list", {})
+	setTimer(models_loadHOTUModelsInRangeOfElement, 200, 1, playerElement, range)
+end
+addCommandHandler("loadModels", function(cmd, range)
+	models_loadModelsNearPlayer(getLocalPlayer(), range)
+end)
 
 function models_setElementModelAttribute(element, modelDescription)
 	setElementData(element, "element_model_data", modelDescription)
