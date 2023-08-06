@@ -11,7 +11,7 @@ Features, updates here are not the newest, but more up-to-date unlike **release*
 # Current release
 
 - Release 0.3a
-New features:
+- New features:
     - Gamemode
         - stargate_gamemode resource was changed from script type to gamemode type
         - commands: /mypos          - outputs your current position
@@ -29,7 +29,9 @@ New features:
         - Ability to regenerate .IPL file based on if given line contains HOTU object or not *development purposes only*
         - Note: HOTU object is object with custom model ID from Stargate: Horizon of the Universe v2.0 mod
         - San Andreas work in progress map is finally included in gamemode (Mount Everest base)
-Features:
+
+## Features
+
     - Models
         - All (or atleast 99%) models from STARGATE:Horizon of the Universe V2.0 mode are contained (script size increased to 1.4 GB)
         - Easy loading models based on 'element_model_data' attribute
