@@ -80,7 +80,7 @@ function planet_setElementOccupiedPlanet(element, planetID, needsLs, resourceSta
     if not planet_isPlanet(planetID) then
         outputDebugString("[PLANETS] Element "..getElementID(element).." was not set to nonexisting planet dimension "..planetID, 2)
         return false
-    end
+    end    
     local ls_stats = planet_getPlanetAtmosphere(planetID)
     local dimension = planet_getPlanetDimension(planetID)
     

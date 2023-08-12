@@ -10,10 +10,19 @@ Features, updates here are not the newest, but more up-to-date unlike **release*
 
 # Current release
 
-- Release 0.3a
+- Release 0.3b
 - No release notes
 
 ## New features
+- Models
+    - Finally fixed dynamic loading and unloading models (models were not unloaded properly, which causes video memory to be bloated)
+    - Player will freeze and move its camera far away when loading models and unfreeze (and move back) when models are fully loaded
+- Map
+    - Ability to generate full and correct .map files
+    - Earth - SGC map objects are full and complete without (noticed) bugs
+    - Icarus - map objects are full and complete
+
+## Features
 - Gamemode
     - stargate_gamemode resource was changed from script type to gamemode type
     - commands: 
@@ -22,7 +31,6 @@ Features, updates here are not the newest, but more up-to-date unlike **release*
         - /dim d          - sets your planet/dimension to d
         - /poselement eID - teleports you to elements position (eID = elements ID)
 - Models
-    - Rewritten again, due to MTA SA streamer limitations
     - Models are now loaded (and unloaded) dynamically depending on client's occupied planet instead loading all of them at server join
         - Thanks to this, models with size > 15 MB are no longer an issue and **all models from HOTU mod can be loaded**
 - Map
@@ -32,9 +40,6 @@ Features, updates here are not the newest, but more up-to-date unlike **release*
     - Ability to regenerate .IPL file based on if given line contains HOTU object or not *development purposes only*
     - Note: HOTU object is object with custom model ID from Stargate: Horizon of the Universe v2.0 mod
     - San Andreas work in progress map is finally included in gamemode (Mount Everest base)
-
-## Features
-
 - Models
     - All (or atleast 99%) models from STARGATE:Horizon of the Universe V2.0 mode are contained (script size increased to 1.4 GB)
     - Easy loading models based on 'element_model_data' attribute

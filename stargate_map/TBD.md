@@ -4,25 +4,22 @@ Contains all maps and its related scripts.
 
 # TODO
 
-- IPL to map
-    - implement, test
-    - what about planets?
-
-- Maps
-    - Main map & lobby (San Andreas)  -> dimension 0 / planet 0 (not Earth)
-    - SGC (Earth)
-    - Abydos
-    - Custom MW World 1
-    - Custom MW World 2
-    - Other MW Worlds ...
+- Load HOTU maps from IPL and convert them into separate .map files in separate dimensions per planet
+    - SGC (Earth)   -> DONE
+    - Icarus        -> DONE
+    - Abydos        
     - Atlantis
     - Pegasus worlds
     - Destiny
     - SG Universe worlds
-- Basic functionality
+- Custom worlds
+    - Main map & lobby (San Andreas)  -> dimension 0 / planet 0 (not Earth)
+    - Custom MW World 1, 2, ..
+    - Other MW Worlds ...
+- Basic functionality of SA map
     - Spawn area = Lobby in San Andreas
     - Gate area in SA
-    - Other map interactions
+- Functionality of HOTU maps
 - Basic connection and co-working between resources
     - Spawn stargates in map worlds
 

@@ -152,16 +152,16 @@ function map_generateObjectsArrayTable(objectID, objectModel, x, y, z, dimension
     return TN
 end
 
-function map_createHOTUObjects()
+function map_createHOTUObjects(file)
     local localPlayer = getElementByID("1")
-    local stargate_ipl = fileOpen("files/stargate.IPL")
+    local stargate_ipl = fileOpen(file)
     if not stargate_ipl then
-        outputDebugString("[MAP|C] Unable to open stargate.IPL file!", 1)
+        outputDebugString("[MAP|C] Unable to open file!", 1)
         return false
     end
     local stargate_ipl_content = fileRead(stargate_ipl, fileGetSize(stargate_ipl))
     if not stargate_ipl_content then
-        outputDebugString("[MAP|C] Unable to read from stargate.IPL file!", 1)
+        outputDebugString("[MAP|C] Unable to read from file!", 1)
         return false
     end
     fileClose(stargate_ipl)
@@ -172,7 +172,8 @@ function map_createHOTUObjects()
     local dffFileName = ""
     local interior = ""
     local posX, posY, posZ = ""
-    local rotX, rotY, rotZ = ""
+    local qrX, qrY, qrZ, qrW = ""
+    local rotX, rotY, rotZ = nil
     local modelID = 0
     local dimension = 0
     local TN = {}
@@ -187,7 +188,7 @@ function map_createHOTUObjects()
     local cnt_def = 0
     local cnt_un = 0
     local cnt_p = 0
-    outputDebugString("[MAP|C] Beggining of creating HOTU map.")
+    outputDebugString("[MAP|C] Beggining of creating HOTU map from "..tostring(file))
     local maplines = map_generateMapFileBeginning()
 
     for i,line in ipairs(stargate_ipl_lines) do
@@ -198,9 +199,11 @@ function map_createHOTUObjects()
         posX = line_split[4]
         posY = line_split[5]
         posZ = line_split[6]
-        rotX = line_split[7]
-        rotY = line_split[8]
-        rotZ = line_split[9]
+        qrX = line_split[7]
+        qrY = line_split[8]
+        qrZ = line_split[9]
+        qrW = line_split[10]
+        rotX, rotY, rotZ = fromQuaternion(tonumber(qrX), tonumber(qrY), tonumber(qrZ), tonumber(qrW))
 
         -- generating map
         --TN = { hotuID, 1337, posX, posY, posZ, 6969, dffFileName, rotX, rotY, rotZ, interior }
@@ -209,37 +212,39 @@ function map_createHOTUObjects()
         -- creating objects
         --outputDebugString("[MAP|C] Created object '"..tostring(dffFileName).."' ("..posX..","..posY..","..posZ..").")
         --object = createObject(1337, tonumber(posX), tonumber(posY), tonumber(posZ))
+        --setElementDimension(object, 6969)
         --setElementRotation(object, tonumber(rotX), tonumber(rotY), tonumber(rotZ))
         --setElementData(object, "hotu_object", true)
         --setElementData(object, "hotu_id", tonumber(hotuID))
         --setElementID(object, "HOTU["..tostring(hotuID).."]"..tostring(dffFileName))
         --setElementData(object, "element_model_data", dffFileName)
-        cnt_p = cnt_p + 1
+        --setElementData(object, "element_model_loaded", false)
+        --cnt_p = cnt_p + 1
     end
     
     --map_generateMapFile(objectsArray, "stargate_random")
-    --outputDebugString("[MAP|C] HOTU map created. Created objects: "..tostring(cnt_p)..".")
+    --outputDebugString("[MAP|C] HOTU map from file "..tostring(file).." created. Created objects: "..tostring(cnt_p)..".")
     return true
-    -- load stargate.IPL file 
-    -- IPL file line === HOTUID, dffName, ?, x, y, z, rx, ry, rz, ?, ?
-    -- loop per line
-    -- createObject
-    -- elementData: element_object_type     =   "hotu_object"
-    -- elementData: element_model_data      =   dffName (IPL/second thing; MUST BE same as stargate.IDE dffName in models script)
-    -- elementData: element_hotuid          =   HOTUID  (IPL/first thing)
-    -- elementData: element_ipl_data        =   table {x,y,z,rx,ry,rz}  (IPL)
-    -- maybe: setElementPlanet?
-end
-addEventHandler("onResourceStart", resourceRoot, map_createHOTUObjects)
-
-function map_placeHOTUObjects()
-    -- loop at all object elements
-    -- if element is hotu_object and has ipl data
-    -- setElementPosition
-    -- [!] models are set in models_c
 end
 
-function map_teleportToElementByID(src, cmd, id, range)
+function map_onStart()
+    r1 = map_createHOTUObjects("files/stargate.IPL")
+    if r1 == true then
+        r2 = map_createHOTUObjects("files/stargate_2.IPL")
+        if r2 == true then
+            r3 = map_createHOTUObjects("files/stargate_3.IPL")
+            if r3 == true then
+                r4 = map_createHOTUObjects("files/stargate_4.IPL")
+            end
+        end
+    end
+    if not r1 or not r2 or not r3 or not r4 then
+        outputDebugString("Very bad thing happened in MAP_C.lua")
+    end
+end
+addEventHandler("onResourceStart", resourceRoot, map_onStart)
+
+function map_teleportToElementByID(src, cmd, id)
     local e = getElementByID(id)
     if not e then
         outputChatBox("Wrong element ID!")
@@ -250,7 +255,11 @@ function map_teleportToElementByID(src, cmd, id, range)
 end
 addCommandHandler("poselement", map_teleportToElementByID)
 
-function map_getHOTUObjectsNearPlayer(e, cmd, s_range)
+function map_getHOTUObjectsNearPlayer(e, cmd, s_range, m_dimension)
+    if not s_range then
+        outputChatBox("Where range")
+        return false
+    end
     local range = tonumber(s_range)
     local x,y,z = getElementPosition(e)
     local cnt = 0
@@ -258,6 +267,13 @@ function map_getHOTUObjectsNearPlayer(e, cmd, s_range)
 
     local objectsArray = {}
     local TN = {}
+    local dimension = nil
+    if not m_dimension then
+        dimension = 0
+    else
+        dimension = tonumber(m_dimension)
+    end
+
     for i,object in ipairs(getElementsByType("object")) do
         if getElementData(object, "hotu_object") == true or getElementData(object, "hotu_object") == "true" then
             ox,oy,oz = getElementPosition(object)
@@ -267,13 +283,13 @@ function map_getHOTUObjectsNearPlayer(e, cmd, s_range)
                 local rotX, rotY, rotZ = getElementRotation(object)
                 local interior = getElementInterior(object)
                 local dffFileName = getElementData(object, "element_model_data")
-                TN = { hotuID, 1337, posX, posY, posZ, 1, dffFileName, rotX, rotY, rotZ, interior }
+                TN = { hotuID, 1337, posX, posY, posZ, m_dimension, dffFileName, rotX, rotY, rotZ, interior }
                 objectsArray = array_push(objectsArray, TN)
                 cnt = cnt + 1
             end
         end
     end
     map_generateMapFile(objectsArray, "output")
-    outputDebugString("[MODELS|C] Found "..tostring(cnt).." objects in "..tostring(range).." range of 'Player ID ("..tostring(getElementID(e))..")'. File generated!")
+    outputDebugString("[MODELS|C] Found "..tostring(cnt).." objects in "..tostring(range).." range of 'Player ID ("..tostring(getElementID(e))..")'. File generated! (dimension '"..tostring(dimension).."')")
 end
 addCommandHandler("generate", map_getHOTUObjectsNearPlayer)
