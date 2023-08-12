@@ -65,15 +65,6 @@ function models_loadObjects(reload)
 					local x,y,z = getElementPosition(object)
 					outputDebugString("[MODELS|C] Object element '"..tostring(getElementID(object)).." was assigned model '"..tostring(id).."'")
 					setElementData(object, "element_model_modelSet", true)
-				else
-					id = models_getUnloadedObjectID(getLocalPlayer(), model_data)
-					if id then
-						if getElementData(object, "hotu_object") == true then -- not loaded model
-							--outputDebugString("[MODELS|C] Object element '"..tostring(getElementID(object)).."' is HOTU object, but its model is not loaded.")
-						end
-					else -- not HOTU object
-						outputDebugString("[MODELS|C] Object element '"..tostring(getElementID(object)).."' has unknown objectName '"..tostring(model_data).."' and was not set new model ID.")
-					end
 				end
 			end
 		end
@@ -85,8 +76,8 @@ function models_freeObjectTextures()
 	local txds = getElementData(getLocalPlayer(), "txd_loaded_list")
 	local cnt = 0
 	if txds then
-		for i,txd in ipairs(txds) do
-			destroyElement(txd)
+		for i,txd_table in ipairs(txds) do
+			destroyElement(txd_table[1])
 			cnt = i
 		end
 	end
@@ -121,15 +112,31 @@ function models_loadObjectModel(txdPath, dffPath, colPath, requestIDOnly, doNotR
 	local objectID = rres
 	local col = nil
 	local rcol = nil
-	local txd = engineLoadTXD(txdPath)
+	local txd_list = getElementData(getLocalPlayer(), "txd_loaded_list")
+	local txd_isNew = true
+	local txd = nil
+	if txd_list then -- use already loaded txd
+		for i,t_table in ipairs(txd_list) do
+			if t_table[2] == txdPath then
+				txd_isNew = false
+				txd = t_table[1]
+				break
+			end
+		end
+	end
+
+	if txd_isNew == true then
+		txd = engineLoadTXD(txdPath)
+	end
 	if txd == nil or txd == false then
 		outputDebugString("loadObjectModel("..tostring(objectID)..","..tostring(txdPath)..","..tostring(dffPath)..","..tostring(colPath)..") [TXD LOAD]", 2)
 		return false
 	end
 	local rtxd = engineImportTXD(txd, objectID)
 	if rtxd == nil or rtxd == false then
-		outputDebugString("loadObjectModel("..tostring(objectID)..","..tostring(txdPath)..","..tostring(dffPath)..","..tostring(colPath)..") [TXD CORRUPT]", 1)
-		return false
+		-- Note: do nothing since TXDs are reused and that will cause 'rxtd' to be false for somehow weird reason (even it's loaded OK) 
+		--outputDebugString("loadObjectModel("..tostring(objectID)..","..tostring(txdPath)..","..tostring(dffPath)..","..tostring(colPath)..") [TXD IMPORT "..tostring(rtxd).."]", 1)
+		--return false
 	end
 
 	dff = engineLoadDFF(dffPath, objectID)
@@ -140,7 +147,7 @@ function models_loadObjectModel(txdPath, dffPath, colPath, requestIDOnly, doNotR
 
 	local rdff = engineReplaceModel(dff, objectID)
 	if rdff == false or rdff == nil then
-		outputDebugString("loadObjectModel("..tostring(objectID)..","..tostring(txdPath)..","..tostring(dffPath)..","..tostring(colPath)..") [DFF CORRUPT]", 1)
+		outputDebugString("loadObjectModel("..tostring(objectID)..","..tostring(txdPath)..","..tostring(dffPath)..","..tostring(colPath)..") [DFF REPLACE]", 1)
 		return false
 	end
 
@@ -155,13 +162,12 @@ function models_loadObjectModel(txdPath, dffPath, colPath, requestIDOnly, doNotR
 
 
 	if rcol == false then
-		outputDebugString("loadObjectModel("..tostring(objectID)..","..tostring(txdPath)..","..tostring(dffPath)..","..tostring(colPath)..") [COL CORRUPT]", 2)
+		outputDebugString("loadObjectModel("..tostring(objectID)..","..tostring(txdPath)..","..tostring(dffPath)..","..tostring(colPath)..") [COL REPLACE]", 2)
 		return false
 	end
 
-	local txd_list = getElementData(getLocalPlayer(), "txd_loaded_list")
-	if txd_list then
-		txd_list = array_push(txd_list, txd)
+	if txd_list and txd_isNew == true then
+		txd_list = array_push(txd_list, { txd, txdPath })
 	end
 	setElementData(getLocalPlayer(), "txd_loaded_list", txd_list)
 	return true, objectID
@@ -392,16 +398,6 @@ function models_getObjectID(playerElement, objectName)
 	return nil
 end
 
-function models_getUnloadedObjectID(playerElement, objectName)
-	local model_delayed = getElementData(playerElement, "models_delayed_load")
-	for i,tn in ipairs(model_delayed) do
-		if tn[4] == objectName then
-			return tn[5]
-		end
-	end	-- Table structure: { dffPath, txdPath, colPath, dffFileName, hotuID, size }
-	return nil
-end
-
 function models_getObjectHOTUID(playerElement, objectName)
 	local model_data = getElementData(playerElement, "models_data")
 	local tn_objectID = nil
@@ -419,17 +415,21 @@ function models_getObjectHOTUID(playerElement, objectName)
 end
 
 function models_loadHOTUModelsInRangeOfElement(e, range)
+	setCameraMatrix(-10000,-10000,-1000)
+	setElementFrozen(getLocalPlayer(), true)
     local x,y,z = getElementPosition(e)
+	local d = getElementDimension(e)
     local id = 0
     local cnt = 0
-    local ox,oy,oz = nil
+    local ox,oy,oz,od = nil
     local t = 50
 	local loadedModelsList = getElementData(getLocalPlayer(), "loaded_models_list")
 
     for i,object in ipairs(getElementsByType("object")) do
         if getElementData(object, "hotu_object") == true or getElementData(object, "hotu_object") == "true" then
             ox,oy,oz = getElementPosition(object)
-            if math.abs(x - ox) < range and math.abs(y - oy) < range and math.abs(z - oz) < range then
+			od = getElementDimension(object)
+            if math.abs(x - ox) < range and math.abs(y - oy) < range and math.abs(z - oz) < range and od == d then
                 id = models_getObjectID(getLocalPlayer(), getElementData(object, "element_model_data"))
                 setTimer(models_loadModelManually, t, 1, id, false)
 				loadedModelsList = array_push(loadedModelsList, object)
