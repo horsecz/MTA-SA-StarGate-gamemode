@@ -81,6 +81,19 @@ function models_loadObjects(reload)
 	global_setData("MODELS_LOADED", true)
 end
 
+function models_freeObjectTextures()
+	local txds = getElementData(getLocalPlayer(), "txd_loaded_list")
+	local cnt = 0
+	if txds then
+		for i,txd in ipairs(txds) do
+			destroyElement(txd)
+			cnt = i
+		end
+	end
+	setElementData(getLocalPlayer(), "txd_loaded_list", {})
+	outputDebugString("[MODELS|C] Destroyed "..tostring(cnt).." texture elements.")
+end
+
 -- loads model of one object
 function models_loadObjectModel(txdPath, dffPath, colPath, requestIDOnly, doNotRequestID, id, unload)
 	local rres = nil
@@ -119,7 +132,7 @@ function models_loadObjectModel(txdPath, dffPath, colPath, requestIDOnly, doNotR
 		return false
 	end
 
-	local dff = engineLoadDFF(dffPath)
+	dff = engineLoadDFF(dffPath, objectID)
 	if dff == nil or dff == false then
 		outputDebugString("loadObjectModel("..tostring(objectID)..","..tostring(txdPath)..","..tostring(dffPath)..","..tostring(colPath)..") [DFF LOAD]", 2)
 		return false
@@ -145,6 +158,12 @@ function models_loadObjectModel(txdPath, dffPath, colPath, requestIDOnly, doNotR
 		outputDebugString("loadObjectModel("..tostring(objectID)..","..tostring(txdPath)..","..tostring(dffPath)..","..tostring(colPath)..") [COL CORRUPT]", 2)
 		return false
 	end
+
+	local txd_list = getElementData(getLocalPlayer(), "txd_loaded_list")
+	if txd_list then
+		txd_list = array_push(txd_list, txd)
+	end
+	setElementData(getLocalPlayer(), "txd_loaded_list", txd_list)
 	return true, objectID
 end
 
@@ -333,69 +352,6 @@ function models_loadModelManually(objectID, unload, reload)
 	end
 end
 
-
-function models_loadBigFiles()
-	local MODELS_DELAYED_LOAD = getElementData(getLocalPlayer(), "models_delayed_load")
-	local DELAYED_TN = {}
-	local t = 500
-	local mb = 0
-	local increase = 0
-	setElementData(getLocalPlayer(), "models_load_for_counter_loaded", 0)
-	setElementData(getLocalPlayer(), "models_load_for_counter_failed", 0)
-
-	---- 
-	---- TO BE DONE
-	if 1 == 1 then
-		--for i, tn in ipairs(MODELS_DELAYED_LOAD) do
-			--outputDebugString("[MODELS|C] Model '"..tostring(tn[4]).."' was skipped from loading process. (TXD too big)")
-		--end
-		--outputDebugString("[MODELS|C] Big texture files and models were not loaded. [Work in progress]")
-		return false
-	end
-	---- TO BE DONE
-	----
-
-	for i,tn in ipairs(MODELS_DELAYED_LOAD) do
-		setTimer(function(dffPath, txdPath, colPath, dffFileName, hotuID, size)
-			local MODELS = getElementData(getLocalPlayer(), "models_data")
-			local counter_loaded = getElementData(getLocalPlayer(), "models_load_for_counter_loaded")
-			local counter_failed = getElementData(getLocalPlayer(), "models_load_for_counter_failed")
-			engineStreamingFreeUpMemory(size)
-			result, objectID = models_loadObjectModel(txdPath, dffPath, colPath)
-
-			if result == true then
-				counter_loaded = counter_loaded + 1
-				setElementData(getLocalPlayer(), "models_load_fuor_counter_loaded", counter_loaded)
-				TN = { tonumber(objectID), dffFileName, tonumber(hotuID) }
-				MODELS = array_push(MODELS, TN)
-				setElementData(getLocalPlayer(), "models_data", MODELS)
-			else
-				counter_failed = counter_failed + 1
-				setElementData(getLocalPlayer(), "models_load_for_counter_failed", counter_failed)
-				if objectID then
-					engineFreeModel(objectID)
-				end
-			end
-		end, t, 1, tn[1], tn[2], tn[3], tn[4], tn[5], tn[6])
-		mb = math.floor(tn[6]/1000000)
-		if mb < 20 then
-			increase = 5
-		else
-			increase = 10
-		end
-		t = t + mb*increase
-	end
-
-	setTimer(function()
-		local counter_loaded = getElementData(getLocalPlayer(), "models_load_for_counter_loaded")
-		local counter_failed = getElementData(getLocalPlayer(), "models_load_for_counter_failed")
-		engineRestreamWorld(true)
-		outputDebugString("[MODELS|C] Loading delayed completed. ("..tostring(counter_loaded).." OK; "..tostring(counter_failed).." FAILED)")
-	end, t, 1)
-	outputDebugString("[MODELS|C] Delayed loading models begin. Expected total time: "..tostring(t/1000).." seconds.")
-end
-
-
 function models_engineReserveObjectModelID(id, first)
 	if LAST_RESERVED_OBJECT_MODEL >= id then
 		return true
@@ -484,6 +440,10 @@ function models_loadHOTUModelsInRangeOfElement(e, range)
     end
 
 	models_loadObjects(true)
+	setTimer(setElementFrozen, t+100, 1, getLocalPlayer(), false)
+	setTimer(setElementCollisionsEnabled, t+100, 1, getLocalPlayer(), true)
+	setTimer(setCameraTarget, t+150, 1, getLocalPlayer())
+	setTimer(setElementData, t+100, 1, e, "planet_models_loaded", true)
 	setElementData(getLocalPlayer(), "loaded_models_list", loadedModelsList)
     outputDebugString("[MODELS|C] Loaded "..tostring(cnt).." objects in "..tostring(range).." range of '"..tostring(getElementID(e)).."' ")
 end
@@ -498,6 +458,7 @@ function models_loadModelsNearPlayer(playerElement, s_range)
 		outputDebugString("models_loadModelsNearPlayer(...) missing playerElement ("..tostring(playerElement)..")", 1)
 		return false
 	end
+	models_freeObjectTextures()
 
 	local cnt = 0
 	local id = nil

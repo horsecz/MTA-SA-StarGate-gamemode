@@ -5,10 +5,7 @@ function onPlayerSpawn(x, y, z, r, temp1, temp2, temp3, dimension)
     fadeCamera(source, true, 1)
     local ls = lifesupport_create()
     lifesupport_setElementLifesupport(source, ls)
-    
-    if not RESOURCE_STOP then
-        planet_setElementOccupiedPlanet(source, "PLANET_6969", true, true)
-    end
+    planet_setElementOccupiedPlanet(source, "PLANET_6969", true)
 end
 addEventHandler ( "onPlayerSpawn", getRootElement(), onPlayerSpawn)
 

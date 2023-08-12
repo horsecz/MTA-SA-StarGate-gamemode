@@ -1,6 +1,8 @@
 # TO BE DONE
 
 Medium priority (needed but can be skipped for now):
+- Transport animation
+    - to hide slow model loading
 - Support of galaxies and other gate types
     - 8th chevron; dialling to another galaxy; support of galaxies
     - 9th chevron; dialling to Destiny;

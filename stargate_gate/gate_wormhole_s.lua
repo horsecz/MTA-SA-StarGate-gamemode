@@ -168,7 +168,6 @@ end
 -- teleport function for stargate horizon markers; source = marker
 function stargate_wormhole_transport(hitElement)
     if stargate_marker_isEventHorizon(source) and getElementDimension(hitElement) == getElementDimension(source) then
-        setElementCollisionsEnabled(hitElement, false)
         local stargateIDFrom = stargate_marker_getSource(source)
         if getElementData(source, "active") == false then -- closing gate
             setElementAlpha(hitElement, 0)
@@ -207,13 +206,16 @@ function stargate_wormhole_transport(hitElement)
             if (rx > 60 and rx < 115) then -- if lying on the ground, teleport element higher
                 z2 = z2 + 1
             end
-            setElementPosition(hitElement, x2, y2, z2)
-            setElementRotation(hitElement, erx, ery, rz)
+            setElementData(hitElement, "planet_models_loaded", false)
+            setCameraMatrix(hitElement, -10000,-10000,-1000)
             local planet = planet_getElementOccupiedPlanet(stargate_getElement(stargateIDTo))
             planet_setElementOccupiedPlanet(hitElement, planet, true)
             stargate_sound_play(stargateIDFrom, enum_soundDescription.GATE_HORIZON_TOUCH, 75)
             stargate_sound_play(stargateIDTo, enum_soundDescription.GATE_HORIZON_TOUCH, 75)
-            setElementCollisionsEnabled(hitElement, true)
+            setElementPosition(hitElement, x2, y2, z2)
+            setElementRotation(hitElement, erx, ery, rz)
+            setElementCollisionsEnabled(hitElement, false)
+            setElementFrozen(hitElement, true)
         else
             setElementAlpha(hitElement, 0)
             if getElementType(hitElement) == "ped" or getElementType(hitElement) == "player" then

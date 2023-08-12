@@ -7,6 +7,7 @@ function initServer()
     local ls_stats = lifesupport_create(100, 20, 0, 1)
     newPL = planet_create(0, enum_galaxy.MILKYWAY, "San Andreas")
     newPL = planet_create(1, enum_galaxy.MILKYWAY, "Earth")
+    newPL = planet_create(2, enum_galaxy.MILKYWAY, "Icarus")
     newPL = planet_create(6969, enum_galaxy.MILKYWAY, nil, ls_stats)   -- Development planet
     newPL = planet_create(4242, enum_galaxy.MILKYWAY, nil, ls_stats)   -- Sandbox planet
         
@@ -38,6 +39,10 @@ function initServer()
     -- Earth
     newSG = stargate_create(enum_galaxy.MILKYWAY, 1, -66.228576660156, 1873.39, 2220.52, {5, 15, 9, 14, 8, 31, 39}, "sgc", enum_stargateDialType.SLOW, 0, 0, 180, false, true)
     newDHD = dhd_create(enum_galaxy.MILKYWAY, 1, -66.386734008789, 1855.2181396484, 2217.7, 0, 0, 165, getElementID(newSG))
+
+    -- Icarus
+    newSG = stargate_create(enum_galaxy.MILKYWAY, 2, -137, 1930, 2186, {4, 8, 12, 16, 22, 24, 1}, nil, enum_stargateDialType.SLOW, 0, 0, 180, false, true)
+    newDHD = dhd_create(enum_galaxy.MILKYWAY, 2, -134.35200500488, 1949.1099853516, 2184.1000976562, 0, 0, 241.00012207031, getElementID(newSG))
 
     outputDebugString("[GATE_SPAWNER] Initialized.")
     triggerEvent("gateSpawnerActive", root)
