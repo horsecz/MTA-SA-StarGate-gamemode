@@ -210,20 +210,20 @@ function map_createHOTUObjects(file)
         --objectsArray = array_push(objectsArray, TN)
 
         -- creating objects
-        --outputDebugString("[MAP|C] Created object '"..tostring(dffFileName).."' ("..posX..","..posY..","..posZ..").")
-        --object = createObject(1337, tonumber(posX), tonumber(posY), tonumber(posZ))
-        --setElementDimension(object, 6969)
-        --setElementRotation(object, tonumber(rotX), tonumber(rotY), tonumber(rotZ))
-        --setElementData(object, "hotu_object", true)
-        --setElementData(object, "hotu_id", tonumber(hotuID))
-        --setElementID(object, "HOTU["..tostring(hotuID).."]"..tostring(dffFileName))
-        --setElementData(object, "element_model_data", dffFileName)
-        --setElementData(object, "element_model_loaded", false)
-        --cnt_p = cnt_p + 1
+        outputDebugString("[MAP|C] Created object '"..tostring(dffFileName).."' ("..posX..","..posY..","..posZ..").")
+        object = createObject(1337, tonumber(posX), tonumber(posY), tonumber(posZ))
+        setElementDimension(object, 6969)
+        setElementRotation(object, tonumber(rotX), tonumber(rotY), tonumber(rotZ))
+        setElementData(object, "hotu_object", true)
+        setElementData(object, "hotu_id", tonumber(hotuID))
+        setElementID(object, "HOTU["..tostring(hotuID).."]"..tostring(dffFileName))
+        setElementData(object, "element_model_data", dffFileName)
+        setElementData(object, "element_model_loaded", false)
+        cnt_p = cnt_p + 1
     end
     
     --map_generateMapFile(objectsArray, "stargate_random")
-    --outputDebugString("[MAP|C] HOTU map from file "..tostring(file).." created. Created objects: "..tostring(cnt_p)..".")
+    outputDebugString("[MAP|C] HOTU map from file "..tostring(file).." created. Created objects: "..tostring(cnt_p)..".")
     return true
 end
 

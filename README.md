@@ -10,17 +10,23 @@ Features, updates here are not the newest, but more up-to-date unlike **release*
 
 # Current release
 
-- Release 0.3b
+- Release 0.3c
 - No release notes
 
 ## New features
 - Models
-    - Finally fixed dynamic loading and unloading models (models were not unloaded properly, which causes video memory to be bloated)
-    - Player will freeze and move its camera far away when loading models and unfreeze (and move back) when models are fully loaded
+    - Dynamic model loading now consumes even less memory thanks to reusing loaded textures
+        - Atlantis map is now correctly loaded (in 0.3b release, it wouldn't load due to insufficient video memory)
+        - The video memory usage dropped atleast 20 times (from 0.3b release; before: Atlantis map used >4 GB of memory, now: Atlantis map is using 200 MB;)
+        - Note: Atlantis map is the greatest and most model/texture/resource heavy map in the HOTU mod
+    - Fixed bug when models from other dimension/planet were also loaded when close to player
 - Map
-    - Ability to generate full and correct .map files
-    - Earth - SGC map objects are full and complete without (noticed) bugs
-    - Icarus - map objects are full and complete
+    - *Temporary feature: HOTU objects are created dynamically on resource start (for sorting and generating .map files)*
+- Spawner
+    - Creating stargates at these planets:
+        - Earth (SGC)
+        - Icarus base
+        - Atlantis (using MilkyWay model)
 
 ## Features
 - Gamemode
@@ -33,6 +39,8 @@ Features, updates here are not the newest, but more up-to-date unlike **release*
 - Models
     - Models are now loaded (and unloaded) dynamically depending on client's occupied planet instead loading all of them at server join
         - Thanks to this, models with size > 15 MB are no longer an issue and **all models from HOTU mod can be loaded**
+    - Finally fixed dynamic loading and unloading models (models were not unloaded properly, which causes video memory to be bloated)
+    - Player will freeze and move its camera far away when loading models and unfreeze (and move back) when models are fully loaded
 - Map
     - Earth planet with stargate including (incompleted and buggy) SGC base model [DHD dial command: '/dial 5']
     - Ability to generate .map file from IPL file (HOTU objects mostly) *development purposes only*
@@ -40,6 +48,9 @@ Features, updates here are not the newest, but more up-to-date unlike **release*
     - Ability to regenerate .IPL file based on if given line contains HOTU object or not *development purposes only*
     - Note: HOTU object is object with custom model ID from Stargate: Horizon of the Universe v2.0 mod
     - San Andreas work in progress map is finally included in gamemode (Mount Everest base)
+    - Ability to generate full and correct .map files
+    - Earth - SGC map objects are full and complete without (noticed) bugs
+    - Icarus - map objects are full and complete
 - Models
     - All (or atleast 99%) models from STARGATE:Horizon of the Universe V2.0 mode are contained (script size increased to 1.4 GB)
     - Easy loading models based on 'element_model_data' attribute
