@@ -41,7 +41,7 @@ function initServer()
     newDHD = dhd_create(enum_galaxy.MILKYWAY, 1, -66.386734008789, 1855.2181396484, 2217.7, 0, 0, 165, getElementID(newSG))
 
     -- Icarus
-    newSG = stargate_create(enum_galaxy.MILKYWAY, 2, -137, 1930, 2187, {4, 8, 12, 16, 22, 24, 1}, nil, enum_stargateDialType.SLOW, 0, 0, 0, false, true)
+    newSG = stargate_create(enum_galaxy.MILKYWAY, 2, -137.04, 1930.8, 2186.22, {4, 8, 12, 16, 22, 24, 1}, nil, enum_stargateDialType.SLOW, 0, 0, 0, false, true)
     newDHD = dhd_create(enum_galaxy.MILKYWAY, 2, -134.35200500488, 1949.1099853516, 2184.1000976562, 0, 0, 241.00012207031, getElementID(newSG))
 
     -- Atlantis

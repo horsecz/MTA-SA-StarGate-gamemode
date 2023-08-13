@@ -520,6 +520,8 @@
 	<file src="models/Innerring.dff" type="client" />
  
  
+	<file src="collisions/Innerring.col" type="client" />
+	<file src="collisions/Outerring.col" type="client" />
 	<file src="collisions/tente.col" type="client" />
 	<file src="collisions/hologram.col" type="client" />
 	<file src="collisions/ngen.col" type="client" />

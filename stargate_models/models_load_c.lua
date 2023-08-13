@@ -42,6 +42,9 @@ function models_load_stargateCore(unload)
 	for i=1,12 do
 		models_loadModelManually(models_getObjectID(getLocalPlayer(), "Kawoosh"..tostring(i)), unload)
 	end
+	for i=1,10 do
+		models_loadModelManually(models_getObjectID(getLocalPlayer(), "iris"..tostring(i)), unload)
+	end
 end
 
 -- loads milkyway DHD

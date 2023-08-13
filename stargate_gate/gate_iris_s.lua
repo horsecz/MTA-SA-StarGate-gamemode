@@ -44,6 +44,10 @@ function stargate_iris_autoclose(stargateID)
     end
 end
 
+addCommandHandler("testiris", function(e, cmd)
+    stargate_iris_toggle("SG_MW_3")
+end)
+
 function stargate_iris_toggle(stargateID)
     local irisStatus = stargate_iris_isActive(stargateID)
     if irisStatus == true then
