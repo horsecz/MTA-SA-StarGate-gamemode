@@ -26,14 +26,16 @@ You may still need to do one more step to ensure that gamemode works properly - 
 - II. Locate **Admin** group (``<group name="Admin">``) and add stargate_gamemode resource to this group
     - Insert this line there: ``<object name="resource.stargate_gamemode"></object>``
 
-## Use instructions
+## Installation and play
 
-- I. You must download the entire content of this branch
+- I. You must download the entire content of this branch*
 - II. Copy (or extract if downloaded archive) all folders and their contents (except README.md and TBD.md) into your MTA server's resource directory
     - this could be for example: ``C:/Program Files (x86)/MTA San Andreas 1.6/server/mods/deathmatch/resources``
     - if you do not have MTA server, you should see Prerequisites section (above this one) first
 - III. You are good to go - now start your server, start resource ``stargate_gamemode`` and enjoy! 
     - recommended: start the resource in server console (command ``start stargate_gamemode``) and then join
+
+*Warning: this is release branch - currently this branch does not contain all neccessary files and scripts. Switch to development branch if you wanna download and play this gamemode.
 
 ## This is release branch
 
