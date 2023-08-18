@@ -1,13 +1,18 @@
 <meta>
     <min_mta_version server="1.5.8-9.20957"></min_mta_version>
-    <info type="gamemode" name="stargate_gamemode" version="1.0.0"></info>
+    <info type="gamemode" name="STARGATE: Gamemode" version="1.0.0"></info>
 
     <script src="gamemode_s.lua" type="server" />
     <script src="gamemode_c.lua" type="client" />
     <script src="gamemode_imports_s.lua" type="server" />
     <script src="gamemode_imports_c.lua" type="client" />
+    <script src="gamemode_functions.lua" type="shared" />
+    <script src="gamemode_commands.lua" type="shared" />
 
     <export function="import_players_joined" type="server" />
+
+    <export function="isElementInCoordinatesRange" type="shared" />
+    <export function="isElementInRange" type="shared" />
 
     <include resource="stargate_exports" />
     <include resource="stargate_map" />

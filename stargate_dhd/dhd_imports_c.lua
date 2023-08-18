@@ -1,1 +1,1 @@
--- imports_c.lua
+-- imports_s.lua: Importing functions from other resources; client-side

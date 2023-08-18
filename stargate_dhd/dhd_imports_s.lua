@@ -1,7 +1,6 @@
--- imports_s.lua
+-- imports_s.lua: Importing functions from other resources; server-side
 
 enum_galaxy = (exports.stargate_gate:import_enum_galaxy())
-
 
 function models_getElementModelAttribute(...)
     return (exports.stargate_exports:models_getElementModelAttribute(...))

@@ -1,4 +1,4 @@
--- imports_s.lua: Importing functions from other gate_* resources
+-- imports_s.lua: Importing functions from other gate_* resources; server-side
 
 function planet_setElementOccupiedPlanet(...)
     return (exports.stargate_planets:planet_setElementOccupiedPlanet(...))
@@ -44,10 +44,18 @@ function array_get(...)
     return (exports.stargate_exports:array_get(...))
 end
 
-function global_getData(...)
-    return (exports.stargate_exports:global_getData(...))
+function global_addData(key, value)
+    return (setElementData(global_getElement(), key, value))
 end
 
-function global_setData(...)
-    return (exports.stargate_exports:global_setData(...))
+function global_getData(key)
+    return (getElementData(global_getElement(), key))
+end
+
+function global_setData(key)
+    return (global_addData(key, value))
+end
+
+function global_removeData(key)
+    return (global_setData(key, nil))
 end

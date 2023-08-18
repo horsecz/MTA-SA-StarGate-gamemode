@@ -1,12 +1,20 @@
 <meta>
     <min_mta_version server="1.5.8-9.20957"></min_mta_version>
-    <info type="stargate_dh" version="1.0.0"></info>
+    <info name="STARGATE: DHD" type="script" version="1.0.0"></info>
 
     <script src="dhd_s.lua" type="server"></script>
     <script src="dhd_c.lua" type="client"></script>
+    <script src="dhd_useful.lua" type="shared"></script>
     <script src="dhd_imports_s.lua" type="server"></script>
     <script src="dhd_imports_c.lua" type="client"></script>
 
     <export function="dhd_create" type="server" />
     <export function="dhd_remove" type="server" />
+
+    <export function="dhd_setBroken" type="shared" />
+    <export function="dhd_setGalaxyDial" type="shared" />
+    <export function="dhd_isBroken" type="shared" />
+    <export function="dhd_canDialGalaxy" type="shared" />
+    <export function="dhd_getElement" type="shared" />
+    <export function="dhd_getID" type="shared" />
 </meta>
