@@ -1,7 +1,3 @@
-# Stargate PLANETS script
+# To be done
 
-Every dimension represents one planet. Each planet has its unique parameters, map, time, life support, stargate(s), ...
-
-# TODO
-
-- Test all
+- Nothing

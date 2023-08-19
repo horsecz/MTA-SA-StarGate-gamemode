@@ -1,19 +1,22 @@
---- spawner_s.lua_ Element spawner for Stargate gamemode
+--- spawner_s.lua: Element spawner for Stargate gamemode; server-side
 
-function initServer()
-    -- PLANET SPAWNER
+-- Start spawner resource -> initialize and spawn all elements:
+-- > initialize global array lists
+-- > create planets
+-- > spawn stargates and their dhds
+-- > spawn dhds (unassigned)
+function spawner_serverStart()
+    spawner_initGlobals()
+    spawner_planetSpawner()
+    spawner_gateSpawner()
+    triggerEvent("gateSpawnerActive", root)
+end
+addEventHandler("onResourceStart", resourceRoot, spawner_serverStart)
+
+-- Initialize global lists
+function spawner_initGlobals()
     global_setData("PLANET_LIST", {})
-    local newPL = nil
-    local ls_stats = lifesupport_create(100, 20, 0, 1)
-    newPL = planet_create(0, enum_galaxy.MILKYWAY, "San Andreas")
-    newPL = planet_create(1, enum_galaxy.MILKYWAY, "Earth")
-    newPL = planet_create(2, enum_galaxy.MILKYWAY, "Icarus")
-    newPL = planet_create(6969, enum_galaxy.MILKYWAY, nil, ls_stats)   -- Development planet
-    newPL = planet_create(4242, enum_galaxy.MILKYWAY, nil, ls_stats)   -- Sandbox planet
-        
-    -- GATE SPAWNER
-    local newSG = nil
-    local newDHD = nil
+
     global_setData("SG_MW", {})
     global_setData("SG_PG", {})
     global_setData("SG_UN", {})
@@ -21,38 +24,56 @@ function initServer()
     global_setData("DHD_MW", {})
     global_setData("DHD_PG", {})
     global_setData("DHD_UN", {})
+end
 
-    -- TEST
-    newSG = stargate_create(enum_galaxy.MILKYWAY, 0, 0, 0, 2.25, {15,11,9,19,25,32,39}, nil, enum_stargateDialType.FAST, 90, 0, 0, false)
-    newDHD = dhd_create(enum_galaxy.MILKYWAY, 0, -2, 6, 1.7, 0, 0, 180, getElementID(newSG))
+-- Create (and "spawn") all planets
+function spawner_planetSpawner()
+    local newPL = nil
+    newPL = planet_create(enum_planetDimension.SanAndreas, enum_galaxy.MILKYWAY, enum_planetName[enum_planetDimension.SanAndreas])
+    newPL = planet_create(enum_planetDimension.Earth, enum_galaxy.MILKYWAY, enum_planetName[enum_planetDimension.Earth])
+    newPL = planet_create(enum_planetDimension.Icarus, enum_galaxy.MILKYWAY, enum_planetName[enum_planetDimension.Icarus])
+    newPL = planet_create(enum_planetDimension.DevelopmentWorld, enum_galaxy.MILKYWAY, enum_planetName[enum_planetDimension.DevelopmentWorld], lifesupport_create(100, 20, 0, 1))
+    newPL = planet_create(enum_planetDimension.SandboxWorld, enum_galaxy.MILKYWAY, enum_planetName[enum_planetDimension.SandboxWorld], lifesupport_create(100, 20, 0, 1))
+    outputDebugString("[STARGATE:SPAWNER] Created planets.")
+end
 
-    newSG = stargate_create(enum_galaxy.MILKYWAY, 0, 0, 0, 22, {14,11,9,19,25,32,39}, nil, enum_stargateDialType.FAST, 270, 0, 0, false)
+-- Create and spawn all stargates with their assigned DHDs (if they have one)
+function spawner_gateSpawner()
+    local newSG = nil
+    local newDHD = nil
 
-    newSG = stargate_create(enum_galaxy.MILKYWAY, 6969, 20, 0, 4, {1,3,5,7,9,11,39}, "sgc", enum_stargateDialType.SLOW, 0, 0, 0, false, true)
-    newDHD = dhd_create(enum_galaxy.MILKYWAY, 6969, 22, 6, 1.7, 0, 0, 210, getElementID(newSG))
+    -- DEVELOPMENT ONLY
+    newSG = stargate_create(enum_galaxy.MILKYWAY, enum_planetDimension.DevelopmentWorld, 0, 0, 2.25, {15,11,9,19,25,32,39}, nil, enum_stargateDialType.FAST, 90, 0, 0, false)
+    newDHD = dhd_create(enum_galaxy.MILKYWAY, enum_planetDimension.DevelopmentWorld, -2, 6, 1.7, 0, 0, 180, getElementID(newSG))
 
-    newSG = stargate_create(enum_galaxy.MILKYWAY, 6969, -20, 0, 3, {1,2,3,4,5,6,39}, "sgc", enum_stargateDialType.INSTANT, 45, 20, 45)
-    newDHD = dhd_create(enum_galaxy.MILKYWAY, 6969, -20, 6, 1.7, 0, 0, 165, getElementID(newSG))
-    newDHD = dhd_create(enum_galaxy.MILKYWAY, 6969, 10, 10, 1.7, 0, 0, 150)
-    -- TEST
+    newSG = stargate_create(enum_galaxy.MILKYWAY, enum_planetDimension.DevelopmentWorld, 0, 0, 22, {14,11,9,19,25,32,39}, nil, enum_stargateDialType.FAST, 270, 0, 0, false)
+
+    newSG = stargate_create(enum_galaxy.MILKYWAY, enum_planetDimension.DevelopmentWorld, 20, 0, 4, {1,3,5,7,9,11,39}, "sgc", enum_stargateDialType.SLOW, 0, 0, 0, false, true)
+    newDHD = dhd_create(enum_galaxy.MILKYWAY, enum_planetDimension.DevelopmentWorld, 22, 6, 1.7, 0, 0, 210, getElementID(newSG))
+
+    newSG = stargate_create(enum_galaxy.MILKYWAY, enum_planetDimension.DevelopmentWorld, -20, 0, 3, {1,2,3,4,5,6,39}, "sgc", enum_stargateDialType.INSTANT, 45, 20, 45)
+    newDHD = dhd_create(enum_galaxy.MILKYWAY, enum_planetDimension.DevelopmentWorld, -20, 6, 1.7, 0, 0, 165, getElementID(newSG))
+    newDHD = dhd_create(enum_galaxy.MILKYWAY, enum_planetDimension.DevelopmentWorld, 10, 10, 1.7, 0, 0, 150)
+    -- DEVELOPMENT ONLY
 
     -- Earth
-    newSG = stargate_create(enum_galaxy.MILKYWAY, 1, -66.228576660156, 1873.39, 2220.52, {5, 15, 9, 14, 8, 31, 39}, "sgc", enum_stargateDialType.SLOW, 0, 0, 180, false, true)
-    newDHD = dhd_create(enum_galaxy.MILKYWAY, 1, -66.386734008789, 1855.2181396484, 2217.7, 0, 0, 165, getElementID(newSG))
+    newSG = stargate_create(enum_galaxy.MILKYWAY, enum_planetDimension.Earth, -66.228576660156, 1873.39, 2220.52, enum_stargateAddress.Earth, "sgc", enum_stargateDialType.SLOW, 0, 0, 180, false, true)
+    newDHD = dhd_create(enum_galaxy.MILKYWAY, enum_planetDimension.Earth, -66.386734008789, 1855.2181396484, 2217.7, 0, 0, 165, getElementID(newSG))
 
     -- Icarus
-    newSG = stargate_create(enum_galaxy.MILKYWAY, 2, -137.04, 1930.8, 2186.22, {4, 8, 12, 16, 22, 24, 1}, nil, enum_stargateDialType.SLOW, 0, 0, 0, false, true)
-    newDHD = dhd_create(enum_galaxy.MILKYWAY, 2, -134.35200500488, 1949.1099853516, 2184.1000976562, 0, 0, 241.00012207031, getElementID(newSG))
+    newSG = stargate_create(enum_galaxy.MILKYWAY, enum_planetDimension.Icarus, -137.12, 1930.8, 2186.22, enum_stargateAddress.Icarus, nil, enum_stargateDialType.SLOW, 0, 0, 0, false, true)
+    newDHD = dhd_create(enum_galaxy.MILKYWAY, enum_planetDimension.Icarus, -134.35200500488, 1949.1099853516, 2184.1000976562, 0, 0, 241.00012207031, getElementID(newSG))
 
-    -- Atlantis
-    newSG = stargate_create(enum_galaxy.MILKYWAY, 6969, 575.6, -2786, 1999.85, {9, 15, 25, 11, 8, 32, 39}, "sgc", enum_stargateDialType.SLOW, 0, 0, 0, false, true)
-    newDHD = dhd_create(enum_galaxy.MILKYWAY, 6969, 591, -2766, 2004, 0, 0, 180, getElementID(newSG))
+    -- Atlantis     >>> TODO: Development world dimension <<<
+    newSG = stargate_create(enum_galaxy.MILKYWAY, enum_planetDimension.DevelopmentWorld, 575.6, -2786, 1999.85, enum_stargateAddress.Atlantis, "sgc", enum_stargateDialType.SLOW, 0, 0, 0, false, true)
+    newDHD = dhd_create(enum_galaxy.MILKYWAY, enum_planetDimension.DevelopmentWorld, 591, -2766, 2004, 0, 0, 180, getElementID(newSG))
 
-    outputDebugString("[GATE_SPAWNER] Initialized.")
-    triggerEvent("gateSpawnerActive", root)
+    outputDebugString("[STARGATE:SPAWNER] Spawned Stargates and DHDs.")
 end
-addEventHandler("onResourceStart", resourceRoot, initServer)
 
+-- Add stargate element to stargate gate element list
+--- REQUIRED PARAMETERS:
+--> gateElement     reference       stargate element
 function spawner_gateList_add(gateElement)
     local id = getElementID(gateElement)
     local galaxy = stargate_getGalaxy(id)

@@ -1,7 +1,15 @@
--- planet_c.lua: Main script for client-side stargate_planets
+-- useful.lua: Useful functions when working with planet element; shared
+
+--- Planet element attributes
+--> dimension       dimension which this planet belongs to
+--> galaxy          galaxy in which is this planet located 
+--> name            name of the planet (if there is one)
+--> lifesupport     lifesupport element containing data about planet atmosphere stats
+--> cx, cy, cz      planet center position
 
 ---
---- GETTERS
+--- ATTRIBUTE Functions
+---
 
 function planet_getPlanetElement(planetID)
     local planet = getElementByID(planetID)
@@ -27,9 +35,8 @@ function planet_getDimensionPlanet(dimension)
     return nil
 end
 
--- returns dimension in which is this planet located
 function planet_getPlanetDimension(planetID)
-    return (getElementData(planet_getPlanetElement(planetID), "dimension"))
+    return (tonumber(getElementData(planet_getPlanetElement(planetID), "dimension")))
 end
 
 function planet_getPlanetGalaxy(planetID)
@@ -41,7 +48,7 @@ function planet_getPlanetName(planetID)
 end
 
 function planet_getPlanetAtmosphere(planetID)
-    return (getElementData(planet_getPlanetElement(planetID), "atmosphere"))
+    return (getElementData(planet_getPlanetElement(planetID), "lifesupport"))
 end
 
 function planet_getPlanetCenterPosition(planetID)
@@ -61,7 +68,8 @@ end
 
 
 ---
---- ELEMENT FUNCTIONS
+--- ELEMENT Functions
+---
 
 function planet_getElementOccupiedPlanet(element)
     return (getElementData(element, "planet_occupied"))
@@ -80,7 +88,7 @@ function planet_setElementOccupiedPlanet(element, planetID, needsLs, resourceSta
     if not planet_isPlanet(planetID) then
         outputDebugString("[PLANETS] Element "..getElementID(element).." was not set to nonexisting planet dimension "..planetID, 2)
         return false
-    end    
+    end
     local ls_stats = planet_getPlanetAtmosphere(planetID)
     local dimension = planet_getPlanetDimension(planetID)
     

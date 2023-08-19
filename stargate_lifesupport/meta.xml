@@ -1,9 +1,11 @@
 <meta>
     <min_mta_version server="1.5.8-9.20957"></min_mta_version>
-    <info type="stargate_lifesupport" version="1.0.0"></info>
+    <info name="STARGATE: Lifesupport" type="script" version="1.0.0"></info>
     
-    <script src="ls_s.lua" type="server" />
-    <script src="ls_imports_s.lua" type="server" />
+    <script src="lifesupport.lua" type="shared" />
+    <script src="lifesupport_useful.lua" type="shared"></script>
+
+    <script src="lifesupport_imports_s.lua" type="server" />
 
     <export function="lifesupport_create" type="server" />
     <export function="lifesupport_getValues" type="server" />
