@@ -1,6 +1,11 @@
--- chevron_s.lua_ Chevron element module
+-- chevron_s.lua: Chevron element module; server-side
 
--- set chevron active on SG
+-- Create chevron object element and attach it to stargate
+--- REQUIRED PARAMETERS:
+--> stargateID      string      ID of stargate
+--> chevron         int         number of chevron (1-9) that is being created
+--- RETURNS:
+--> Reference; chevron object element
 function stargate_chevron_create(stargateID, chevron)
     local x, y, z = stargate_getPosition(stargateID)
     local newChevron = createObject(1337, x, y, z)
@@ -17,6 +22,12 @@ function stargate_chevron_create(stargateID, chevron)
     return newChevron
 end
 
+-- Shows or hides active chevron object element on stargate
+--- REQUIRED PARAMETERS:
+--> stargateID      string      ID of stargate
+--> chevron         int         number of chevron that is being activated (1-9)
+--> active          bool        showing or hiding chevron?
+--> playSound       bool        will be chevron activation sound played?
 function stargate_chevron_setActive(stargateID, chevron, active, playSound)
     local chevronElement = stargate_chevron_getElement(stargateID.."C"..tostring(chevron))
     if active == true then
@@ -31,25 +42,19 @@ function stargate_chevron_setActive(stargateID, chevron, active, playSound)
     setElementData(chevronElement, "active", active)
 end
 
+---
+--- INTERNAL Functions
+---
+
+-- Assigns ID to new chevron object element
+--- REQUIRED PARAMETERS:
+--> chevron         reference       chevron object element
+--> gateID          string          stargate ID, to which this chevron will be attached to
+--> chevronNumber   int             number of chevron (1-9)
+--- RETURNS:
+--> String; new ID for chevron element
 function stargate_chevron_assignID(chevron, gateID, chevronNumber)
     local id = gateID.."C"..tostring(chevronNumber)
     setElementID(chevron, id)
     return id
-end
-
-function stargate_chevron_getID(chevron)
-    return (getElementID(chevron))
-end
-
-function stargate_chevron_getElement(id)
-    return (getElementByID(id))
-end
-
-function stargate_chevron_getPosition(id)
-    return (getElementData(stargate_chevron_getElement(id), "number"))
-end
-
-function stargate_chevron_isActive(stargateID, chevron)
-    chevron = stargate_chevron_getElement(stargateID.."C"..tostring(chevron))
-    return (getElementData(chevron, "active"))
 end

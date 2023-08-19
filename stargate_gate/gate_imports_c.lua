@@ -1,4 +1,4 @@
--- imports_c.lua_ Importing functions from other gate_* resources
+-- imports_c.lua: Importing functions from other gate_* resources; client-side
 
 function callClientFunction(funcname, ...)
     local arg = { ... }

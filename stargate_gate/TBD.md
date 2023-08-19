@@ -1,16 +1,17 @@
-# TO BE DONE
+# To be done
 
 Medium priority (needed but can be skipped for now):
+- (Better) collisions for stargate iris
 - Transport animation
-    - to hide slow model loading
+    - to hide model loading
+    - can be very short; no need for long one (but can be optional)
 - Support of galaxies and other gate types
-    - 8th chevron; dialling to another galaxy; support of galaxies
+    - 8th chevron; dialling to another galaxy; support of galaxies and gate types
     - 9th chevron; dialling to Destiny;
     - Pegasus gate model
     - Universe gate model
 
 Lower priority (good to have):
-- (Better) collisions for stargate iris
 - Support transport of all elements
     - Supporting: Player, Ped, Vehicle, Projectile
     - Not Supporting: Weapon bullet

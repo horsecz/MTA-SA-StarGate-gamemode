@@ -1,10 +1,20 @@
--- sound_c.lua: Clientside sound module
+-- sound_c.lua: Stargate sounds module; client-side
 
--- plays3d sound from server
+-- PlaySound3D but from triggered server-side event with additional data
+-- > plays in set distance
+-- > played in dimension where stargate is placed
+-- > exception is sound of milkyway ring rotating
+--		> this sound is played periodically
+--- REQUIRED PARAMETERS:
+--> stargateID		string		ID of stargate
+--> soundpath		string		file path of sound
+--> x, y, z			int			world position, where will be sound played
+--> distance		int			range, in which will be sound heard
+--> soundAttrib		string		custom sound attribute (to identify the sound)
 function playSound3DFromServerSG(stargateID, soundpath, x, y, z, distance, soundAttrib)
 	local s = playSound3D(soundpath, x, y, z)
 	local planet = planet_getElementOccupiedPlanet(stargate_getElement(stargateID))
-	setElementDimension(s, planet_getPlanetDimension(planet)) -- need to use immediately
+	setElementDimension(s, planet_getPlanetDimension(planet)) -- need to use setElementDimension immediately
     planet_setElementOccupiedPlanet(s, planet)		
 
 
@@ -19,7 +29,7 @@ function playSound3DFromServerSG(stargateID, soundpath, x, y, z, distance, sound
 		local beginSoundLength = getSoundLength(s)*1000
 		local continueRotationSound = setTimer(function(stargateID, distance)
 			local ls = playSound3D("sounds/mw_ring_rotate.mp3", x, y, z)
-			setElementDimension(ls, planet_getPlanetDimension(planet)) -- need to use immediately
+			setElementDimension(ls, planet_getPlanetDimension(planet)) -- need to use setElementDimension immediately
 			planet_setElementOccupiedPlanet(ls, planet)		
 			setSoundMaxDistance(ls, distance)
 			setElementData(getElementByID(stargateID), "sound_ring_rotate_long", ls)
@@ -31,7 +41,10 @@ end
 addEvent("clientPlaySound3D", true)
 addEventHandler("clientPlaySound3D", root, playSound3DFromServerSG)
 
--- stops sound from server
+-- StopSound from triggered server-side event
+--- REQUIRED PARAMETERS:
+--> stargateID		string		ID of stargate
+--> soundAttribute	string		attribute key, which identifies the sound
 function stopSoundFromServerSG(stargateID, soundAttribute)
 	local sound = getElementData(getElementByID(stargateID), soundAttribute)
 	if isElement(sound) and getElementType(sound) == "sound" then

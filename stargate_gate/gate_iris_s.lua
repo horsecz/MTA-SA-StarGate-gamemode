@@ -1,5 +1,11 @@
--- iris_s.lua_ Iris module
+-- iris_s.lua: Iris element module; server-side
 
+-- Created new iris object element (animation frame) and attaches it to stargate
+--- REQUIRED PARAMETERS:
+--> stargateID      string      ID of stargate
+--> frame           int         iris animation frame
+--- RETURNS:
+--> Reference; iris object element animation frame
 function stargate_iris_create(stargateID, frame)
     local x, y, z = stargate_getPosition(stargateID)
     local iris = createObject(1337, x, y, z)
@@ -15,6 +21,11 @@ function stargate_iris_create(stargateID, frame)
     return iris
 end
 
+-- Enables or disables auto-close of iris that is attached to given stargate
+-- > iris auto-close is performed on every incoming wormhole if it is enabled
+--- REQUIRED PARAMETERS:
+--> stargateID      string      ID of stargate
+--> autoclose       bool        enabled or disabled iris auto-close?
 function stargate_iris_setAutoClose(stargateID, autoclose)
     if autoclose == true then
         local t = setTimer(stargate_iris_autoclose, 50, 0, stargateID)
@@ -28,6 +39,9 @@ function stargate_iris_setAutoClose(stargateID, autoclose)
     end
 end
 
+-- Performs auto-close of stargate's iris
+--- REQUIRED PARAMETERS:
+--> stargateID      string      ID of stargate
 function stargate_iris_autoclose(stargateID)
     local incoming = stargate_getIncomingStatus(stargateID)
     local iris = stargate_iris_isActive(stargateID)
@@ -44,10 +58,9 @@ function stargate_iris_autoclose(stargateID)
     end
 end
 
-addCommandHandler("testiris", function(e, cmd)
-    stargate_iris_toggle("SG_MW_3")
-end)
-
+-- Switch iris status (open <-> close)
+--- REQUIRED PARAMETERS:
+--> stargateID      string      ID of stargate
 function stargate_iris_toggle(stargateID)
     local irisStatus = stargate_iris_isActive(stargateID)
     if irisStatus == true then
@@ -57,6 +70,16 @@ function stargate_iris_toggle(stargateID)
     end
 end
 
+-- Activate or deactivate stargate's iris
+-- > perform open/close animation with sound
+-- > hide event horizon teleport marker (hides in the middle of closing animation)
+-- > forbid all elements to be teleported in or out
+-- > set its (iris) own state to "toggling" when performing animation and reset back to normal after it's done  
+--- REQUIRED PARAMETERS:
+--> stargateID      string      ID of stargate
+--> active          bool        open or close iris?
+--- RETURNS:
+--> Int; time [ms] to perform iris open/close animation or false if stargate's vortex is being opened or false if iris is already being opened/closed
 function stargate_iris_setActive(stargateID, active)
     local iris = nil
     local t = GATE_IRIS_ACTIVATION_SPEED
@@ -127,8 +150,4 @@ function stargate_iris_setActive(stargateID, active)
     setTimer(setElementData, t, 1, stargate_getElement(stargateID), "irisIsToggling", false)
     setTimer(setElementCollisionsEnabled, t/2, 1, iris, active)
     return t
-end
-
-function stargate_iris_isActive(stargateID)
-    return (getElementData(stargate_getElement(stargateID), "irisActive"))
 end

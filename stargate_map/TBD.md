@@ -1,8 +1,4 @@
-# Stargate MAP script
-
-Contains all maps and its related scripts.
-
-# TODO
+# To be done
 
 - Load HOTU maps from IPL and convert them into separate .map files in separate dimensions per planet
     - SGC (Earth)   -> DONE
@@ -19,7 +15,11 @@ Contains all maps and its related scripts.
 - Basic functionality of SA map
     - Spawn area = Lobby in San Andreas
     - Gate area in SA
-- Functionality of HOTU maps
+- Basic functionality of Milkyway maps
+    - SGC
+    - Icarus
+    - Other worlds
+- Functionality of all HOTU maps
 - Basic connection and co-working between resources
-    - Spawn stargates in map worlds
-
+    - Spawn stargates and dhds in map worlds
+- San Andreas (and other worlds) NPCs and world "aliveness" (no ghost towns and worlds!)

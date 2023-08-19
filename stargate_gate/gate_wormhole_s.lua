@@ -1,16 +1,27 @@
--- wormhole_s.lua_ Wormhole operations module
+-- wormhole_s.lua: Module for wormhole operations and functions; server-side
 
--- create wormhole between stargates
+-- Create wormhole between two stargates
+-- > Set all stargates open status (to true) and their energy consumption to GATE_ENERGY_WORMHOLE
+-- > Perform kawoosh/vortex opening animation (and create kill zone marker so any element is destroyed if touching vortex)
+-- > Show and animate event horizon with enabling transport from source stargate to destination stargate
+-- > Create timer for stargate autoclose after given time; timer is only one, however reference is stored on both gates
+-- > Create timer for automatic stargate close, when stargates energy requirements won't be met (one timer, references on both gates)
+--- REQUIRED PARAMETERS:
+--> stargateIDFrom      string      ID of stargate
+--> stargateIdTO        int         kawoosh frame number
+--- RETURNS:
+--> Bool; false if very rare case happens (both stargates dial themselves at the same time), otherwise no return value
 function stargate_wormhole_create(stargateIDFrom, stargateIDTo)
     stargate_setOpen(stargateIDFrom, true)
     if stargate_isOpen(stargateIDTo) then
-        outputDebugString("[STARGATE] HANDLED RARE CASE: Both stargates (F:"..stargateIDFrom..", T:"..stargateIDTo..") dialed themselves at the same time. Stargate T did not create wormhole.")
+        outputDebugString("[STARGATE] HANDLED RARE CASE: Both stargates (F:"..stargateIDFrom..", T:"..stargateIDTo..") dialed themselves at the same time. Stargates won't create wormhole.")
         return false
     else
         stargate_setOpen(stargateIDTo, true)
     end
     energy_device_setConsumption(stargate_getEnergyElement(stargateIDFrom), GATE_ENERGY_WORMHOLE)
     energy_device_setConsumption(stargate_getEnergyElement(stargateIDTo), GATE_ENERGY_WORMHOLE)
+
     -- opening, vortex
     stargate_sound_play(stargateIDFrom, enum_soundDescription.GATE_VORTEX_OPEN)
     stargate_sound_play(stargateIDTo, enum_soundDescription.GATE_VORTEX_OPEN)
@@ -65,6 +76,10 @@ function stargate_wormhole_create(stargateIDFrom, stargateIDTo)
     end, vortexTime+100, 1, stargateIDFrom, stargateIDTo)
 end
 
+-- Perform check whether stargate energy status is OK; if not, close the connection (wormhole) and notify player
+--- REQUIRED PARAMETERS:
+--> stargateIDFrom      string      ID of source stargate
+--> stargateIDTo        string      ID of destination stargate
 function stargate_wormhole_energyCheck(stargateIDFrom, stargateIDTo)
     local fE = stargate_getEnergyElement(stargateIDFrom)
     local tE = stargate_getEnergyElement(stargateIDTo)
@@ -79,8 +94,12 @@ function stargate_wormhole_energyCheck(stargateIDFrom, stargateIDTo)
     end
 end
 
--- prepare for creation of wormhole between stargates; check if it is possible to connect both gates,
--- returns enumeration value of enum stargateStatus; if connection possible, returns GATE_IDLE value
+-- Prepare for creation of wormhole between stargates; check if it is possible to connect both gates and create wormhole
+--- REQUIRED PARAMETERS:
+--> stargateIDFrom      string      ID of source stargate
+--> stargateIDTo        string      ID of destination stargate
+--- RETURNS:
+-- enum_stargateStatus; enumeration value (int) - if connection is possible returns GATE_IDLE value, otherwise returns proper value from enum
 function stargate_wormhole_checkAvailability(stargateIDFrom, stargateIDTo)
     if stargateIDFrom == stargateIDTo then
         return enum_stargateStatus.DIAL_SELF
@@ -100,11 +119,19 @@ function stargate_wormhole_checkAvailability(stargateIDFrom, stargateIDTo)
     return enum_stargateStatus.GATE_IDLE
 end
 
--- In case that other-dialed SG is dialling (active) but not connected yet, we must check for its status again
--- before completely failing dialling process;
--- if dialed SG is still not yet open and we can estabilish connection, we get priority and interrupt its dialling;
--- 
--- connected SG == all chevrons on outgoing SG locked/encoded & any chevron on incoming SG is locked/encoded
+-- Secures connection between two stargates
+-- > Performs neccessary checks like:
+--      > destination gate open (someone dialed it faster)      -> dial failed
+--      > source gate open (incoming wormhole on source gate)   -> dial failed
+--      > source gate has attribute dial_failed set true (incoming wormhole on source gate)             -> nothing happens
+--      > energy requirements for source stargate weren't met (not enough energy to create wormhole)    -> dial failed
+-- > If all checks are fine, activates destination stargate and creates wormhole
+-- > If checks are OK but destination stargate is active (not open, dialling out - animation not finished yet), destination gate will be interrupted (dial for it will fail) and wormhole will be created
+--- REQUIRED PARAMETERS:
+--> stargateIDFrom      string      ID of source stargate
+--> stargateIDTo        string      ID of destination stargate
+--- RETURNS:
+--> Null; if connection cannot be secured, otherwise no return value
 function stargate_wormhole_secureConnection(stargateIDFrom, stargateIDTo)
     local sg_en = stargate_getEnergyElement(stargateIDFrom)
     if stargate_isOpen(stargateIDTo) then -- second stargate dialed out faster
@@ -165,7 +192,18 @@ function stargate_wormhole_secureConnection(stargateIDFrom, stargateIDTo)
     setTimer(stargate_wormhole_create, GATE_OPEN_DELAY + MW_WORMHOLE_CREATE_DELAY, 1, stargateIDFrom, stargateIDTo)
 end
 
--- teleport function for stargate horizon markers; source = marker
+-- Teleport function for stargate horizon markers
+-- > Teleports element that hits event horizon marker to destination stargate
+-- > When teleporting, plays horizon touch sound
+-- > Element won't be teleported if:
+--      > stargate is being closed (horizon is deactivating)    -> element will be destroyed
+--      > marker is on destination stargate         -> nothing happens
+--      > iris is active on source stargate         -> nothing happens
+--      > iris is active on destination stargate    -> element will be destroyed
+--- REQUIRED PARAMETERS:
+--> Inherited from "onMarkerHit" server event
+--- RETURNS:
+--> Bool; true if element hit the marker but teleport won't be performed
 function stargate_wormhole_transport(hitElement)
     if stargate_marker_isEventHorizon(source) and getElementDimension(hitElement) == getElementDimension(source) then
         local stargateIDFrom = stargate_marker_getSource(source)
@@ -227,7 +265,14 @@ function stargate_wormhole_transport(hitElement)
     end
 end
 
--- close active wormhole between two SGs
+-- Close active wormhole between two stargates; shut down both gates
+-- > 1. Deactivate horizon markers (but don't destroy yet)
+-- > 2. Play gate close sound
+-- > 3. Animate event horizon closing, remove horizon marker
+-- > 4. Reset stargate attributes and turn off chevrons
+--- REQUIRED PARAMETERS:
+--> stargateIDFrom      string      ID of source stargate
+--> stargateIDTo        string      ID of destination stargate
 function stargate_wormhole_close(stargateIDFrom, stargateIDTo)
     killTimer(stargate_getEnergyTimer(stargateIDFrom))
     -- prepare, disable teleportation

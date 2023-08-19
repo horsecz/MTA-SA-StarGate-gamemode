@@ -1,1 +1,1 @@
--- map_c.lua
+-- map_c.lua: Main module for stargate maps; client-side
