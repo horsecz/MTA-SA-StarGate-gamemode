@@ -1,9 +1,13 @@
 <meta>
     <min_mta_version server="1.6.0-9.21695" client="1.6.0-9.21695"></min_mta_version>
-    <info type="stargate_models" version="1.0.0"></info>
+    <info name="STARGATE: Models" type="script" version="1.0.0"></info>
 
     <script src="models_s.lua" type="server"></script>
     <script src="models_c.lua" type="client"></script>
+	<script src="models_useful.lua" type="shared"></script>
+	<script src="models_declarations.lua" type="shared"></script>
+	<script src="models_commands.lua" type="shared"></script>
+
 	<script src="models_load_c.lua" type="client"></script>
     <script src="models_imports_s.lua" type="server"></script>
     <script src="models_imports_c.lua" type="client"></script>

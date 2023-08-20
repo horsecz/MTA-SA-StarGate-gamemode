@@ -1,5 +1,8 @@
---- load.c: manual loading of models
+--- load.c: Loading given models; client-side 
 
+-- Load models in occupied planet
+-- > core models (Stargate Model, Stargate Core, DHD Model)
+-- > models in given range of player
 function models_load_autoPlanetModelsLoad()
     local galaxy = planet_getElementOccupiedGalaxy(getLocalPlayer())
     local planet = planet_getElementOccupiedPlanet(getLocalPlayer())
@@ -15,13 +18,16 @@ end
 addEvent("models_load_autoPlanetModelsLoad_event", true)
 addEventHandler("models_load_autoPlanetModelsLoad_event", root, models_load_autoPlanetModelsLoad)
 
+-- Unload core planet models (stargate milkyway, core stargate, dhd milkyway)
 function models_load_autoPlanetModelsUnload()
     models_load_stargateMW(true)
     models_load_stargateCore(true)
     models_load_dhdMW(true) 
 end
 
--- loads milkyway stargate
+-- Loads milkyway stargate model
+--- OPTIONAL PARAMETERS:
+--> unload		bool		will be model(s) unloaded?
 function models_load_stargateMW(unload)
 	local sg_mw = models_getObjectID(getLocalPlayer(), "innerring")
 	local sg_mw_ring = models_getObjectID(getLocalPlayer(), "outerring")
@@ -33,7 +39,9 @@ function models_load_stargateMW(unload)
 	end
 end
 
--- loads horizon, activation and kawoosh for MW and PG stargates
+-- Loads horizon, activation and kawoosh-vortex for MW and PG stargates
+--- OPTIONAL PARAMETERS:
+--> unload		bool		will be model(s) unloaded?
 function models_load_stargateCore(unload)
 	for i=1,6 do
 		models_loadModelManually(models_getObjectID(getLocalPlayer(), "act"..tostring(i)), unload)
@@ -47,7 +55,9 @@ function models_load_stargateCore(unload)
 	end
 end
 
--- loads milkyway DHD
+-- Loads milkyway DHD model
+--- OPTIONAL PARAMETERS:
+--> unload		bool		will be model(s) unloaded?
 function models_load_dhdMW(unload)
     local dhd = models_getObjectID(getLocalPlayer(), "dhd")
 	models_loadModelManually(dhd, unload)

@@ -1,4 +1,4 @@
--- imports_s.lua_ Importing functions from other gate_* resources
+-- imports_s.lua: Importing functions from other gate_* resources; server-side
 
 SG_MW = nil
 
