@@ -7,7 +7,7 @@
     <script src="gamemode_imports_s.lua" type="server" />
     <script src="gamemode_imports_c.lua" type="client" />
     <script src="gamemode_functions.lua" type="shared" />
-    <script src="gamemode_commands.lua" type="shared" />
+    <script src="gamemode_commands_s.lua" type="server" />
 
     <export function="import_players_joined" type="server" />
 

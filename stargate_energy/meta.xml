@@ -24,5 +24,5 @@
     <export function="energy_device_setMaxProduction" type="shared" />
     <export function="energy_device_setName" type="shared" />
 
-    <export function="energy_beginTransfer" type="shared" />
+    <export function="energy_transfer" type="shared" />
 </meta>

@@ -48,7 +48,7 @@ function energy_device_getMaxProduction(...)
 end
 
 function energy_beginTransfer(...)
-    return (exports.stargate_energy:energy_beginTransfer(...))
+    return (exports.stargate_energy:energy_transfer(...))
 end
 
 

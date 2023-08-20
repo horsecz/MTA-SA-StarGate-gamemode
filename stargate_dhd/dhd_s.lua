@@ -65,6 +65,7 @@ end
 function dhd_remove(dhdID)
     local dhd = dhd_getElement(dhdID)
     local dhd_marker = getElementByID(dhdID.."_EM")
+    dhd_detachFromStargate(dhdID)
     removeEventHandler("onMarkerHit", dhd_marker, dhd_activate)
     destroyElement(dhd)
     destroyElement(dhd_marker)
@@ -117,8 +118,8 @@ function dhd_activate(player)
             outputChatBox("["..tostring(getElementID(dhd)).."] You can now dial with command: /dial [Stargate ID number]")
             setElementData(player, "atDHD", dhd)
             addCommandHandler("dial", dhd_dialStart)
-            outputChatBox("[ENERGY] DHD: "..tostring(energy_device_getStorage(energy)))
-            outputChatBox("[ENERGY] SG: "..tostring(energy_device_getStorage(energy_sg)))
+            --outputChatBox("[ENERGY] DHD: "..tostring(energy_device_getStorage(energy)).." S / "..tostring(energy_device_getProduction(energy)).." P / "..tostring(energy_device_getConsumption(energy)).." C")
+            --outputChatBox("[ENERGY] SG: "..tostring(energy_device_getStorage(energy_sg)).." S / "..tostring(energy_device_getProduction(energy_sg)).." P / "..tostring(energy_device_getConsumption(energy_sg)).." C")
             -- TEMPORARY ^^^
             --
         end

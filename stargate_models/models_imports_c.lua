@@ -53,6 +53,10 @@ function planet_setElementOccupiedPlanet(...)
     return (exports.stargate_planets:planet_setElementOccupiedPlanet(...))
 end
 
+function planet_getPlanetName(...)
+    return (exports.stargate_planets:planet_getPlanetName(...))
+end
+
 function global_setData(...)
     return (exports.stargate_exports:global_setData(...))
 end

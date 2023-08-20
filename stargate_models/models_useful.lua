@@ -100,6 +100,32 @@ function models_getObjectHOTUID(playerElement, objectName)
 	return nil
 end
 
+-- Sets clients texture quality setting to specified level
+--- REQUIRED PARAMETERS:
+--> level		int		specified quality settings level (accepting: 1 - 4)
+--- RETURNS:
+--> String; level string description or nil if invalid level
+function models_setTextureQualitySetting(level)
+	local mq_level_str = "69"
+	if level == 4 then
+		mq_level_str = "Default"
+		DUPE_TXD_LOAD_MAX = DUPE_TXD_LOAD_MAX_DEFAULT
+	elseif level == 3 then
+		mq_level_str = "Medium"
+		DUPE_TXD_LOAD_MAX = DUPE_TXD_LOAD_MAX_LOWSPEC_1
+	elseif level == 2 then
+		mq_level_str = "Low"
+		DUPE_TXD_LOAD_MAX = DUPE_TXD_LOAD_MAX_LOWSPEC_2
+	elseif level == 1 then
+		mq_level_str = "Minimum"
+		DUPE_TXD_LOAD_MAX = DUPE_TXD_LOAD_MAX_LOWSPEC_3
+	else
+		outputDebugString("[STARGATE:MODELS] models_setTextureQualitySetting("..tostring(level).."): Wrong level.", 2)
+		return nil
+	end
+	return mq_level_str
+end
+
 -- 
 -- TO BE REMOVED
 function setElementModelClient(element, modelID)

@@ -44,18 +44,18 @@ function array_get(...)
     return (exports.stargate_exports:array_get(...))
 end
 
-function global_addData(key, value)
-    return (setElementData(global_getElement(), key, value))
+function global_addData(...)
+    return (exports.stargate_exports:global_addData(...))
 end
 
-function global_getData(key)
-    return (getElementData(global_getElement(), key))
+function global_getData(...)
+    return (exports.stargate_exports:global_getData(...))
 end
 
-function global_setData(key)
-    return (global_addData(key, value))
+function global_setData(...)
+    return (exports.stargate_exports:global_setData(...))
 end
 
-function global_removeData(key)
-    return (global_setData(key, nil))
+function global_removeData(...)
+    return (exports.stargate_exports:global_removeData(...))
 end

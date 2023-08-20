@@ -296,6 +296,10 @@ function stargate_wormhole_close(stargateIDFrom, stargateIDTo)
         stargate_setOpen(stargateIDFrom, false)
         stargate_setOpen(stargateIDTo, false)
         stargate_setIncomingStatus(stargateIDTo, false)
+
+        stargate_horizon_remove(stargateIDFrom)
+        stargate_horizon_remove(stargateIDTo)
+        
         setElementData(stargate_getElement(stargateIDFrom), "dial_failed", false)
         setElementData(stargate_getElement(stargateIDTo), "dial_failed", false)
     end, 3000, 1, stargateIDFrom, stargateIDTo)

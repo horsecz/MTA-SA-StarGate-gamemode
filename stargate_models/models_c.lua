@@ -12,6 +12,15 @@ function models_clientStarted()
 
 
 	local loadTime = models_load()	-- only parses, all models have isLoaded == false
+
+	if not loadTime then
+		outputChatBox("[STARGATE:MODELS] Fatal error: models cannot be loaded. Reconnect and try again.")
+		fadeCamera(false)
+		setElementPosition(getLocalPlayer(), 99999, 99999, 9999)
+		setElementFrozen(getLocalPlayer(), true)
+		setElementAlpha(getLocalPlayer(), 0)
+		return false
+	end
 	setTimer(models_loadObjects, loadTime, 1)
 	setTimer(models_loadCore, loadTime+1000, 1)
 
@@ -39,6 +48,7 @@ function models_clientTimer()
 
 	local VMTotal_warn = false
 	local VMFree_warn = false
+
 	if VMTotal < VM_RECOMMENDED_MB then
 		VMTotal_warn = true
 	end
@@ -46,10 +56,31 @@ function models_clientTimer()
 		VMFree_warn = true
 	end
 	
-	if VMTotal_warn == true and not VMTotal_warning == "happened" then
+	if VMTotal_warn == true and VMTotal_warning == false then
 		if VMTotal < VM_MINIMUM_MB then
-			outputChatBox("[SG:MODELS] WARNING! Your total GPU Video Memory is less than minimum recommended value. Your GPU VM: "..tostring(VMTotal).." MB; Minimum recommended: "..tostring(VM_RECOMMENDED_MB).." MB") 
-			outputChatBox("[SG:MODELS] Low video memory may cause lower FPS, failure of loading models or at worst - game crash. Your total GPU VM is less than minimum recommended value of "..tostring(VM_MINIMUM_MB).." MB.")
+			local mq_level_str = "3"
+			if VMTotal < VM_MINIMUM_MB and VMTotal > VM_MINIMUM_MB_L3 then
+				mq_level_str = "Medium"
+				DUPE_TXD_LOAD_MAX = DUPE_TXD_LOAD_MAX_LOWSPEC_1
+			elseif VMTotal <= VM_MINIMUM_MB_L3 and VMTotal > VM_MINIMUM_MB_L2 then
+				mq_level_str = "Low"
+				DUPE_TXD_LOAD_MAX = DUPE_TXD_LOAD_MAX_LOWSPEC_2
+			elseif VMTotal <= VM_MINIMUM_MB_L2 and VMTotal > VM_MINIMUM_MB_L1 then
+				mq_level_str = "Minimum"
+				DUPE_TXD_LOAD_MAX = DUPE_TXD_LOAD_MAX_LOWSPEC_3
+			else
+				mq_level_str = "Minimum"
+				DUPE_TXD_LOAD_MAX = DUPE_TXD_LOAD_MAX_LOWSPEC_3
+			end
+
+			if VMTotal < VM_MINIMUM_MB_L1 then
+				outputChatBox("[SG:MODELS] WARNING! Your total GPU Video Memory is less than absoulte minimum value for playing this gamemode. Your GPU VM: "..tostring(VMTotal).." MB; Recommended: "..tostring(VM_MINIMUM_MB_L1).." MB") 	
+				outputChatBox("[SG:MODELS] Your texture quality setting was lowered to prevent game crash, however you may still experience it due to very low memory.")
+			else
+				outputChatBox("[SG:MODELS] WARNING! Your total GPU Video Memory is less than minimum recommended value. Your GPU VM: "..tostring(VMTotal).." MB; Recommended: "..tostring(VM_RECOMMENDED_MB).." MB") 
+				outputChatBox("[SG:MODELS] Your texture quality setting was lowered to prevent game crash and ensure you can still enjoy this gamemode.")
+			end
+			outputChatBox("[SG:MODELS] Textures quality level: "..mq_level_str)
 		else
 			outputChatBox("[SG:MODELS] WARNING! Your total GPU Video Memory is less than recommended value for smooth gameplay. Your GPU VM: "..tostring(VMTotal).." MB; Recommended: "..tostring(VM_RECOMMENDED_MB).." MB")
 			outputChatBox("[SG:MODELS] Although you satisfy minimum requirements ("..tostring(VM_MINIMUM_MB).." MB), you may still experience lower FPS or lags when playing.")
@@ -82,9 +113,11 @@ addEventHandler("onClientResourceStop", resourceRoot, models_clientStopped)
 -- Anti-crash system - protects client from crashing by filling the entire GPU Video Memory (and overflowing it)
 -- 	> Unloads all textures when VM is below specified treshold
 --  > If player is not in San Andreas, teleports him there
-function models_vm_protection()
+--- OPTIONAL PARAMETERS:
+--> dontAsk		bool		dont wait for if condition and destroy the models now
+function models_vm_protection(dontAsk)
 	local VMFree = dxGetStatus().VideoMemoryFreeForMTA -- MB
-	if VMFree < VM_DESTROY_THRESHOLD then
+	if VMFree < VM_DESTROY_THRESHOLD or dontAsk == true then
 		models_unloadModels()
 		local str_addition = "."
 		if not planet_getElementOccupiedPlanet(getLocalPlayer()) == "PLANET_0" then
@@ -109,13 +142,9 @@ end
 --- RETURNS:
 --> Bool; true if model ids are already loaded (and reload is not active), otherwise no return value
 function models_loadObjects(reload)
-	local modelsLoaded = global_getData("MODELS_LOADED")
+	local modelsLoaded = getElementData(getLocalPlayer(), "player_object_models_loaded")
 	if modelsLoaded == true then
-		if not reload then
-			return true
-		else
-			outputDebugString("[MODELS|C] Reloading object models.")
-		end
+		outputDebugString("[MODELS|C] Reloading object models.")
 	end
 
 	local model_data = nil
@@ -123,20 +152,15 @@ function models_loadObjects(reload)
 	for i,object in ipairs(getElementsByType("object")) do
 		model_data = models_getElementModelAttribute(object)
 		if model_data then
-			if getElementData(object, "element_model_modelSet") == true then
-				-- model already set
-			else
-				id = models_getObjectID(getLocalPlayer(), model_data)
-				if id then
-					setElementModel(object, id)
-					local x,y,z = getElementPosition(object)
-					outputDebugString("[MODELS|C] Object element '"..tostring(getElementID(object)).." was assigned model '"..tostring(id).."'")
-					setElementData(object, "element_model_modelSet", true)
-				end
+			id = models_getObjectID(getLocalPlayer(), model_data)
+			if id then
+				setElementModel(object, id)
+				local x,y,z = getElementPosition(object)
+				--outputDebugString("[MODELS|C] Object element '"..tostring(getElementID(object)).." was assigned model '"..tostring(id).."'")
 			end
 		end
 	end
-	global_setData("MODELS_LOADED", true)
+	setElementData(getLocalPlayer(), "player_object_models_loaded", true)
 end
 
 -- Frees GPU VM by destroying all used/loaded texture elements
@@ -211,29 +235,89 @@ function models_loadObjectModel(txdPath, dffPath, colPath, requestIDOnly, doNotR
 	local txd_list = getElementData(getLocalPlayer(), "txd_loaded_list")
 	local txd_isNew = true
 	local txd = nil
-	if txd_list then -- use already loaded txd
+	local txd_num = 1
+	local rtxd_loaded = false
+	local rtxd = nil
+
+	-- doesnt work on AMD GPU ...
+	if dxGetStatus().VideoMemoryFreeForMTA < VM_DESTROY_THRESHOLD then
+		models_vm_protection(true)
+		return false
+	end
+
+	-- reuse loaded txd if loaded too often
+	if txd_list then
 		for i,t_table in ipairs(txd_list) do
 			if t_table[2] == txdPath then
-				txd_isNew = false
-				txd = t_table[1]
-				break
+				txd_num = t_table[3]
+				if t_table[3] >= DUPE_TXD_LOAD_MAX then
+					txd_isNew = false
+					txd = t_table[1]
+					rtxd = engineImportTXD(txd, objectID)
+					if rtxd then
+						rtxd_loaded = true
+						break
+					end
+				end
 			end
 		end
 	end
 
 	if txd_isNew == true then
 		txd = engineLoadTXD(txdPath)
+		txd_num = txd_num + 1
 	end
-	if txd == nil or txd == false then
-		outputDebugString("loadObjectModel("..tostring(objectID)..","..tostring(txdPath)..","..tostring(dffPath)..","..tostring(colPath)..") [TXD LOAD]", 2)
+
+	if not txd then 
+		outputDebugString("loadObjectModel("..tostring(objectID)..","..tostring(txdPath)..","..tostring(dffPath)..","..tostring(colPath)..") [TXD LOAD] (Free VM: "..tostring(dxGetStatus().VideoMemoryFreeForMTA)..")", 2)
 		return false
 	end
-	local rtxd = engineImportTXD(txd, objectID)
-	if rtxd == nil or rtxd == false then
-		-- Note: do nothing since TXDs are reused and that will cause 'rxtd' to be false for somehow weird reason (even it's loaded OK) 
-		--outputDebugString("loadObjectModel("..tostring(objectID)..","..tostring(txdPath)..","..tostring(dffPath)..","..tostring(colPath)..") [TXD IMPORT "..tostring(rtxd).."]", 1)
-		--return false
+
+	if rtxd_loaded == false then
+		rtxd = engineImportTXD(txd, objectID)
 	end
+	if not rtxd then
+		if txd_isNew == true then -- we care only if its newly loaded TXD
+			outputDebugString("loadObjectModel("..tostring(objectID)..","..tostring(txdPath)..","..tostring(dffPath)..","..tostring(colPath)..") [TXD IMPORT "..tostring(rtxd).."]", 1)
+			return false
+		end
+	end
+
+	-- REUSING TEXTURES
+	--if not rtxd then -- cannot reuse TXD -> need load it again
+	--	outputDebugString("loadObjectModel("..tostring(objectID)..","..tostring(txdPath)..","..tostring(dffPath)..","..tostring(colPath)..") Failed -> trying another", 2)
+	--	
+	--	local txd_num = 1
+	--	local txd_loaded = false
+	--	if txd_list then -- use already loaded txd but different (try all of them)
+	--		for i,t_table in ipairs(txd_list) do
+	--			if t_table[2] == txdPath and t_table[3] > 1 then -- dont try the first one again
+	--				txd_isNew = false
+	--				txd = t_table[1]
+	--				txd_num = t_table[3]
+--
+--					rtxd = engineImportTXD(txd, objectID)
+--					if rtxd then
+--						txd_loaded = true
+--						outputDebugString("Another found! Number: "..tostring(txd_num))
+--						break
+--					end
+--				end
+--			end
+--		end
+--
+--		if txd_loaded == false then -- none of them worked properly
+--			txd_num = txd_num + 1
+--			txd = engineLoadTXD(txdPath)
+--			rtxd = engineImportTXD(txd, objectID)
+--			outputDebugString("Another not found. Loading TXD again ("..tostring(txd_num).."th time).")
+--			if not rtxd then
+--				outputDebugString("loadObjectModel("..tostring(objectID)..","..tostring(txdPath)..","..tostring(dffPath)..","..tostring(colPath)..") [TXD IMPORT "..tostring(rtxd).."]", 1)
+--				return false
+--			end
+--			txd_list = array_push(txd_list, { txd, txdPath, txd_num })
+--		end
+--	end
 
 	dff = engineLoadDFF(dffPath, objectID)
 	if dff == nil or dff == false then
@@ -263,8 +347,9 @@ function models_loadObjectModel(txdPath, dffPath, colPath, requestIDOnly, doNotR
 	end
 
 	if txd_list and txd_isNew == true then
-		txd_list = array_push(txd_list, { txd, txdPath })
+		txd_list = array_push(txd_list, { txd, txdPath, txd_num })
 	end
+	--txd_list = array_push(txd_list, { txd, txdPath, array_size(txd_list) })
 	setElementData(getLocalPlayer(), "txd_loaded_list", txd_list)
 	return true, objectID
 end
@@ -292,6 +377,7 @@ function models_load()
 
 	if not stargate_ide then
 		outputDebugString("[MODELS|C] No models loaded! Unable to open 'files/stargate.ide' file.", 1)
+		outputChatBox("[STARGATE:MODELS] Unable to open file 'files/stargate.ide' in 'stargate_models' resource.")
 		return false
 	end
 	local stargate_ide_content = fileRead(stargate_ide, fileGetSize(stargate_ide))
@@ -325,7 +411,8 @@ function models_load()
 		txdPath = PATH_TXD..txdFileName..".txd"
 		local txdFileDesc = fileOpen(txdPath)
 		if txdFileDesc == false then
-			outputDebugString("[MODELS|C] Unable to open file '"..txdPath.."'. Aborting loading models.")
+			outputDebugString("[MODELS|C] Unable to open file '"..tostring(txdPath).."'. Aborting loading models.")
+			outputChatBox("[STARGATE:MODELS] Unable to open file '"..tostring(txdPath).."' in 'stargate_models' resource.")
 			return false
 		end
 		local txdFileSize = fileGetSize(txdFileDesc)

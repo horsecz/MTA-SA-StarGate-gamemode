@@ -13,10 +13,11 @@ function models_load_autoPlanetModelsLoad()
         models_load_stargateCore()
         models_load_dhdMW()
     end
-	models_loadModelsNearPlayer(getLocalPlayer(), 150)
+	models_loadModelsNearPlayer(getLocalPlayer(), 250)
 end
 addEvent("models_load_autoPlanetModelsLoad_event", true)
 addEventHandler("models_load_autoPlanetModelsLoad_event", root, models_load_autoPlanetModelsLoad)
+global_setData("models_load_autoPlanetModelsLoad_event:added", true)
 
 -- Unload core planet models (stargate milkyway, core stargate, dhd milkyway)
 function models_load_autoPlanetModelsUnload()

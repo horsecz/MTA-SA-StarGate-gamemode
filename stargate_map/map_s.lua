@@ -87,7 +87,7 @@ function map_createHOTUObjects(file)
         --objectsArray = array_push(objectsArray, TN)
 
         -- creating objects in world
-        outputDebugString("[MAP|C] Created object '"..tostring(dffFileName).."' ("..posX..","..posY..","..posZ..").")
+        --outputDebugString("[MAP|C] Created object '"..tostring(dffFileName).."' ("..posX..","..posY..","..posZ..").")
         object = createObject(1337, tonumber(posX), tonumber(posY), tonumber(posZ))
         setElementDimension(object, 6969)
         setElementRotation(object, tonumber(rotX), tonumber(rotY), tonumber(rotZ))
@@ -100,7 +100,7 @@ function map_createHOTUObjects(file)
     end
     
     --map_generateMapFile(objectsArray, "stargate_random")  -- generating map file
-    outputDebugString("[MAP|C] HOTU map from file "..tostring(file).." created. Created objects: "..tostring(cnt_p)..".")
+    outputDebugString("[MAP|S] HOTU map from file "..tostring(file).." created. Created objects: "..tostring(cnt_p)..".")
     return true
 end
 

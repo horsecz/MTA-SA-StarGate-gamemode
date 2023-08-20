@@ -1,7 +1,7 @@
 -- useful.lua: Useful functions when working with planet element; shared
 
 --- Planet element attributes
---> dimension       dimension which this planet belongs to
+--> dimension       dimension which this planet belongs to 
 --> galaxy          galaxy in which is this planet located 
 --> name            name of the planet (if there is one)
 --> lifesupport     lifesupport element containing data about planet atmosphere stats
@@ -47,8 +47,16 @@ function planet_getPlanetName(planetID)
     return (getElementData(planet_getPlanetElement(planetID), "name"))
 end
 
+function planet_setPlanetName(planetID, name)
+    return (setElementData(planet_getPlanetElement(planetID), "name", name))
+end
+
 function planet_getPlanetAtmosphere(planetID)
     return (getElementData(planet_getPlanetElement(planetID), "lifesupport"))
+end
+
+function planet_setPlanetAtmosphere(planetID, ls)
+    return (setElementData(planet_getPlanetElement(planetID), "lifesupport", ls))
 end
 
 function planet_getPlanetCenterPosition(planetID)
@@ -56,6 +64,12 @@ function planet_getPlanetCenterPosition(planetID)
     local cy = getElementData(planet_getPlanetElement(planetID), "cy")
     local cz = getElementData(planet_getPlanetElement(planetID), "cz")
     return cx, cy, cz
+end
+
+function planet_setPlanetCenterPosition(planetID, cx, cy, cz)
+    setElementData(planet_getPlanetElement(planetID), "cx", cx)
+    setElementData(planet_getPlanetElement(planetID), "cy", cy)
+    setElementData(planet_getPlanetElement(planetID), "cz", cz)
 end
 
 function planet_isPlanet(planetID)

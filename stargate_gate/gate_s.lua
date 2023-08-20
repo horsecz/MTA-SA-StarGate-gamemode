@@ -59,7 +59,7 @@ function stargate_create(gateType, dimension, x, y, z, address, irisType, defaul
     stargate_setAddress(id, address)
     stargate_setDefaultDialType(id, dt)
     stargate_setForceDialType(id, forceDefaultDialType)
-    energy_device_create(GATE_ENERGY_WORMHOLE, 0, GATE_ENERGY_WORMHOLE, stargate, GATE_ENERGY_IDLE, 0, "stargate_energy_device")
+    energy_device_create(GATE_ENERGY_CAPACITY, 0, GATE_ENERGY_WORMHOLE, stargate, GATE_ENERGY_IDLE, 0, "stargate_energy_device")
     planet_setElementOccupiedPlanet(stargate, "PLANET_"..dimension)
     stargate_addCollisions(id)
     

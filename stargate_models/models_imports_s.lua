@@ -17,6 +17,14 @@ function callClientFunction(client, funcname, ...)
     triggerClientEvent(client, "onServerCallsClientFunction", resourceRoot, funcname, unpack(arg or {}))
 end
 
+function global_setData(...)
+    return (exports.stargate_exports:global_setData(...))
+end
+
+function global_getData(...)
+    return (exports.stargate_exports:global_getData(...))
+end
+
 function stargate_setModel(...)
     return (exports.stargate_gate:stargate_setModel(...))
 end

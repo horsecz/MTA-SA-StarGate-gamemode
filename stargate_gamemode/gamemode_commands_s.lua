@@ -1,4 +1,4 @@
--- commands.lua: Commands available to players all time (except exceptions ...)
+-- commands_s.lua: Commands available to players all time (except exceptions ...); server-side
 
 ---
 --- DEVELOPMENT COMMANDS
