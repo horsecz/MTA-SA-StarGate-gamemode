@@ -251,7 +251,7 @@ function stargate_wormhole_transport(hitElement)
             stargate_sound_play(stargateIDFrom, enum_soundDescription.GATE_HORIZON_TOUCH, 75)
             stargate_sound_play(stargateIDTo, enum_soundDescription.GATE_HORIZON_TOUCH, 75)
             setElementPosition(hitElement, x2, y2, z2)
-            setElementRotation(hitElement, erx, ery, rz)
+            setElementRotation(hitElement, rx, ry, rz)
             setElementCollisionsEnabled(hitElement, false)
             setElementFrozen(hitElement, true)
         else

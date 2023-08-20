@@ -1,10 +1,14 @@
 # To be done
 
 Medium priority (needed but can be skipped for now):
+- Teleport element rotation (currently incorrect)
 - (Better) collisions for stargate iris
 - Transport animation
     - to hide model loading
     - can be very short; no need for long one (but can be optional)
+    - make element really be transported
+        - while loading models (player), set his position to neutral dimension/position
+        - after models are loaded teleport player into correct dimension and position
 - Support of galaxies and other gate types
     - 8th chevron; dialling to another galaxy; support of galaxies and gate types
     - 9th chevron; dialling to Destiny;
