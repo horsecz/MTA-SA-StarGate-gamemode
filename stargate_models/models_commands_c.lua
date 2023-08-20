@@ -8,10 +8,10 @@ addCommandHandler("txdquality", function(cmd, level_str)
 	end
 	local level_string = models_setTextureQualitySetting(tonumber(level_str))
 
-	if level_string then
+	if not level_string then
 		outputChatBox("[STARGATE:MODELS] You need to specify correct level! (value 1-4)")
 	else
-		outputChatBox("[STARGATE:MODELS] Your texture quality level was set to: '"..tostring(level_string).."'")
+		outputChatBox("[STARGATE:MODELS] Your texture quality level was set to: '"..tostring(level_string).."'. (will be applied on next model load)")
 	end
 end)
 
