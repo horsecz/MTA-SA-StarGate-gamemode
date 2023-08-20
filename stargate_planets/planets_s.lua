@@ -1,29 +1,29 @@
-    -- planets_s.lua: Main script for server-side stargate_planets
+-- planets_s.lua: Main script for planets used in stargate gamemode; server-side
 
 PLANET_LIST = {}
 
-function initServer()
+-- Initialize planet list on this resource start
+function planet_initServer()
     PLANET_LIST = global_getData("PLANET_LIST")
 end
-addEventHandler("onResourceStart", resourceRoot, initServer)
+addEventHandler("onResourceStart", resourceRoot, planet_initServer)
 
---- create new planet
----
+--- Create new planet element
 
 --- REQUIRED PARAMETERS:
---> dimension   world dimension in which will planet take place
---> galaxy      galaxy in which is planet located (enum_galaxy)
+--> dimension   int                     world dimension in which will planet take place
+--> galaxy      enum_galaxy     galaxy in which is planet located
 
 --- OPTIONAL PARAMETERS:
---> name        name of the planet
---- default:    random name depending on galaxy (MW: PXX-XXX; PG: MXX-XXX; UN: U-XXXXX)
---> ls_stats    lifesupport stats for planet (see stargate_lifesupport script&element)
---- default:    default lifesupport values (San Andreas/Earth defaults)
---> cx, cy, cz  planet center coordinates
---- default:    0,0,0
+--> name            string      name of the planet
+--- default: random name depending on galaxy (Milkyway: PXX-XXX; Pegasus: MXX-XXX; Universe: U-XXXXX; Other: nil)
+--> ls_stats        reference   lifesupport element - atmosphere stats for planet
+--- default: default lifesupport values (San Andreas/Earth defaults)
+--> cx, cy, cz      int         planet center coordinates
+--- default: 0, 0, 0
 
---- OUTPUT:
---> planet element
+--- RETURNS:
+--> Reference; planet element or nil if creation failed (created planet is using same dimension as another planet)
 function planet_create(dimension, galaxy, name, ls_stats, cx, cy, cz)
     if not name then
         name = planet_createRandomName(dimension, galaxy)
@@ -69,7 +69,14 @@ function planet_create(dimension, galaxy, name, ls_stats, cx, cy, cz)
     end
 end
 
-function planet_createRandomName(dimension, galaxy)
+-- Creates random name for new planet
+-- > as it would name it Stargate computer in SGC (PXX-XXX or MXX-XXX or U-XXXXX format; X = random number)
+-- > for other galaxies PXXXXX format is used (X = random number)
+--- REQUIRED PARAMETERS:
+--> galaxy      enum_galaxy      galaxy in which is planet located in
+--- RETURNS:
+--> String; name of the planet
+function planet_createRandomName(galaxy)
     local GX = nil
     local name = "Unknown name"
     local fmt = 0
@@ -86,20 +93,25 @@ function planet_createRandomName(dimension, galaxy)
         fmt = 2
     end
 
-    if fmt == 0 then
+    if fmt == 0 then    -- MW and PG; [P/M]XX-XXX format
         local NUM1 = tostring(math.random(10,99))
         local NUM2 = tostring(math.random(100,999))
         name = GX..NUM1.."-"..NUM2
-    elseif fmt == 1 then
+    elseif fmt == 1 then    -- UN; [U]-XXXXX format
         local NUM = tostring(math.random(10000,99999))
         name = GX.."-"..NUM
-    else
+    else -- other; [P]XXXXX format
         local NUM = tostring(math.random(10000,99999))
         name = GX..NUM
     end
     return name
 end
 
+-- Check if planet element can be created
+--- REQUIRED PARAMETERS:
+--> planet      reference       new planet element
+--- RETURNS:
+--> Bool; true if planet can be created or false if not (new planet will occupy dimension of existing planet) 
 function planet_createCheck(planet)
     local planetID = planet_getPlanetID(planet)
     local name = planet_getPlanetName(planetID)
@@ -119,108 +131,6 @@ function planet_createCheck(planet)
             if galaxy == c_galaxy then
                 outputDebugString("[PLANETS] Planet "..name.." for dimension "..tostring(dimension).." has same name as another planet in same galaxy.", 2)
             end
-        end
-    end
-    return true
-end
-
-
----
---- GETTERS
-
-function planet_getPlanetElement(planetID)
-    local planet = getElementByID(planetID)
-    if getElementType(planet) == "planet" then
-        return planet
-    else
-        return nil
-    end
-end
-
-function planet_getPlanetID(planet)
-    return (getElementID(planet))
-end
-
--- returns planet assigned to given dimension (nil if none)
-function planet_getDimensionPlanet(dimension)
-    local pl = global_getData("PLANET_LIST")
-    for i,p in pairs(pl) do
-        if planet_getPlanetDimension(dimension) == dimension then
-            return p
-        end
-    end
-    return nil
-end
-
--- returns dimension in which is this planet located
-function planet_getPlanetDimension(planetID)
-    return (tonumber(getElementData(planet_getPlanetElement(planetID), "dimension")))
-end
-
-function planet_getPlanetGalaxy(planetID)
-    return (getElementData(planet_getPlanetElement(planetID), "galaxy"))
-end
-
-function planet_getPlanetName(planetID)
-    return (getElementData(planet_getPlanetElement(planetID), "name"))
-end
-
-function planet_getPlanetAtmosphere(planetID)
-    return (getElementData(planet_getPlanetElement(planetID), "lifesupport"))
-end
-
-function planet_getPlanetCenterPosition(planetID)
-    local cx = getElementData(planet_getPlanetElement(planetID), "cx")
-    local cy = getElementData(planet_getPlanetElement(planetID), "cy")
-    local cz = getElementData(planet_getPlanetElement(planetID), "cz")
-    return cx, cy, cz
-end
-
-function planet_isPlanet(planetID)
-    if (planet_getPlanetElement(planetID)) == false or (planet_getPlanetElement(planetID)) == nil then
-        return false
-    else
-        return true
-    end
-end
-
-
----
---- ELEMENT FUNCTIONS
-
-function planet_getElementOccupiedPlanet(element)
-    return (getElementData(element, "planet_occupied"))
-end
-
-function planet_getElementOccupiedGalaxy(element)
-    local planet = planet_getElementOccupiedPlanet(element)
-    return (planet_getPlanetGalaxy(planet))
-end
-
-function planet_isElementOnPlanet(planetID, element)
-    return (planet_getElementOccupiedPlanet(element) == planetID)
-end
-
-function planet_setElementOccupiedPlanet(element, planetID, needsLs, resourceStart)
-    if not planet_isPlanet(planetID) then
-        outputDebugString("[PLANETS] Element "..getElementID(element).." was not set to nonexisting planet dimension "..planetID, 2)
-        return false
-    end
-    local ls_stats = planet_getPlanetAtmosphere(planetID)
-    local dimension = planet_getPlanetDimension(planetID)
-    
-    if not needsLs then
-        needsLs = false
-    end
-    if needsLs == true then
-        setElementData(element, "lifesupport", ls_stats)
-    end
-    setElementData(element, "planet_occupied", planetID)
-    setElementDimension(element, dimension)
-
-    if getElementType(element) == "player" then
-        if not resourceStart then
-            models_load_autoPlanetModelsLoad()
         end
     end
     return true

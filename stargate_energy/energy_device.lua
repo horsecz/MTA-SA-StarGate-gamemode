@@ -1,9 +1,10 @@
--- device_s.lua: Energy device element module
+-- device.lua: Energy device element module; shared
 
---- create energy device element - battery or generator
---- devices can act as generator or battery storage
+------------ ENERGY DEVICE NOTES
+--------
+--- Devices can act as generator, battery, transformator or any combination of these (depends on produced, consumed or generated neergy) 
 --> generator:  produces energy, max_production < 0 or > 0
----             produced energy stored into small "buffer" (max_storage)
+---             produced energy stored into "buffer" (max_storage)
 --> battery:    no energy production (max_production is 0)
 ---             receiving energy and storing into storage (max_storage)
 
@@ -15,39 +16,43 @@
 --> test_result     were energy requirements (consumption) for this device met last second? 
 ---                 aka: storage > consumption last second
 ---                 also: energy_device_getEnergyRequirementsTestResult(...)
+--------
+------------
 
+--- Create energy device element
 --- REQUIRED PARAMETERS:
 --> element to which element will be this energy element attachedTo
---> max_storage     amount of energy device can store
---          nil, false or 0     no energy can be stored
+--> max_storage     int     amount of energy device can store
+--          0                   no energy can be stored
 --          less than  0        infinite amount of energy can be stored  
 --          other               energy storage value
---> max_production  amount of energy device can product/create in one second (in best conditions)
---          nil, false or 0     no production
+--> max_production  int     amount of energy device can product/create in one second (in best conditions)
+--          0                   no production
 --          less than 0         infinite production in one second
 --          other               production/s
---> transfer_rate   amount of energy device can transfer in second
---          same as max_storage or max_production
---          warning: value 0 will make device unusable
+--> transfer_rate   int     amount of energy device can transfer in second
+--          note: same as max_storage or max_production
+--          warning: value 0 will make device unusable (for transfers)
 --          note: cannot be below zero (infinite) 
---          note: if this value is greater than max_storage, it will be set to max_storage
+--          note: if this value is greater than max_storage, it will be set (capped) to max_storage
 
 --- OPTIONAL PARAMETERS:
---> sourceElement       element to be attached with energy device element
+--> sourceElement       reference     element to be attached with energy device element
 --          default: nil
 --          warning: energy device element will be unaccessable if not attached to another element 
---> consumption_rate    amount of energy device will consume (from its buffer/storage) per second
+--> consumption_rate    int           amount of energy device will consume (from its buffer/storage) per second
 --          same as transfer rate
 --          default: 0
 --          note: cannot be below zero (infinite)
 --          note: if this value is greater than max_storage, it will be set to max_storage
---> min_production      minimum amount of energy device can produce in one second
+--> min_production      int            minimum amount of energy device can produce in one second
 --          default: 0; values same as max_production
 --          if min_production > max_production, value is set to match max_production
---> name    name of the device
+--> name                string          name of the device
 --          default: nil
+
 --- RETURNS:
---> Energy device element
+--> Reference; Energy device element
 function energy_device_create(max_storage, max_production, transfer_rate, sourceElement, consumption_rate, min_production, name)
     local energyElement = createElement("energy", 0)
     local min_prod = min_produciton
@@ -101,15 +106,18 @@ function energy_device_create(max_storage, max_production, transfer_rate, source
     return energyElement
 end
 
+-- Attaches energy device element to another element
+-- REQUIRED PARAMETERS:
+--> element         reference       element attach to
+--> energyElement   reference       energy device element
 function energy_device_attachToElement(element, energyElement)
     setElementData(element, "energy", energyElement)
 end
 
----
---- TIMERS
----
-
--- currently all devices will constantly produce max_production
+-- Starts producing energy every second in energy device
+-- REQUIRED PARAMETERS:
+--> energyDevice    reference       energy device element
+-- Note: currently all devices will constantly produce max_production
 function energy_device_startProductionTimer(energyDevice)
     local p_timer = setTimer(function(energyDevice)
         local max_production = energy_device_getMaxProduction(energyDevice)
@@ -119,11 +127,16 @@ function energy_device_startProductionTimer(energyDevice)
     setElementData(energyDevice, "timer_production", p_timer)
 end
 
+-- Energy device will stop producing energy every second
+-- REQUIRED PARAMETERS:
+--> energyDevice    reference       energy device element
 function energy_device_stopProductionTimer(energyDevice)
     killTimer(energy_device_getProductionTimer(energyDevice))
 end
 
--- device will consume energy from its storage
+-- Energy device will start to consume energy from its storage
+-- REQUIRED PARAMETERS:
+--> energyDevice    reference       energy device element 
 function energy_device_startConsumptionTimer(energyDevice)
     local c_timer = setTimer(function(energyDevice)
         local consumption = energy_device_getConsumption(energyDevice)
@@ -139,10 +152,21 @@ function energy_device_startConsumptionTimer(energyDevice)
     setElementData(energyDevice, "timer_consumption", c_timer)
 end
 
+-- Stop consuming energy from energy device's own storage
+-- REQUIRED PARAMETERS:
+--> energyDevice    reference       energy device element 
 function energy_device_stopConsumptionTimer(energyDevice)
     killTimer(energy_device_getConsumptionTimer(energyDevice))
 end
 
+---
+--- INTERNAL
+---
+
+-- Adds energy transfer timer element to array of transfer timers in energy device 
+-- REQUIRED PARAMETERS:
+--> energyDevice    reference       energy device element 
+--> timer           reference       timer element
 function energy_device_addTransferTimer(energyDevice, timer)
     local timers = energy_device_getTransferTimers(energyDevice)
     if timers == nil or timers == false then
@@ -152,6 +176,10 @@ function energy_device_addTransferTimer(energyDevice, timer)
     setElementData(energyDevice, "array_timers", timers)
 end
 
+-- Remove energy transfer timer from timers array in energy device
+-- REQUIRED PARAMETERS:
+--> energyDevice    reference       energy device element 
+--> timer           reference       timer element
 function energy_device_removeTransferTimer(energyDevice, timer)
     local timers = energy_device_getTransferTimers(energyDevice)
     if timers == nil or timers == false then
@@ -159,126 +187,4 @@ function energy_device_removeTransferTimer(energyDevice, timer)
     end
     timers = array_remove(timers, timer)
     setElementData(energyDevice, "array_timers", timers)
-end
-
-
----
---- GETTERS/SETTERS
----
-
-function energy_device_getTransferTimers(energyDevice)
-    return getElementData(energyDevice, "array_timers")
-end
-
-function energy_device_isTransferringEnergy(energyDevice)
-    local t = energy_device_getTransferTimers(energyDevice)
-    if t [1] == nil then
-        return false
-    else
-        return true
-    end
-end
-
-
-function energy_device_getProductionTimer(energyDevice)
-    return getElementData(energyDevice, "timer_production")
-end
-
--- energy produced in last second
-function energy_device_getProductionResult(energyDevice)
-    return getElementData(energyDevice, "timer_production_result")
-end
-
-function energy_device_getConsumptionTimer(energyDevice)
-    return getElementData(energyDevice, "timer_consumption")
-end
-
--- energy consumed last second
-function energy_device_getConsumptionResult(energyDevice)
-    return getElementData(energyDevice, "timer_consumption_result")
-end
-
--- checks last second energy balance
-function energy_device_getEnergyRequirementsTestResult(energyDevice)
-    return getElementData(energyDevice, "timer_consumption_er_test")
-end
-
--- checks if energy requirements for device were met
-function energy_device_energyRequirementsMet(energyDevice)
-    -- no energy consumption/requirements => automatically true
-    if energy_device_getEnergyRequirementsTestResult(energyDevice) == false or energy_device_getEnergyRequirementsTestResult(energyDevice) == nil then
-        return true
-    end
-
-    if energy_device_getEnergyRequirementsTestResult(energyDevice) >= 0 then
-        return true
-    else
-        return false
-    end
-end
-
-
-function energy_device_getMaxStorage(energyDevice)
-    return getElementData(energyDevice, "max_storage")
-end
-
-function energy_device_getMaxProduction(energyDevice)
-    return getElementData(energyDevice, "max_production")
-end
-
-function energy_device_getMinProduction(energyDevice)
-    return getElementData(energyDevice, "min_production")
-end
-
-function energy_device_getName(energyDevice)
-    return getElementData(energyDevice, "name")
-end
-
-
-function energy_device_setMaxStorage(energyDevice, v)
-    return setElementData(energyDevice, "max_storage", v)
-end
-
-function energy_device_setMaxProduction(energyDevice, v)
-    return setElementData(energyDevice, "max_production", v)
-end
-
-function energy_device_setMinProduction(energyDevice, v)
-    return setElementData(energyDevice, "min_production", v)
-end
-
-function energy_device_setName(energyDevice, v)
-    return setElementData(energyDevice, "name", v)
-end
-
-function energy_device_setStorage(energyDevice, v)
-    return setElementData(energyDevice, "storage", v)
-end
-
-function energy_device_setProduction(energyDevice, v)
-    return setElementData(energyDevice, "production", v)
-end
-
-function energy_device_getStorage(energyDevice)
-    return getElementData(energyDevice, "storage")
-end
-
-function energy_device_getProduction(energyDevice)
-    return getElementData(energyDevice, "production")
-end
-
-function energy_device_getTransferRate(energyDevice)
-    return getElementData(energyDevice, "transfer_rate")
-end
-
-function energy_device_setTransferRate(energyDevice, v)
-    return setElementData(energyDevice, "transfer_rate", v)
-end
-
-function energy_device_getConsumption(energyDevice)
-    return getElementData(energyDevice, "consumption")
-end
-
-function energy_device_setConsumption(energyDevice, v)
-    return setElementData(energyDevice, "consumption", v)
 end

@@ -1,1 +1,1 @@
---- spawner_c.lua: Element spawner for Stargate gamemode
+--- spawner_c.lua: Element spawner for Stargate gamemode; client-side

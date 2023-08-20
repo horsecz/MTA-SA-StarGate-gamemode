@@ -1,6 +1,23 @@
----
---- GETTERS/SETTERS
----
+-- useful.lua: Useful functions for working with energy device; shared
+
+-- Energy element attributes:
+--> productionResult        amount of energy in EU produced in last second
+--> consumptionResult       amount of energy in EU consumed last second
+--> energyRequirementsTestResult    were energy requirements for this device met last second?
+--> maxStorage              amount of energy in EU device can store
+--> storage                 amount of energy in EU device is currently storing
+--> maxProduction           amount of energy in EU device can produce at peak conditions per second
+--> minProduction           amount of energy in EU device can produce in the worst conditions per second
+--> production              amount of energy in EU device is currently producing per second
+--> name                    name of the energy device
+--> transferRate            amount of energy in EU per second that device can transfer to another device
+--> consumption             amount of energy in EU device is consuming every second
+
+-- Attributes for internal use:
+--> transferTimers          array of transfer timers (transfers that currently are happening to/from this device)
+--> productionTimer         producing energy timer
+--> consumptionTimer        consuming energy timer
+--> energyRequirementsTestResult    energy consumed last second
 
 function energy_device_getTransferTimers(energyDevice)
     return getElementData(energyDevice, "array_timers")

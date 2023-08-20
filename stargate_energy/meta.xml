@@ -1,11 +1,10 @@
 <meta>
     <min_mta_version server="1.5.8-9.20957"></min_mta_version>
-    <info type="stargate_energy" version="1.0.0"></info>
+    <info name="STARGATE: Energy" type="script" version="1.0.0"></info>
 
-    <script src="energy_s.lua" type="server" />
-    <script src="energy_device_s.lua" type="server" />
-    <script src="energy_device_c.lua" type="client" />
-    <script src="energy_battery_s.lua" type="server" />
+    <script src="energy.lua" type="shared" />
+    <script src="energy_device.lua" type="shared" />
+    <script src="energy_useful.lua" type="shared" />
     <script src="energy_imports_s.lua" type="server" />
 
     <export function="energy_device_create" type="server" />
@@ -25,5 +24,5 @@
     <export function="energy_device_setMaxProduction" type="shared" />
     <export function="energy_device_setName" type="shared" />
 
-    <export function="energy_beginTransfer" type="server" />
+    <export function="energy_transfer" type="shared" />
 </meta>

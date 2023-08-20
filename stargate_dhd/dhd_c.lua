@@ -1,6 +1,6 @@
--- dhd_c.lua: client-side dhd module
+-- dhd_c.lua: Module implementing dial home device (on client-side)
 
-function dhdGUI(stargateStatus)
+function dhd_openClassicGUI(stargateStatus)
     -- dhd gui
     -- different stargate status => different gui look & behavior
     -- inspired by garrys mod gui
@@ -20,7 +20,7 @@ function dhdGUI(stargateStatus)
         -- => status
 end
 
-function baseDHDGUI(stargateStatus)
+function dhd_openBaseGUI(stargateStatus)
     -- special DHD GUI for SGC (ATL; etc)
     -- all states together
     -- more control; more info

@@ -1,7 +1,15 @@
--- planet_c.lua: Main script for client-side stargate_planets
+-- useful.lua: Useful functions when working with planet element; shared
+
+--- Planet element attributes
+--> dimension       dimension which this planet belongs to 
+--> galaxy          galaxy in which is this planet located 
+--> name            name of the planet (if there is one)
+--> lifesupport     lifesupport element containing data about planet atmosphere stats
+--> cx, cy, cz      planet center position
 
 ---
---- GETTERS
+--- ATTRIBUTE Functions
+---
 
 function planet_getPlanetElement(planetID)
     local planet = getElementByID(planetID)
@@ -27,9 +35,8 @@ function planet_getDimensionPlanet(dimension)
     return nil
 end
 
--- returns dimension in which is this planet located
 function planet_getPlanetDimension(planetID)
-    return (getElementData(planet_getPlanetElement(planetID), "dimension"))
+    return (tonumber(getElementData(planet_getPlanetElement(planetID), "dimension")))
 end
 
 function planet_getPlanetGalaxy(planetID)
@@ -40,8 +47,16 @@ function planet_getPlanetName(planetID)
     return (getElementData(planet_getPlanetElement(planetID), "name"))
 end
 
+function planet_setPlanetName(planetID, name)
+    return (setElementData(planet_getPlanetElement(planetID), "name", name))
+end
+
 function planet_getPlanetAtmosphere(planetID)
-    return (getElementData(planet_getPlanetElement(planetID), "atmosphere"))
+    return (getElementData(planet_getPlanetElement(planetID), "lifesupport"))
+end
+
+function planet_setPlanetAtmosphere(planetID, ls)
+    return (setElementData(planet_getPlanetElement(planetID), "lifesupport", ls))
 end
 
 function planet_getPlanetCenterPosition(planetID)
@@ -49,6 +64,12 @@ function planet_getPlanetCenterPosition(planetID)
     local cy = getElementData(planet_getPlanetElement(planetID), "cy")
     local cz = getElementData(planet_getPlanetElement(planetID), "cz")
     return cx, cy, cz
+end
+
+function planet_setPlanetCenterPosition(planetID, cx, cy, cz)
+    setElementData(planet_getPlanetElement(planetID), "cx", cx)
+    setElementData(planet_getPlanetElement(planetID), "cy", cy)
+    setElementData(planet_getPlanetElement(planetID), "cz", cz)
 end
 
 function planet_isPlanet(planetID)
@@ -61,7 +82,8 @@ end
 
 
 ---
---- ELEMENT FUNCTIONS
+--- ELEMENT Functions
+---
 
 function planet_getElementOccupiedPlanet(element)
     return (getElementData(element, "planet_occupied"))
@@ -80,7 +102,7 @@ function planet_setElementOccupiedPlanet(element, planetID, needsLs, resourceSta
     if not planet_isPlanet(planetID) then
         outputDebugString("[PLANETS] Element "..getElementID(element).." was not set to nonexisting planet dimension "..planetID, 2)
         return false
-    end    
+    end
     local ls_stats = planet_getPlanetAtmosphere(planetID)
     local dimension = planet_getPlanetDimension(planetID)
     

@@ -1,4 +1,4 @@
--- imports_s.lua_ Importing functions from other gate_* resources
+-- imports_s.lua: Importing functions from other gate_* resources; server-side
 
 function callClientFunction(client, funcname, ...)
     local arg = { ... }
@@ -48,7 +48,7 @@ function energy_device_getMaxProduction(...)
 end
 
 function energy_beginTransfer(...)
-    return (exports.stargate_energy:energy_beginTransfer(...))
+    return (exports.stargate_energy:energy_transfer(...))
 end
 
 

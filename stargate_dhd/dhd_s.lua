@@ -1,21 +1,25 @@
--- dhd_s.lua: Module implementing dial home device
-DHD_ENERGY_STORAGE = 1000000
-DHD_ENERGY_PRODUCTION = 1000000
+-- dhd_s.lua: Module implementing dial home device (on server-side)
+DHD_ENERGY_STORAGE = 1000000        -- energy storage of DHD; EU
+DHD_ENERGY_PRODUCTION = 1000000     -- energy production of DHD; EU per second
 
+-- Create DHD object
 -- REQUIRED PARAMETERS:
---> type    dhd model; type
---> x, y, z dhd position
+--> type        enum_stargateGalaxy     dhd model; type
+--> x, y, z     int                     dhd position
 
 -- OPTIONAL PARAMETERS:
---> rx, ry, rz  dhd rotation
---> stargateID  ID of stargate that is this DHD attached&connected to
+--> rx, ry, rz      int     dhd rotation
+--> stargateID      string  ID of stargate that is this DHD attached&connected to
 --- default if not specified: nil   (not attached to any gate)
---> galaxyDial  can this DHD dial outside its gate's galaxy?
+--> galaxyDial      bool    can this DHD dial outside its gate's galaxy?
 --- default if not specified: false
---> isBroken    is this DHD broken and not working?
+--> isBroken        bool    is this DHD broken and not working?
 --- default if not specified: false
---> isDamaged   is DHD damaged? (able to dial, receive, but wormhole is unstable)
+--> isDamaged       bool    is DHD damaged? (able to dial, receive, but wormhole is unstable)
 --- default if not specified: false
+
+-- RETURNS:
+--> Reference; DHD object element 
 function dhd_create(type, dimension, x, y, z, rx, ry, rz, stargateID, galaxyDial, isBroken, isDamaged)
     local dhd = createObject(1337, x, y, z, rx, ry, rz)
     models_setElementModelAttribute(dhd, "dhd")
@@ -55,15 +59,22 @@ function dhd_create(type, dimension, x, y, z, rx, ry, rz, stargateID, galaxyDial
     return dhd
 end
 
--- removes dhd
+-- Remove DHD object
+-- REQUIRED PARAMETERS:
+--> dhdID       string  ID of DHD
 function dhd_remove(dhdID)
     local dhd = dhd_getElement(dhdID)
     local dhd_marker = getElementByID(dhdID.."_EM")
+    dhd_detachFromStargate(dhdID)
     removeEventHandler("onMarkerHit", dhd_marker, dhd_activate)
     destroyElement(dhd)
     destroyElement(dhd_marker)
 end
 
+-- Attach DHD to existing stargate
+-- REQUIRED PARAMETERS:
+--> dhdID       string  ID of DHD
+--> stargateID  string  ID of Stargate
 function dhd_attachToStargate(dhdID, stargateID)
     local dhd = dhd_getElement(dhdID)
     local sg_dhd = stargate_getAssignedDHD(stargateID)
@@ -75,6 +86,9 @@ function dhd_attachToStargate(dhdID, stargateID)
     end
 end
 
+-- Detach DHD from stargate
+-- REQUIRED PARAMETERS:
+--> dhdID       string  ID of DHD
 function dhd_detachFromStargate(dhdID)
     local dhd = dhd_getElement(dhdID)
     local sg_id = getElementData(dhd, "attachedStargate")
@@ -83,28 +97,11 @@ function dhd_detachFromStargate(dhdID)
     setElementData(dhd, "attachedStargate", nil)
 end
 
--- assigns new ID to NEW stargate
-function dhd_assignID(dhd, type)
-    local galaxy = "MW"
-    if LastDHDID == nil then
-        LastDHDID = 0
-    end
-    LastDHDID = LastDHDID + 1
-    if type == enum_galaxy.MILKYWAY then
-        galaxy = "MW"
-        local DHD_MW = global_getData("DHD_MW")
-        DHD_MW = array_push(DHD_MW, dhd)
-        global_setData("DHD_MW", DHD_MW)
-    end
-
-    local newID = "DHD_"..galaxy.."_"..tostring(LastDHDID)
-    setElementID(dhd, newID)
-    return newID
-end
-
+-- Action of activating DHD when players gets nearby; allow player to open DHD GUI or dial with command
+-- Performed when player hits DHD marker
+-- REQUIRED PARAMETERS:
+--> player      reference   player element
 function dhd_activate(player)
-    -- if source element is dhd colshape/marker
-        -- open dhd gui
     local marker = getElementByID(getElementID(source))
     if getElementData(marker, "isDHDMarker") == true and getElementDimension(marker) == getElementDimension(player) then
         local dhd = getElementData(marker, "DHD")
@@ -121,14 +118,18 @@ function dhd_activate(player)
             outputChatBox("["..tostring(getElementID(dhd)).."] You can now dial with command: /dial [Stargate ID number]")
             setElementData(player, "atDHD", dhd)
             addCommandHandler("dial", dhd_dialStart)
-            outputChatBox("[ENERGY] DHD: "..tostring(energy_device_getStorage(energy)))
-            outputChatBox("[ENERGY] SG: "..tostring(energy_device_getStorage(energy_sg)))
+            --outputChatBox("[ENERGY] DHD: "..tostring(energy_device_getStorage(energy)).." S / "..tostring(energy_device_getProduction(energy)).." P / "..tostring(energy_device_getConsumption(energy)).." C")
+            --outputChatBox("[ENERGY] SG: "..tostring(energy_device_getStorage(energy_sg)).." S / "..tostring(energy_device_getProduction(energy_sg)).." P / "..tostring(energy_device_getConsumption(energy_sg)).." C")
             -- TEMPORARY ^^^
             --
         end
     end
 end
 
+-- Action of player leaving DHD; remove ability to dial via command or open DHD GUI
+-- Performed when player leaves DHD marker
+-- REQUIRED PARAMETERS:
+--> player      reference   player element
 function dhd_leave(player)
     local marker = getElementByID(getElementID(source))
     if getElementData(marker, "isDHDMarker") == true then
@@ -141,6 +142,11 @@ function dhd_leave(player)
     end
 end
 
+-- Action of dialling stargate; on command /dial [id]
+-- REQUIRED PARAMETERS:
+--> playerSource       reference    player element
+--> commandName        string       name of command
+--> stargateIDTo       string       ID of stargate player wants to dial (only the number)
 function dhd_dialStart(playerSource, commandName, stargateIDTo)
     -- returned values from client-side; dhd gui
     local DHD = getElementData(playerSource, "atDHD")
@@ -149,35 +155,36 @@ function dhd_dialStart(playerSource, commandName, stargateIDTo)
     stargate_dialByID(SGFrom_ID, "SG_MW_"..stargateIDTo) -- ::: TEMPORARY :::
 end
 
+-- Action of stopping dialling process of stargate; on command /dialstop
 function dhd_dialStop()
     -- returned values from client-side; dhd gui
     stargate_dialFail(stargateID, USER_STOPPED)
 end
 
 ---
---- GET/SET functions
+--- INTERNAL functions
 ---
 
-function dhd_setBroken(dhdID, isBroken)
-    setElementData(stargate_dhd_getElement(dhdID), "isBroken", isBroken)
-end
+-- Assigns new ID to new DHD element
+-- REQUIRED PARAMETERS:
+--> dhd     reference               new DHD element
+--> type    enum_stargateGalaxy     type of DHD
+-- RETURNS:
+--> String; ID for DHD Element
+function dhd_assignID(dhd, type)
+    local galaxy = "MW"
+    if LastDHDID == nil then
+        LastDHDID = 0
+    end
+    LastDHDID = LastDHDID + 1
+    if type == enum_galaxy.MILKYWAY then
+        galaxy = "MW"
+        local DHD_MW = global_getData("DHD_MW")
+        DHD_MW = array_push(DHD_MW, dhd)
+        global_setData("DHD_MW", DHD_MW)
+    end
 
-function dhd_setGalaxyDial(dhdID, galaxyDial)
-    setElementData(stargate_dhd_getElement(dhdID), "canDialGalaxy", galaxyDial)
-end
-
-function dhd_isBroken(dhdID)
-    return (getElementData(stargate_dhd_getElement(dhdID), "isBroken"))
-end
-
-function dhd_canDialGalaxy(dhdID)
-    return (getElementData(stargate_dhd_getElement(dhdID), "canDialGalaxy"))
-end
-
-function dhd_getElement(dhdID)
-    return (getElementByID(dhdID))
-end
-
-function dhd_getID(dhd)
-    return (getElementID(dhd))
+    local newID = "DHD_"..galaxy.."_"..tostring(LastDHDID)
+    setElementID(dhd, newID)
+    return newID
 end

@@ -1,4 +1,4 @@
--- imports_s.lua_ Importing functions from other gate_* resources
+-- imports_s.lua: Importing functions from other gate_* resources; server-side
 
 SG_MW = nil
 
@@ -15,6 +15,14 @@ function callClientFunction(client, funcname, ...)
     end
     -- If the clientside event handler is not in the same resource, replace 'resourceRoot' with the appropriate element
     triggerClientEvent(client, "onServerCallsClientFunction", resourceRoot, funcname, unpack(arg or {}))
+end
+
+function global_setData(...)
+    return (exports.stargate_exports:global_setData(...))
+end
+
+function global_getData(...)
+    return (exports.stargate_exports:global_getData(...))
 end
 
 function stargate_setModel(...)

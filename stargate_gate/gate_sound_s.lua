@@ -1,34 +1,29 @@
--- sound_s.lua_ Sound module
+-- sound_s.lua: Stargate sounds module; server-side
 
-enum_soundDescription = {
-    GATE_DIAL_FAIL = 0,
-    GATE_RING_ROTATE = 1,
-
-    GATE_CHEVRON_LOCK = 2,
-    GATE_CHEVRON_INCOMING = 3,
-
-    GATE_VORTEX_OPEN = 4,
-    GATE_HORIZON_TOUCH = 5,
-    GATE_HORIZON = 6,
-
-    GATE_CLOSE = 7,
-
-    GATE_MW_IRIS_CLOSE = 8,
-    GATE_MW_IRIS_OPEN = 9
-}
-
--- play sound at stargate; default distance 150
+-- Play sound at stargate position
+--- REQUIRED PARAMETERS:
+--> stargateID          string                  ID of stargate
+--> soundDescription    enum_soundDescription   (type of) sound that will be played
+--- OPTIONAL PARAMETERS:
+--> soundDistance       int                     range in which will be sound heard
+--- default if not specified:   125
 function stargate_sound_play(stargateID, soundDescription, soundDistance)
     local x, y, z = stargate_getPosition(stargateID)
     local soundPath, soundAttrib = stargate_sound_convertDescription(soundDescription)
     local distance = soundDistance
     if not soundDistance then
-        distance = 100
+        distance = 125
     end
 
     triggerClientEvent("clientPlaySound3D", root, stargateID, soundPath, x, y, z, distance, soundAttrib)
 end
 
+-- Convert sound description (from enum) to sound file path and attribute
+--- REQUIRED PARAMETERS:
+--> soundDescription        enum_soundDescription       (type of) sound
+--- RETURNS:
+--> String; file path of sound
+--> String; sound attribute key name
 function stargate_sound_convertDescription(soundDescription)
     local soundPath = nil
     local soundAttrib = nil
@@ -66,6 +61,10 @@ function stargate_sound_convertDescription(soundDescription)
     return soundPath, soundAttrib
 end
 
+-- Stop played sound
+--- REQUIRED PARAMETERS:
+--> stargateID          string                  ID of stargate
+--> soundDescription    enum_soundDescription   (type of) sound
 function stargate_sound_stop(stargateID, soundDescription)
     local soundPath, soundAttrib = stargate_sound_convertDescription(soundDescription)
     triggerClientEvent("clientStopSound", root, stargateID, soundAttrib)

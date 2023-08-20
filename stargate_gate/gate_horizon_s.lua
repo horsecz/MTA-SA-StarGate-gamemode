@@ -1,5 +1,11 @@
--- horizon_s.lua_ Event horizon module
+-- horizon_s.lua: Event horizon module; server-side
 
+-- Create event horizon element and attach it to stargate; also creates event horizon activation element
+--- REQUIRED PARAMETERS:
+--> stargateID      string      ID of stargate to which will be event horizon attached to
+--> frame           int         event horizon animation frame (model) that is being created
+--- RETURNS:
+--> Reference; event horizon element
 function stargate_horizon_create(stargateID, frame)
     local x, y, z = stargate_getPosition(stargateID)
     local horizon = createObject(1337, x, y, z)
@@ -22,6 +28,15 @@ function stargate_horizon_create(stargateID, frame)
     return horizon
 end
 
+-- Show one frame of event horizon
+-- > if frame is 0, just shows first frame
+-- > if frame is non zero and valid, hides all other horizon frames and shows only this one
+--- REQUIRED PARAMETERS:
+--> stargateID      string      ID of stargate which horizon frame will be shown
+--> frame           int         frame number (1-6; exception is 0 - just showing first frame)
+--> active          bool        will be frame shown or hidden?
+--- RETURNS:
+--> Bool; true if given frame is 0, otherwise no return value
 function stargate_horizon_setActive(stargateID, frame, active)
     local horizon = nil
     if tonumber(frame) == 0 then
@@ -42,6 +57,11 @@ function stargate_horizon_setActive(stargateID, frame, active)
     end
 end
 
+-- Show event horizon activation animation
+--- REQUIRED PARAMETERS:
+--> stargateID      string      ID of stargate which horizon activation will be shown
+--- RETURNS:
+--> Int; time [ms] it will take to show activation animation
 function stargate_horizon_activationAnimation(stargateID)
     local ha = nil
     local t = SG_HORIZON_ACTIVATE_SPEED
@@ -54,6 +74,10 @@ function stargate_horizon_activationAnimation(stargateID)
     return t
 end
 
+-- Shows or hides all horizon activation frames at once
+--- REQUIRED PARAMETERS:
+--> stargateID      string      ID of stargate which horizon activation will be shown
+--> active          bool        will be activation frames shown or hidden?
 function stargate_horizon_activationSet(stargateID, active)
     if active then 
         for i=1,6 do
@@ -68,6 +92,11 @@ function stargate_horizon_activationSet(stargateID, active)
     end
 end
 
+-- Show event horizon deactivation animation
+--- REQUIRED PARAMETERS:
+--> stargateID      string      ID of stargate which horizon deactivation will be shown
+--- RETURNS:
+--> Int; time [ms] it will take to show the animation
 function stargate_horizon_deactivationAnimation(stargateID)
     local ha = nil
     local t = SG_HORIZON_ACTIVATE_SPEED
@@ -81,7 +110,13 @@ function stargate_horizon_deactivationAnimation(stargateID)
     return t
 end
 
--- animate disengaging event horizon when shutting down gate
+
+-- Animate disengaging event horizon when shutting down stargate; Steps:
+-- 1. disabling event horizon animation
+-- 2. removing (hiding) event horizon and its teleport marker
+-- 3. show deactivation animation
+--- REQUIRED PARAMETERS:
+--> stargateID      string      ID of stargate which animation will be shown
 function stargate_horizon_animateRemove(stargateID)
     local sg = stargate_getElement(stargateID)
     killTimer(getElementData(sg, "horizonMainArray"))
@@ -97,17 +132,28 @@ function stargate_horizon_animateRemove(stargateID)
     setTimer(stargate_marker_remove, 1750, 1, stargateID, enum_markerType.EVENTHORIZON)
 end
 
+-- Hide all event horizon frames at once 
+--- REQUIRED PARAMETERS:
+--> stargateID      string      ID of stargate
 function stargate_horizon_remove(stargateID)
     for i=1,6 do
         stargate_horizon_setActive(stargateID, i, false)
     end
 end
 
+-- Get event horizon frame element
+--- REQUIRED PARAMETERS:
+--> stargateID      string      ID of stargate
+--> frame           int         event horizon frame number
+--- RETURNS:
+--> Reference; event horizon frame element
 function stargate_horizon_get(stargateID, frame)
     return (getElementByID(stargateID.."H"..tostring(frame)))
 end
 
--- begin animation of stargate's event horizon
+-- Animate stargate's event horizon; show and hide event horizon frame objects
+--- REQUIRED PARAMETERS:
+--> stargateID      string      ID of stargate
 function stargate_horizon_animateFrames(stargateID)
     local h1 = setTimer(stargate_horizon_setActive, SG_HORIZON_ANIMATION_BEGIN+SG_HORIZON_ANIMATION_SPEED*0, 1, stargateID, 1, true)
     local h2 = setTimer(stargate_horizon_setActive, SG_HORIZON_ANIMATION_BEGIN+SG_HORIZON_ANIMATION_SPEED*1, 1, stargateID, 2, true)

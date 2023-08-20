@@ -1,7 +1,6 @@
--- imports_s.lua
+-- imports_s.lua: Importing functions from other resources; server-side
 
 enum_galaxy = (exports.stargate_gate:import_enum_galaxy())
-
 
 function models_getElementModelAttribute(...)
     return (exports.stargate_exports:models_getElementModelAttribute(...))
@@ -48,7 +47,7 @@ function energy_device_getStorage(...)
 end
 
 function energy_beginTransfer(...)
-    return (exports.stargate_energy:energy_beginTransfer(...))
+    return (exports.stargate_energy:energy_transfer(...))
 end
 
 

@@ -1,5 +1,10 @@
--- ring_s.lua_ Gate ring module
+-- ring_s.lua: Module for stargate ring; server-side
 
+-- Create ring object element and attach it to stargate
+--- REQUIRED PARAMETERS:
+--> gateID      string      stargate ID
+--> x, y, z     int         ring object position
+--> rx, ry, rz  int         ring object rotation
 function stargate_ring_create(gateID, x, y, z, rx, ry, rz)
     local ring = createObject(1337, x, y, z, rx, ry, rz)
     models_setElementModelAttribute(ring, "outerring")
@@ -13,7 +18,12 @@ function stargate_ring_create(gateID, x, y, z, rx, ry, rz)
     attachElements(ring, sg)
 end
 
--- precalculate ring rotation time on MWSG
+-- Calculates ring rotation time for given symbols (for MilkyWay type stargate)
+--- REQUIRED PARAMETERS:
+--> symbol_a    int     first symbol
+--> symbol_b    int     second symbol
+--- RETURNS:
+--> Int; time [ms] that will take for ring to rotate from symbol A to symbol B
 function stargate_ring_getSymbolRotationTime(symbol_a, symbol_b)
     if symbol_a < symbol_b then
         symbolDistance = symbol_b-symbol_a
@@ -28,6 +38,13 @@ function stargate_ring_getSymbolRotationTime(symbol_a, symbol_b)
     return beginTime
 end
 
+-- Perform ring rotation by given number of symbols (distance)
+--- REQUIRED PARAMETERS:
+--> ring                reference   ring element
+--> rotateClockWise     bool        will be ring rotated clockwise or not
+--> symbolDistance      int         the distance (number of symbols) ring will rotate
+--- RETURNS:
+--> Int; time [ms] that will take for ring to be rotated 
 function stargate_ring_rotateSymbols(ring, rotateClockwise, symbolDistance)
     local beginTime = 0
     for i=1,symbolDistance do
@@ -37,6 +54,13 @@ function stargate_ring_rotateSymbols(ring, rotateClockwise, symbolDistance)
     return beginTime
 end
 
+-- Performs ring rotation (by one symbol)
+-- > Ring object is attached object (to stargate), therefore moveObject does not work and custom function for rotating had to be implemented
+--- REQUIRED PARAMETERS:
+--> ring                reference       ring element
+--> rotateClockwise     bool            will be ring rotated clockwise or the other direction?
+--- RETURNS:
+--> Int; time it will take for ring to be rotated
 function stargate_ring_rotateOneSymbol(ring, rotateClockwise)
     setTimer(function(ring, rotateClockwise)
         local x,y,z,rx,ry,rz = getElementAttachedOffsets(ring)
@@ -51,39 +75,18 @@ function stargate_ring_rotateOneSymbol(ring, rotateClockwise)
     return MW_RING_SPEED
 end
 
-function stargate_ring_setID(id, newID)
-    setElementID(stargate_ring_getElement(id), newID)
-end
+---
+--- INTERNAL Functions
+---
 
+-- Assigns ID to new ring element
+--- REQUIRED PARAMETERS:
+--> ring        reference   ring element
+--> gateID      string      stargate ID
+--- RETURNS:
+--> String; ring element ID
 function stargate_ring_assignID(ring, gateID)
     local id = gateID.."R"
     setElementID(ring, id)
     return id
-end
-
-function stargate_ring_getID(ring)
-    return (getElementID(ring))
-end
-
-function stargate_ring_getElement(id)
-    return (getElementByID(id))
-end
-
-function stargate_ring_isRotating(stargateID)
-    return (getElementData(getElementByID(stargateID), "isRotating"))
-end
-
-function stargate_ring_setRotating(stargateID, rotating)
-    return (setElementData(getElementByID(stargateID), "isRotating", rotating))
-end
-
-function stargate_ring_getRotationTime(stargateID)
-    return (getElementData(getElementByID(stargateID.."R"), "rotationTime"))
-end
-
-function stargate_ring_getCurrentSymbol(stargateID)
-    local ring = stargate_ring_getElement(stargateID.."R")
-    local oneSymbolAngle = 360/39
-    local tmpx, tmpy, tmpz, tmprx, ringRotation, tmprz = getElementAttachedOffsets(ring)
-    return (ringRotation/oneSymbolAngle)
 end

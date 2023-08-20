@@ -1,17 +1,12 @@
--- energy_s.lua: Main module for energy script
+-- energy.lua: Main module for energy script; shared
 
----
---- ENERGY
----
-
-
---- "use" stored energy from buffer in one second
+--- Use stored energy from buffer in one second
 --- REQUIRED PARAMETERS:
---> energyDeviceElement     element of energy device
---> energy                  energy to be consumed
---                          note: cannot be infinite (value < 0)
+--> energyDeviceElement     reference   element of energy device
+--> energy                  int         energy to be consumed
+--                                      note: cannot be infinite (value < 0)
 --- RETURNS:
---> total consumed energy
+--> Int; total consumed energy; EU
 function energy_consume(energyDeviceElement, energy)
     local storage = energy_device_getStorage(energyDeviceElement)
     local energy_consumed = energy
@@ -29,13 +24,13 @@ function energy_consume(energyDeviceElement, energy)
     return energy_consumed
 end
 
---- produce some energy in one second
+--- Produce some energy in one second
 --- REQUIRED PARAMETERS:
---> energyDeviceElement     element of energy device
---> energy                  amount of energy for this device to produce
+--> energyDeviceElement     reference   element of energy device
+--> energy                  int         amount of energy for this device to produce
 
 --- RETURNS:
---> produced energy in total
+--> Int; roduced energy in total; EU
 --          >0  some energy was produced
 --          0   no energy produced
 --          <0  infinite energy produced
@@ -57,13 +52,13 @@ function energy_produce(energyDeviceElement, energy)
     return result_energy
 end
 
---- store energy into device in one second
+--- Store energy into device in one second
 --- REQUIRED PARAMETERS:
---> energyDeviceElement     element of energy device
---> energy                  amount of energy to store
+--> energyDeviceElement     reference   element of energy device
+--> energy                  int         amount of energy to store
 
 --- RETURNS:
---> amount of energy stored into device
+--> Int; amount of energy stored into device; EU
 function energy_store(energyDeviceElement, energy)
     local result_energy = energy
     local storage = energy_device_getStorage(energyDeviceElement)
@@ -84,11 +79,40 @@ function energy_store(energyDeviceElement, energy)
     return result_energy
 end
 
---- transfers energy between two devices in one second
+--- Start transferring energy between two devices
+--- REQUIRED PARAMETERS:
+--> deviceSender    reference   sender energy device element
+--> deviceReceiver  reference   receiver energy device element
+--> totalEnergy     int         total energy amount in EU that will be transferred from deviceSender to deviceReceiver
+--- Note: For transferring the energy, slower transfer rate will be used. 
+function energy_transfer(deviceSender, deviceReceiver, totalEnergy)
+    local transfer_s = energy_device_getTransferRate(deviceSender)
+    local transfer_r = energy_device_getTransferRate(deviceReceiver)
+    local transfer_max = transfer_s
+    if transfer_s > transfer_r then
+        transfer_max = transfer_r
+    end
+    local totalReps = math.ceil(totalEnergy / transfer_max)
+
+    local tT = setTimer(function(deviceSender, deviceReceiver, transfer_max)
+        local r = energy_processTransfer(deviceSender, deviceReceiver, transfer_max)
+        setElementData(deviceSender, "timer_transfer_result", r)
+    end, 1000, totalReps, deviceSender, deviceReceiver, transfer_max)
+
+    energy_device_addTransferTimer(deviceSender, tT)
+    energy_device_addTransferTimer(deviceReceiver, tT)
+end
+
+--- Transfers energy between two devices - once
+--- REQUIRED PARAMETERS:
+--> deviceSender        reference   sender device energy element
+--> deviceReceiver      reference   receiver device energy element
+--> energy              int         amount of energy to transfer (in EU)
+
 --- RETURNS:
---> amount of energy sent by sender device
---> amount of energy that receiver device received (stored into its buffer/storage)
-function energy_transfer(deviceSender, deviceReceiver, energy)
+--> Int; amount of energy sent by sender device; EU
+--> Int; amount of energy that receiver device received (stored into its buffer/storage); EU
+function energy_processTransfer(deviceSender, deviceReceiver, energy)
     local result_energy = energy
     local stored_energy = energy
     local storage = energy_device_getStorage(deviceSender)
@@ -106,24 +130,4 @@ function energy_transfer(deviceSender, deviceReceiver, energy)
     end
 
     return result_energy, stored_energy
-end
-
---- initiate and process energy transfer between two devices
---- note: used will be the slower rate  
-function energy_beginTransfer(deviceSender, deviceReceiver, totalEnergy)
-    local transfer_s = energy_device_getTransferRate(deviceSender)
-    local transfer_r = energy_device_getTransferRate(deviceReceiver)
-    local transfer_max = transfer_s
-    if transfer_s > transfer_r then
-        transfer_max = transfer_r
-    end
-    local totalReps = math.ceil(totalEnergy / transfer_max)
-
-    local tT = setTimer(function(deviceSender, deviceReceiver, transfer_max)
-        local r = energy_transfer(deviceSender, deviceReceiver, transfer_max)
-        setElementData(deviceSender, "timer_transfer_result", r)
-    end, 1000, totalReps, deviceSender, deviceReceiver, transfer_max)
-
-    energy_device_addTransferTimer(deviceSender, tT)
-    energy_device_addTransferTimer(deviceReceiver, tT)
 end

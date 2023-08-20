@@ -1,20 +1,26 @@
 <meta>
     <min_mta_version server="1.5.8-9.20957"></min_mta_version>
-    <info type="stargate_gate" version="1.0.0"></info>
+    <info name="STARGATE: Gate" type="script" version="1.0.0"></info>
 
     <script src="gate_imports_c.lua" type="client"></script>
     <script src="gate_imports_s.lua" type="server"></script>
 
     <script src="gate_s.lua" type="server"></script>
     <script src="gate_c.lua" type="client"></script>
+    <script src="gate_internal_s.lua" type="server"></script>
+    <script src="gate_declarations.lua" type="shared"></script>
+    <script src="gate_useful.lua" type="shared"></script>
 
     <script src="gate_chevron_s.lua" type="server"></script>
-    <script src="gate_galaxy_s.lua" type="server"></script>
+    <script src="gate_chevron_useful.lua" type="shared"></script>
+    <script src="gate_galaxy.lua" type="shared"></script>   
     <script src="gate_horizon_s.lua" type="server"></script>
-    <script src="gate_marker_s.lua" type="server"></script>
-    <script src="gate_ring_s.lua" type="server"></script>
     <script src="gate_iris_s.lua" type="server"></script>
-    <script src="gate_ring_c.lua" type="client"></script>
+    <script src="gate_iris_useful.lua" type="shared"></script>
+    <script src="gate_marker_s.lua" type="server"></script>
+    <script src="gate_marker_useful.lua" type="shared"></script>
+    <script src="gate_ring_s.lua" type="server"></script>
+    <script src="gate_ring_useful.lua" type="shared"></script>
     <script src="gate_sound_s.lua" type="server"></script>
     <script src="gate_sound_c.lua" type="client"></script>
     <script src="gate_vortex_s.lua" type="server"></script>

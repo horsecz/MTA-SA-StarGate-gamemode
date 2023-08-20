@@ -1,5 +1,10 @@
-RESOURCE_STOP = false
+-- gamemode_s.lua:  Main gamemode script for Stargate for MTA:SA Gamemode; server-side
+RESOURCE_STOP = false       -- is resource being stopped?
 
+-- Actions performed on player spawning
+-- Reset his alpha, camera, lifesupport and occupied planet
+-- PARAMETERS:
+--> inherited from "onPlayerSpawn" event
 function onPlayerSpawn(x, y, z, r, temp1, temp2, temp3, dimension)
     setElementAlpha(source, 255)
     fadeCamera(source, true, 1)
@@ -9,11 +14,17 @@ function onPlayerSpawn(x, y, z, r, temp1, temp2, temp3, dimension)
 end
 addEventHandler ( "onPlayerSpawn", getRootElement(), onPlayerSpawn)
 
+-- Actions performed on player dying
+-- Respawn player
 function onPlayerWasted()
     setTimer(spawnPlayer, 5000, 1, source, 0, 10, 4)
 end
 addEventHandler ( "onPlayerWasted", getRootElement(), onPlayerWasted)
 
+-- Actions performed on player joining the server
+-- Spawn player, add him to joined players array, set player ID
+-- PARAMETERS:
+--> inherited from "onPlayerJoin" event
 function onPlayerJoin(player)
     spawnPlayer(source, 0, 10, 4, 180)
     setCameraTarget(source, source)
@@ -29,6 +40,8 @@ function onPlayerJoin(player)
 end
 addEventHandler( "onPlayerJoin", getRootElement(), onPlayerJoin)
 
+-- Actions performed on player leaving the server
+-- Remove player from joined players array
 function onPlayerLeave()
     if not RESOURCE_STOP then
         local PLAYERS_JOINED = global_getData("var_players_joined")
@@ -39,10 +52,13 @@ function onPlayerLeave()
 end
 addEventHandler( "onPlayerQuit", getRootElement(), onPlayerLeave)
 
+-- Actions performed on gamemode resource start
 function onResourceStart()
 end
 addEventHandler( "onResourceStart", resourceRoot, onResourceStart)
 
+-- Actions performed on gamemode resource stop
+-- Reconnecting all players
 function onResourceStop()
     RESOURCE_STOP = true
     for k, p in ipairs(getElementsByType("player")) do
@@ -50,83 +66,3 @@ function onResourceStop()
     end
 end
 addEventHandler( "onResourceStop", resourceRoot, onResourceStop)
-
--- returns true/false
--- if given element1 is in range of element2 (within specifieed radius)
-function isElementInRange(element1, element2, radius)
-    local x, y, z = getElementPosition(element1)
-    local x2, y2, z2 = getElementPosition(element2)
-    local d1 = getElementDimension(element1)
-    local d2 = getElementDimension(element2)
-    if d1 == d2 then
-        if x < x2+radius and x > x2-radius then
-            if y < y2+radius and y > y2-radius then
-                if z < z2+radius and z > z2-radius then
-                    return true
-                end
-            end
-        end
-    end
-    return false
-end
-
--- if given element1 is in range of coordinates x2,y2,z2 within specified radius
-function isElementInCoordinatesRange(element1, x2, y2, z2, radius)
-    local x, y, z = getElementPosition(element1)
-    if x < x2+radius and x > x2-radius then
-        if y < y2+radius and y > y2-radius then
-            if z < z2+radius and z > z2-radius then
-            return true
-            end
-        end
-    end
-    return false
-end
-
-addCommandHandler("pos", function(src, cmd, x, y, z)
-    setElementPosition(src, tonumber(x), tonumber(y), tonumber(z))
-end)
-
-addCommandHandler("dim", function(src, cmd, d)
-    planet_setElementOccupiedPlanet(src, "PLANET_"..tostring(d), true)
-end)
-
-addCommandHandler("mypos", function(src, cmd, x, y, z)
-    local cx, cy, cz = getElementPosition(src)
-    if not x then
-        outputChatBox("Your position is "..tostring(cx)..", "..tostring(cy)..", "..tostring(cz))
-        return true
-    else
-        setElementPosition(src, cx+tonumber(x), cy+tonumber(y), cz+tonumber(z))
-    end
-end)
-
----
---- DOES NOT BELONG HERE
----
-
--- fake explosion
-function explosion_create(src, cmdName, type)
-    local bombTime = 5000
-    local bombDelay = 2000
-    local bombRange = 1000
-
-    local dimension = 6969
-    local x, y, z = 0, 0, 4
-
-    if type == "nuclear" or type == "stargate" then
-        setTimer(function(x, y, z, d, r)
-            for i,p in ipairs(getElementsByType("player")) do
-                if isElementInCoordinatesRange(p, x, y, z, r) and getElementDimension(p) == d then
-                    local px, py, pz = getElementPosition(p)
-                    fadeCamera(p, false, 0.3, 255, 255, 255)
-                    setElementAlpha(p, 0)
-                    setElementHealth(p, 0)
-                    createExplosion(px, py, pz, 7, p)
-                    createExplosion(px, py, pz+1, 7, p)
-                    createExplosion(px, py, pz-1, 7, p)
-                end
-            end
-        end, 100, (bombTime+bombDelay+255*10)/100, x, y, z, dimension, bombRange)
-    end
-end

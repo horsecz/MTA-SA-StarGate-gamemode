@@ -1,4 +1,4 @@
--- imports_c.lua_ Importing functions from other gate_* resources
+-- imports_c.lua: Importing functions from other gate_* resources; client-side
 
 function callClientFunction(funcname, ...)
     local arg = { ... }
@@ -32,4 +32,8 @@ end
 
 function planet_getPlanetDimension(...)
     return (exports.stargate_planets:planet_getPlanetDimension(...))
+end
+
+function energy_beginTransfer(...)
+    return (exports.stargate_energy:energy_transfer(...))
 end

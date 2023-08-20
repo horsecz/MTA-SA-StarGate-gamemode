@@ -1,3 +1,5 @@
+-- imports_c.lua: Importing functions from other gate_* resources; client-side
+
 enum_galaxy = (exports.stargate_gate:import_enum_galaxy())
 
 function callClientFunction(funcname, ...)
@@ -45,6 +47,14 @@ end
 
 function planet_getElementOccupiedPlanet(...)
     return (exports.stargate_planets:planet_getElementOccupiedPlanet(...))
+end
+
+function planet_setElementOccupiedPlanet(...)
+    return (exports.stargate_planets:planet_setElementOccupiedPlanet(...))
+end
+
+function planet_getPlanetName(...)
+    return (exports.stargate_planets:planet_getPlanetName(...))
 end
 
 function global_setData(...)
