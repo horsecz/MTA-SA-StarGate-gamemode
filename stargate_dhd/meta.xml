@@ -3,10 +3,11 @@
     <info name="STARGATE: DHD" type="script" version="1.0.0"></info>
 
     <script src="dhd_s.lua" type="server"></script>
-    <script src="dhd_c.lua" type="client"></script>
     <script src="dhd_useful.lua" type="shared"></script>
     <script src="dhd_imports_s.lua" type="server"></script>
     <script src="dhd_imports_c.lua" type="client"></script>
+
+    <script src="dhd_gui_c.lua" type="client"></script>
 
     <export function="dhd_create" type="server" />
     <export function="dhd_remove" type="server" />
