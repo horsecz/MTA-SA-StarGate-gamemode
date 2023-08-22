@@ -27,8 +27,7 @@ addEventHandler ( "onPlayerWasted", getRootElement(), onPlayerWasted)
 --> inherited from "onPlayerJoin" event
 function onPlayerJoin(player)
     spawnPlayer(source, 0, 10, 4, 180)
-    setCameraTarget(source, source)
-    fadeCamera(source, true)
+    setElementFrozen(source, true)
     local PLAYERS_JOINED = global_getData("var_players_joined")
 
     if not PLAYERS_JOINED then

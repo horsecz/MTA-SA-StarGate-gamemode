@@ -13,6 +13,9 @@
 
 function planet_getPlanetElement(planetID)
     local planet = getElementByID(planetID)
+    if not isElement(planet) then
+        return nil
+    end
     if getElementType(planet) == "planet" then
         return planet
     else
@@ -78,6 +81,18 @@ function planet_isPlanet(planetID)
     else
         return true
     end
+end
+
+function planet_getPlanetGalaxyString(planetID)
+    local galaxy = planet_getPlanetGalaxy(planetID)
+    if galaxy == 0 then
+        return "MilkyWay"
+    elseif galaxy == 1 then
+        return "Pegasus"
+    elseif galaxy == 2 then
+        return "Universe"
+    end
+    return "Unknown"
 end
 
 

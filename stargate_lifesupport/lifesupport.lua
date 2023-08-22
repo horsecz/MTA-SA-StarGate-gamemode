@@ -56,7 +56,7 @@ function lifesupport_applyStatsOnElement(element)
     end
 
     local ls = lifesupport_getElementLifesupport(element)
-    if ls == nil or ls == false or getElementData(ls, "oxygen") == false then
+    if ls == nil or ls == false or not isElement(ls) then
         return false
     end
     local o, t, tx, g = lifesupport_getValues(ls)
