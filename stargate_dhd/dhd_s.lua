@@ -4,7 +4,7 @@ DHD_ENERGY_PRODUCTION = 1000000     -- energy production of DHD; EU per second
 
 -- Create DHD object
 -- REQUIRED PARAMETERS:
---> type        enum_stargateGalaxy     dhd model; type
+--> type        enum_galaxy             dhd model; type
 --> x, y, z     int                     dhd position
 
 -- OPTIONAL PARAMETERS:
@@ -113,15 +113,11 @@ function dhd_activate(player)
         else
             local dhd_sg = getElementByID(dhd_sg_id)
             local energy_sg = getElementData(dhd_sg, "energy")
-            --
-            -- TEMPORARY :::
-            outputChatBox("["..tostring(getElementID(dhd)).."] You can now dial with command: /dial [Stargate ID number]")
+            outputChatBox("["..tostring(getElementID(dhd)).."] You can now use this DHD!")
             setElementData(player, "atDHD", dhd)
-            addCommandHandler("dial", dhd_dialStart)
-            --outputChatBox("[ENERGY] DHD: "..tostring(energy_device_getStorage(energy)).." S / "..tostring(energy_device_getProduction(energy)).." P / "..tostring(energy_device_getConsumption(energy)).." C")
-            --outputChatBox("[ENERGY] SG: "..tostring(energy_device_getStorage(energy_sg)).." S / "..tostring(energy_device_getProduction(energy_sg)).." P / "..tostring(energy_device_getConsumption(energy_sg)).." C")
-            -- TEMPORARY ^^^
-            --
+            addCommandHandler("dialid", dhd_dialStart)
+            bindKey(gui_getKeyOpen(player), "down", dhd_openGUI)
+            bindKey(gui_getKeyClose(player), "down", dhd_closeGUI)
         end
     end
 end
@@ -133,12 +129,10 @@ end
 function dhd_leave(player)
     local marker = getElementByID(getElementID(source))
     if getElementData(marker, "isDHDMarker") == true then
-        --
-        -- TEMPORARY :::
         setElementData(player, "atDHD", nil)
-        removeCommandHandler("dial", dhd_dialStart)
-        -- TEMPORARY ^^^
-        --
+        removeCommandHandler("dialid", dhd_dialStart)
+        unbindKey(gui_getKeyOpen(player), "down", dhd_openGUI)
+        unbindKey(gui_getKeyClose(player), "down", dhd_closeGUI)
     end
 end
 

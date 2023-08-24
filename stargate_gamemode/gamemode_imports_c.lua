@@ -11,3 +11,7 @@ end
 function global_setData(...)
     return (exports.stargate_exports:global_setData(...))
 end
+
+function showInfoModelsLoadingWindow(...)
+    return (exports.stargate_gui:gui_showInfoModelsLoadingWindow(...))
+end

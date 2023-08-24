@@ -183,13 +183,11 @@ function stargate_setAssignedDHD(id, v)
         local stargate = stargate_getElement(id)
         local dhd = getElementByID(v)
         local dhdType = getElementData(dhd, "type")
-        if dhdType == enum_galaxy.MILKYWAY or dhdType == enum_galaxy.PEGASUS or dhdType == enum_galaxy.UNIVERSE then
+        if not dhdType == enum_galaxy.UNKOWN then   -- dont generate energy when DHD is Base type
             local sg_energy = getElementData(stargate, "energy")
             local dhd_energy = getElementData(dhd, "energy")
             local eTT = setTimer(energy_beginTransfer, 1000, 0, dhd_energy, sg_energy, GATE_ENERGY_WORMHOLE)
             setElementData(dhd, "energy_transfer_timer", eTT)
-        else
-            -- do nothing
         end        
     end
     return (setElementData(stargate_getElement(id), "assignedDHD", v))
