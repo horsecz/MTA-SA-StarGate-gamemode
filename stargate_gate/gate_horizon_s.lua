@@ -107,6 +107,8 @@ function stargate_horizon_deactivationAnimation(stargateID)
         setTimer(setElementAlpha, t, 1, ha, 0)
         t = t + SG_HORIZON_ACTIVATE_SPEED
     end
+
+    setTimer(setElementData, t, 1, stargate_getElement(stargateID), "horizonIsToggling", false)
     return t
 end
 
@@ -119,6 +121,7 @@ end
 --> stargateID      string      ID of stargate which animation will be shown
 function stargate_horizon_animateRemove(stargateID)
     local sg = stargate_getElement(stargateID)
+    setElementData(sg, "horizonIsToggling", true)
     killTimer(getElementData(sg, "horizonMainArray"))
     for i=1,6 do
         local tF = getElementData(sg, "horizonArray")[i]

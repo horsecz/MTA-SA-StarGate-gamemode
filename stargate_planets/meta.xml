@@ -6,16 +6,20 @@
     <script src="planets_useful.lua" type="shared" />
 
     <script src="planets_imports_s.lua" type="server" />
-    <script src="planets_imports_c.lua" type="server" />
+    <script src="planets_imports_c.lua" type="client" />
+
+    <script src="planets_gui_c.lua" type="client"></script>
 
     <export function="planet_create" type="server" />
 
     <export function="planet_getPlanetElement" type="shared" />
+    <export function="planet_getPlanetID" type="shared" />
     <export function="planet_getDimensionPlanet" type="shared" />
     <export function="planet_getPlanetElement" type="shared" />
 
     <export function="planet_getPlanetDimension" type="shared" />
     <export function="planet_getPlanetGalaxy" type="shared" />
+    <export function="planet_getPlanetGalaxyString" type="shared" />
     <export function="planet_getPlanetName" type="shared" />
     <export function="planet_setPlanetName" type="shared" />
     <export function="planet_getPlanetAtmosphere" type="shared" />

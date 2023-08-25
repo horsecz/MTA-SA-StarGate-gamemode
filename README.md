@@ -44,26 +44,35 @@ Features, updates here are not the newest, but more up-to-date unlike **release*
 
 # Current release
 
-- Release 0.4
-- Note: Branch refresh and documentation release and some fixes
+- Release 0.4b
+- Note: GUI Update
 
 ## New features
 
-- Completely refactored and changed documentation including
-    - branch documentation (README.md and TBD.md files)
-    - file distribution and modularization
-    - comments, functions documentation
-    - updated this file (better structure, more information)
-        - added instructions for "installing" and "playing" gamemode
-        - requirements, prerequisites
-        - more notes, better text structure
-- Models
-    - Fixed wrong texture loading
-        - Wrong texture loading was caused by ineffective big texture (TXD) files, which have to be loaded multiple times
-        - Because of more textures being loaded into memory, GPU Video Memory requirements increased (a lot)
-        - Texture quality levels (to ensure gamemode can be played on low-spec PCs)
-- Stargate
-    - Now locking 7th symbol correctly (point of origin)
+- DHD GUI
+    - opens with action button (E; closes with close button F1)
+    - selecting available stargates from list and dialling
+    - option to dial via manually entering stargate adress
+    - dialling speed/type option (if dialling type is not forced)
+    - disengage wormhole, cancel dialling process
+        - you cannot shutdown gate when wormhole is estabilished
+- Lifesupport UI
+    - info text regarding occupied planet and its atmosphere
+    - warning when lifesupport conditions are killing player
+    - right-center of screen, under money, permanent 
+- Planet UI
+    - info text about currently occupied planet and galaxy
+    - top-center of screen, permanent
+- Gamemode
+    - GUI info window at player join when models are being loaded
+    - GUI general info window (showInfoWindow function; /infowindow command)
+    - at join, player will be spawned and frozen, camera is in clouds - will target player after models are loaded 
+    - removed /dial command as it has no use now 
+- DHD
+    - Base DHD type introduced
+        - DHD without model, invisible (object)
+        - Used in bases (SGC, Atlantis, ...)
+        - Usually near (or in) some other object that will represent the DHD (like in/near dialling computer in SGC or at Atlantis DHD console object)
 
 ## Features
 
@@ -89,6 +98,7 @@ Features, updates here are not the newest, but more up-to-date unlike **release*
     - Dynamic loading and unloading of custom models depending on players occupied planet
     - Player will freeze and move its camera far away when loading models and unfreeze (and move back) when models are fully loaded - reducing lag to minimum
     - Anti-crash prevention (GPU VM overflow) and potato PC warning
+    - Texture quality levels (models can be loaded into GPUs with VM 512 MB - 3 GB or more)
 - Maps
     - Ability to generate full and correct .map files, reading from IPL files and regenerating IPL files (features mostly for development)
     - San Andreas (custom objects)

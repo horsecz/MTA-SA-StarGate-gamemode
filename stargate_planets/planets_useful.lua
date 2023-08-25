@@ -13,6 +13,9 @@
 
 function planet_getPlanetElement(planetID)
     local planet = getElementByID(planetID)
+    if not isElement(planet) then
+        return nil
+    end
     if getElementType(planet) == "planet" then
         return planet
     else
@@ -28,7 +31,7 @@ end
 function planet_getDimensionPlanet(dimension)
     local pl = global_getData("PLANET_LIST")
     for i,p in pairs(pl) do
-        if planet_getPlanetDimension(dimension) == dimension then
+        if planet_getPlanetDimension(planet_getPlanetID(p)) == dimension then
             return p
         end
     end
@@ -78,6 +81,18 @@ function planet_isPlanet(planetID)
     else
         return true
     end
+end
+
+function planet_getPlanetGalaxyString(planetID)
+    local galaxy = planet_getPlanetGalaxy(planetID)
+    if galaxy == 0 then
+        return "MilkyWay"
+    elseif galaxy == 1 then
+        return "Pegasus"
+    elseif galaxy == 2 then
+        return "Universe"
+    end
+    return "Unknown"
 end
 
 

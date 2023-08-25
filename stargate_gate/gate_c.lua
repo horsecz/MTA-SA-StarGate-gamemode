@@ -1,5 +1,14 @@
 --- gate_c.lua: Core module for stargates and their logic; client-side
 
+-- See stargate_dial in gate_s.lua
+function stargate_dial(stargateIDFrom, addressArray, stargateDialType, dialer)
+	triggerServerEvent("stargate_dial_from_client", resourceRoot, stargateIDFrom, addressArray, stargateDialType, dialer)
+end
+
+function stargate_abortDial(stargateIDFrom, dialFailed)
+	triggerServerEvent("stargate_abort_dial_from_client", resourceRoot, stargateIDFrom, dialFailed)
+end
+
 -- Handle newly created projectile element (allow them to pass through event horizon and be transported)
 --- REQUIRED PARAMETERS:
 --> Inherited from event "onClientProjectileCreation"

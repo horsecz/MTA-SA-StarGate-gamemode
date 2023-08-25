@@ -72,7 +72,7 @@ function stargate_assignID(stargate)
     return newID
 end
 
--- Turn on all stargate chevrons
+-- Turn on/off all stargate chevrons
 --- REQUIRED PARAMETERS:
 --> stargateID      string      ID of stargate
 --> useDelay        bool        will be all chevrons turned on immediately or with (predefined) delay

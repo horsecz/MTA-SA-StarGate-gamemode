@@ -1,0 +1,21 @@
+<meta>
+    <info name="STARGATE: Grahpical User Interface" type="script" version="1.0.0"></info>
+
+    <script src="gui_declarations.lua" type="shared" />
+
+    <script src="gui_c.lua" type="client" />
+    <script src="gui_handling_s.lua" type="server" />
+    <script src="gui_handling_c.lua" type="client" />
+
+    <script src="gui_useful.lua" type="shared" />
+
+    <export function="gui_showInfoWindow" type="shared" />
+    <export function="gui_showInfoModelsLoadingWindow" type="shared" />
+
+    <export function="gui_getKeyOpen" type="shared" />
+    <export function="gui_getKeyClose" type="shared" />
+    <export function="gui_getKeyOpenClose" type="shared" />
+    <export function="gui_setKeyOpen" type="shared" />
+    <export function="gui_setKeyClose" type="shared" />
+    <export function="gui_setKeyOpenClose" type="shared" />
+</meta>

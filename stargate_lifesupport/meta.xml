@@ -7,6 +7,8 @@
 
     <script src="lifesupport_imports_s.lua" type="server" />
 
+    <script src="lifesupport_gui_c.lua" type="client"></script>
+
     <export function="lifesupport_create" type="server" />
     <export function="lifesupport_getValues" type="server" />
     <export function="lifesupport_setElementLifesupport" type="server" />

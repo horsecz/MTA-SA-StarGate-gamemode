@@ -92,3 +92,19 @@ end
 function global_setData(...)
     return (exports.stargate_exports:global_setData(...))
 end
+
+function gui_getKeyOpen(...)
+    return (exports.stargate_gui:gui_getKeyOpen(...))
+end
+
+function gui_getKeyClose(...)
+    return (exports.stargate_gui:gui_getKeyClose(...))
+end
+
+function gui_getKeyOpenClose(...)
+    return (exports.stargate_gui:gui_getKeyOpenClose(...))
+end
+
+function gui_showInfoWindow(...)
+    return (exports.stargate_gui:gui_showInfoWindow(...))
+end

@@ -21,7 +21,7 @@
 --> isGrounded              bool                    determines if stargate is facing ground or other object that will prevent it to be used
 --- default if not specified: false; true if rx is between 240 and 300
 --> forceDefaultDialType    bool                    if this is enabled, defaultDialType will be forced
---- default if not specified: true
+--- default if not specified: false
 
 --- RETURNS:
 --> Reference; stargate element or nil if creating failed (duplicate address)
@@ -44,7 +44,7 @@ function stargate_create(gateType, dimension, x, y, z, address, irisType, defaul
         dt = enum_stargateDialType.FAST
     end
     if not forceDefaultDialType then
-        forceDefaultDialType = true
+        forceDefaultDialType = false
     end
 
     local stargate = createObject(1337, x, y, z, rx, ry, rz)
@@ -115,29 +115,30 @@ end
 --- REQUIRED PARAMETERS:
 --> stargateID      string      ID of stargate
 function stargate_remove(stargateID)
-    outputChatBox("This function (stargate_remove) is not implemented yet!")
+    outputChatBox("[stargate_gate/gate_s.lua] stargate_remove(...): This function (stargate_remove) is not implemented yet!")
 end
 
 -- Begin dialling process of stargate
 -- > checks if stargate has enough energy to dial, is not grounded or not active (if these checks fail - dialling will fail without animation)
 -- > begins dialling animation and sets stargate energy consumption to GATE_ENERGY_DIAL
--- > checks if there is possibility to create wormhole between stargates (in the moment dialling starts)
---  1. Translation of address to stargate ID failed ->  not possible, dialling fails after completing animation (invalid address)
---  2. Second stargate is disabled, grounded        ->  same as 1. (destination gate is disabled or grounded)
---  3. Stargate is dialling itself                  ->  same as 1. (dialling itself)
---  4. There is incoming wormhole happening         ->  not possible (dialling already failed from other function, animation already interrupted)
---  5. No issues in current moment                  ->  may be possible, prepare connection between stargates (after dialling animation)
 
 --- REQUIRED PARAMETERS:
 --> stargateIDFrom      string                  ID of source stargate (outgoing)
 --> addressArray        reference               array of address of destination/dialed stargate (incoming)
 --> stargateDialType    enum_stargateDialType   used dial type/mode of stargate    
+--> dialer              reference               player element which started dialling
 --- RETURNS:
 -- Boolean; true if dialling process may continue or false if connection is not possible and dialling will fail
-function stargate_dial(stargateIDFrom, addressArray, stargateDialType)
+function stargate_dial(stargateIDFrom, addressArray, stargateDialType, dialer)
     local stargateIDTo = stargate_convertAddressToID(stargateIDFrom, addressArray)
     local sg_energy = stargate_getEnergyElement(stargateIDFrom)
-    if energy_device_energyRequirementsMet(sg_energy) == false then
+    setElementData(stargate_getElement(stargateIDFrom), "dialerPlayer", dialer)
+
+    if stargateIDTo == nil or stargateIDTo == false then
+        gui_showInfoWindow(dialer, "Stargate", "Dialling aborted - invalid address!")
+        return false
+    end
+    if energy_device_energyRequirementsMet(sg_energy) == false  then
         stargate_diallingFailed(stargateIDFrom, stargateIDTo, enum_stargateStatus.DIAL_NO_ENERGY, false)
         return false
     end
@@ -161,31 +162,23 @@ function stargate_dial(stargateIDFrom, addressArray, stargateDialType)
     if not totalTime then
         stargate_setDialAddress(stargateIDFrom, nil)
         stargate_setActive(stargateIDFrom, false)
+        stargate_setAllChevronsActive(stargateIDFrom, false)
         return false
     end
 
     energy_device_setConsumption(stargate_getEnergyElement(stargateIDFrom), GATE_ENERGY_DIAL)
     stargate_setConnectionID(stargateIDFrom, stargateIDTo)
-    if stargateIDTo then -- may success
-        local result = stargate_wormhole_checkAvailability(stargateIDFrom, stargateIDTo)
-        if result == enum_stargateStatus.GATE_DISABLED then
-            setTimer(stargate_diallingFailed, totalTime+MW_WORMHOLE_CREATE_DELAY, 1, stargateIDFrom, stargateIDTo, result)
-        elseif result == enum_stargateStatus.GATE_GROUNDED then
-            setTimer(stargate_diallingFailed, totalTime+MW_WORMHOLE_CREATE_DELAY, 1, stargateIDFrom, stargateIDTo, result)
-        elseif result == enum_stargateStatus.DIAL_SELF then
-            setTimer(stargate_diallingFailed, totalTime+MW_WORMHOLE_CREATE_DELAY, 1, stargateIDFrom, stargateIDTo, result)
-        elseif result == enum_stargateStatus.DIAL_GATE_INCOMING then
-            -- dont do anything
-        else -- connection can be secured and at this moment, dialling may not fail
-            local anotherTimer = setTimer(stargate_wormhole_secureConnection, totalTime, 1, stargateIDFrom, stargateIDTo)
-            setElementData(stargate_getElement(stargateIDFrom), "secureTimer", anotherTimer)
-        end
-    else -- will surely fail
-        setTimer(stargate_diallingFailed, totalTime, 1, stargateIDFrom, stargateIDTo, enum_stargateStatus.DIAL_UNKNOWN_ADDRESS)
+    local result = stargate_wormhole_checkAvailability(stargateIDFrom, stargateIDTo)
+    if result == enum_stargateStatus.DIAL_GATE_INCOMING then
+        -- dont do anything
+    else -- connection can be secured and at this moment, dialling may not fail
+        local anotherTimer = setTimer(stargate_wormhole_secureConnection, totalTime, 1, stargateIDFrom, stargateIDTo)
+        setElementData(stargate_getElement(stargateIDFrom), "secureTimer", anotherTimer)
     end
-
     return true
 end
+addEvent("stargate_dial_from_client", true)
+addEventHandler("stargate_dial_from_client", resourceRoot, stargate_dial)
 
 -- Begin dialling process of stargate but dial by ID instead of address (see stargate_dial(...))
 --- REQUIRED PARAMETERS:
@@ -202,6 +195,7 @@ end
 -- > plays dial fail sound (depending on dontPlaySound argument)
 -- > resets stargate element data
 -- > turns off active glyphs, chevrons
+-- > does nothing when dial is already being failed (dial fail sound is playing)
 --- REQUIRED PARAMETERS:
 --> stargateIDFrom      string                  ID of source stargate (outgoing)
 --> stargateIDTo        string                  ID of destination stargate (incoming)
@@ -213,14 +207,21 @@ end
 --- RETURNS:
 --> Null; nil if source stargate is open, otherwise nothing is returned
 function stargate_diallingFailed(stargateIDFrom, stargateIDTo, reason, dontPlaySound)
-    if stargate_isOpen(stargateIDFrom) then
-        return nil
-    end
     local id = stargateIDFrom
     local arrow = "to"
     if reason == enum_stargateStatus.DIAL_GATE_INCOMING then
         id = stargateIDTo
         arrow = "from"
+    end
+    if getElementData(stargate_getElement(id), "dialFailing") == true then
+        return false
+    end
+
+    local dialer = getElementData(stargate_getElement(id), "dialerPlayer")
+    setElementData(stargate_getElement(id), "dialFailing", true)
+
+    if stargate_isOpen(stargateIDFrom) then
+        return nil
     end
 
     if not dontPlaySound then
@@ -231,8 +232,14 @@ function stargate_diallingFailed(stargateIDFrom, stargateIDTo, reason, dontPlayS
     setElementData(stargate_getElement(id), "timer_shutdownChevrons", t)
     stargate_setDialAddress(id, nil)
     stargate_setActive(id, false)
+    setTimer(setElementData, MW_DIAL_FAIL_CHVRN_DELAY, 1, stargate_getElement(id), "dialFailing", false)
+    setTimer(setElementData, MW_DIAL_FAIL_CHVRN_DELAY, 1, stargate_getElement(id), "dial_failed", false)
     energy_device_setConsumption(stargate_getEnergyElement(id), GATE_ENERGY_IDLE)
-    outputChatBox("[STARGATE ("..tostring(stargateIDFrom)..")] Dialling "..arrow.." "..tostring(stargateIDTo).." failed. ("..enum_stargateStatus.toString(reason)..")")
+    if reason == enum_stargateStatus.DIAL_ABORTED then
+        gui_showInfoWindow(dialer, "Stargate", "Dialling aborted.", 3000)
+    else
+        gui_showInfoWindow(dialer, "Stargate", "Dialling failed -  "..enum_stargateStatus.toString(reason)..".", 3000)
+    end
 end
 
 -- Perform animation of rotating ring (MilkyWay stargate) - single rotation of ring to specified symbol
@@ -248,7 +255,7 @@ function stargate_animateOutgoingDial(stargateID, symbol, chevron, lastChevron)
     local stargate = stargate_getElement(stargateID)
     local x, y, z, rx, ry, rz = getElementAttachedOffsets(ring)
     local oneSymbolAngle = 360/39
-    local currentSymbol = ry/oneSymbolAngle
+    local currentSymbol = math.floor(ry/oneSymbolAngle)
     local symbolDistance = 0
     local clockWise = true
     if currentSymbol < symbol then
@@ -258,11 +265,16 @@ function stargate_animateOutgoingDial(stargateID, symbol, chevron, lastChevron)
         clockWise = false
     end
     -- start rotating
-    stargate_ring_setRotating(stargateID, true)
-    local timeTook = stargate_ring_rotateSymbols(ring, clockWise, symbolDistance)
-    tm = setTimer(stargate_sound_play, MW_RING_SPEED, 1, stargateID, enum_soundDescription.GATE_RING_ROTATE)
-    setElementData(ring, "rotationTime", MW_RING_CHEVRON_LOCK_SLOW_DELAY+timeTook+MW_RING_CHEVRON_LOCK+MW_RING_CHEVRON_LOCK_AE+MW_RING_ROTATE_PAUSE)
-    t = array_push(t, tm)
+    local timeTook = 0
+    if symbolDistance > 0 then 
+        stargate_ring_setRotating(stargateID, true)
+        timeTook = stargate_ring_rotateSymbols(ring, clockWise, symbolDistance)
+        tm = setTimer(stargate_sound_play, MW_RING_SPEED, 1, stargateID, enum_soundDescription.GATE_RING_ROTATE)
+        setElementData(ring, "rotationTime", MW_RING_CHEVRON_LOCK_SLOW_DELAY+timeTook+MW_RING_CHEVRON_LOCK+MW_RING_CHEVRON_LOCK_AE+MW_RING_ROTATE_PAUSE)
+        t = array_push(t, tm)
+    else
+        timeTook = -MW_RING_CHEVRON_LOCK_SLOW_DELAY + MW_RING_CHEVRON_LOCK_SLOW_DELAY/10
+    end
     -- top chevron after symbol reached
     tm = setTimer(stargate_chevron_setActive, MW_RING_CHEVRON_LOCK_SLOW_DELAY+timeTook, 1, stargateID, 7, true)
     t = array_push(t, tm)
@@ -325,7 +337,7 @@ function stargate_diallingAnimation(stargateID, stargateDialType)
         local stargate = stargate_getElement(stargateID)
         local x, y, z, rx, ry, rz = getElementAttachedOffsets(ring)
         local oneSymbolAngle = 360/39
-        local currentSymbol = ry/oneSymbolAngle
+        local currentSymbol = math.floor(ry/oneSymbolAngle)
         local symbolDistance = 0
         local clockWise = true
         local symbol = currentSymbol + 16
@@ -367,3 +379,65 @@ function stargate_diallingAnimation(stargateID, stargateDialType)
     end
     return t
 end
+
+-- Abort dialling process
+-- > when stargate is dialling
+-- > when stargate is dialling but incoming wormhole is being created
+--- REQUIRED PARAMETERS:
+--> stargateID  string          ID of Stargate that is dialling
+--- OPTIONAL PARAMETERS:
+--> dialFailed      bool        was it aborted because dialling process failed?
+function stargate_abortDial(stargateID, dialFailed)
+    local stargateIDTo = stargate_getConnectionID(stargateID)
+    stargate_setDialAddress(stargateID, nil)
+    setElementData(stargate_getElement(stargateID), "dial_failed", true)
+
+    if isTimer(getElementData(stargate_getElement(stargateID), "timer_shutdownChevrons")) then
+        killTimer(getElementData(stargate_getElement(stargateID), "timer_shutdownChevrons"))
+    end
+    for i=1,7 do
+        local t = getElementData(stargate_getElement(stargateID), "rot_anim_timer_"..tostring(i))
+        local ts = getElementData(stargate_getElement(stargateID), "rot_anim_timer_"..tostring(i).."_semitimers")
+                
+        if not ts == nil or not ts == false then
+            for i,v in ipairs(ts) do
+                if isTimer(v) then
+                    killTimer(v)
+                end
+            end
+        end
+
+        local ts2 = getElementData(stargate_getElement(stargateID), "rot_anim_timer_semitimers")
+        if ts2 then
+            for i,v in ipairs(ts2) do
+                if isTimer(v) then
+                    killTimer(v)
+                end
+            end
+        end
+        if isTimer(t) then
+            killTimer(t)
+        end
+        local st = getElementData(stargate_getElement(stargateID), "secureTimer")
+        if isTimer(st) then
+            killTimer(st)
+        end
+        local rotationTimers = getElementData(stargate_getRingElement(stargateID), "ring_rotate_symbols_timers")
+        if rotationTimers then
+            for i,v in ipairs(rotationTimers) do
+                if isTimer(v) then
+                    killTimer(v)
+                end
+            end
+        end
+    end
+    setTimer(stargate_sound_stop, 2500, 1, stargateID, enum_soundDescription.GATE_RING_ROTATE)
+
+    if dialFailed then
+        stargate_diallingFailed(stargateIDTo, stargateID, enum_stargateStatus.DIAL_GATE_INCOMING, true)
+    else
+        stargate_diallingFailed(stargateID, stargateIDTo, enum_stargateStatus.DIAL_ABORTED, false)
+    end
+end
+addEvent("stargate_abort_dial_from_client", true)
+addEventHandler("stargate_abort_dial_from_client", resourceRoot, stargate_abortDial)

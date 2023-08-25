@@ -4,6 +4,7 @@
 
     <script src="gamemode_s.lua" type="server" />
     <script src="gamemode_c.lua" type="client" />
+    <script src="gamemode_gui_c.lua" type="client" />
     <script src="gamemode_imports_s.lua" type="server" />
     <script src="gamemode_imports_c.lua" type="client" />
     <script src="gamemode_functions.lua" type="shared" />
@@ -14,7 +15,11 @@
     <export function="isElementInCoordinatesRange" type="shared" />
     <export function="isElementInRange" type="shared" />
 
+    <export function="showInfoWindow" type="client" />
+    <export function="showInfoModelsLoadingWindow" type="client" />
+
     <include resource="stargate_exports" />
+    <include resource="stargate_gui" />
     <include resource="stargate_map" />
     <include resource="stargate_gate" />
     <include resource="stargate_energy" />
