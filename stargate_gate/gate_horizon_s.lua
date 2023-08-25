@@ -108,7 +108,7 @@ function stargate_horizon_deactivationAnimation(stargateID)
         t = t + SG_HORIZON_ACTIVATE_SPEED
     end
 
-    setTimer(setElementData, t, 1, sg, "horizonIsToggling", false)
+    setTimer(setElementData, t, 1, stargate_getElement(stargateID), "horizonIsToggling", false)
     return t
 end
 

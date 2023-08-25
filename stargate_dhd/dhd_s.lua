@@ -113,11 +113,10 @@ function dhd_activate(player)
         else
             local dhd_sg = getElementByID(dhd_sg_id)
             local energy_sg = getElementData(dhd_sg, "energy")
-            outputChatBox("["..tostring(getElementID(dhd)).."] You can now use this DHD!")
+            gui_showInfoWindow(player, "DHD", "You can now open DHD GUI with 'E' key or close it with 'F1' key!", 5000)
             setElementData(player, "atDHD", dhd)
-            addCommandHandler("dialid", dhd_dialStart)
-            bindKey(gui_getKeyOpen(player), "down", dhd_openGUI)
-            bindKey(gui_getKeyClose(player), "down", dhd_closeGUI)
+            bindKey(player, gui_getKeyOpen(player), "down", dhd_openGUI, player)
+            bindKey(player, gui_getKeyClose(player), "down", dhd_closeGUI, player)
         end
     end
 end
@@ -130,9 +129,8 @@ function dhd_leave(player)
     local marker = getElementByID(getElementID(source))
     if getElementData(marker, "isDHDMarker") == true then
         setElementData(player, "atDHD", nil)
-        removeCommandHandler("dialid", dhd_dialStart)
-        unbindKey(gui_getKeyOpen(player), "down", dhd_openGUI)
-        unbindKey(gui_getKeyClose(player), "down", dhd_closeGUI)
+        unbindKey(player, gui_getKeyOpen(player), "down", dhd_openGUI)
+        unbindKey(player, gui_getKeyClose(player), "down", dhd_closeGUI)
     end
 end
 
@@ -146,7 +144,8 @@ function dhd_dialStart(playerSource, commandName, stargateIDTo)
     local DHD = getElementData(playerSource, "atDHD")
     local SGFrom_ID = getElementData(DHD, "attachedStargate")
 
-    stargate_dialByID(SGFrom_ID, "SG_MW_"..stargateIDTo) -- ::: TEMPORARY :::
+    gui_showInfoWindow("DHD", "Dialling by ID!")
+    stargate_dialByID(SGFrom_ID, "SG_MW_"..stargateIDTo)
 end
 
 -- Action of stopping dialling process of stargate; on command /dialstop

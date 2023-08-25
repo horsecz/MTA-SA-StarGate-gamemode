@@ -22,21 +22,21 @@ function gui_showInfoWindow(title, text, duration)
     
     
     addEventHandler("onClientRender", getRootElement(), gui_infoWindow)
-    setTimer(removeInfoWindow, GUI_INFO_WINDOW_DURATION, 1)
+    setTimer(gui_removeInfoWindow, GUI_INFO_WINDOW_DURATION, 1)
     GUI_INFO_WINDOW_DISPLAYED = true
     return true
 end
 addEvent("gui_showInfoWindow", true)
-addEventHandler("gui_showInfoWindow", resourceRoot, gui_showInfoWindow)
+addEventHandler("gui_showInfoWindow", localPlayer, gui_showInfoWindow)
 
 -- Shows models loading window
 function gui_showInfoModelsLoadingWindow()
     addEventHandler("onClientRender", getRootElement(), gui_infoModelsLoadingWindow)
-    local rT = setTimer(removeInfoModelsLoadingWindow, 500, 0)
+    local rT = setTimer(gui_removeInfoModelsLoadingWindow, 500, 0)
     setElementData(getLocalPlayer(), "gui_info_models_loading", rT)
 end
 addEvent("gui_showInfoModelsLoadingWindow", true)
-addEventHandler("gui_showInfoModelsLoadingWindow", resourceRoot, gui_showInfoModelsLoadingWindow)
+addEventHandler("gui_showInfoModelsLoadingWindow", localPlayer, gui_showInfoModelsLoadingWindow)
 
 
 -- Removes models loading window
@@ -51,7 +51,7 @@ function gui_removeInfoModelsLoadingWindow()
     end
 end
 addEvent("gui_removeInfoModelsLoadingWindow", true)
-addEventHandler("gui_removeInfoModelsLoadingWindow", resourceRoot, gui_removeInfoModelsLoadingWindow)
+addEventHandler("gui_removeInfoModelsLoadingWindow", localPlayer, gui_removeInfoModelsLoadingWindow)
 
 -- Removes info window
 function gui_removeInfoWindow()
@@ -59,4 +59,4 @@ function gui_removeInfoWindow()
     GUI_INFO_WINDOW_DISPLAYED = false
 end
 addEvent("gui_removeInfoWindow", true)
-addEventHandler("gui_removeInfoWindow", resourceRoot, gui_removeInfoWindow)
+addEventHandler("gui_removeInfoWindow", localPlayer, gui_removeInfoWindow)

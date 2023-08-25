@@ -66,13 +66,14 @@ function stargate_wormhole_create(stargateIDFrom, stargateIDTo)
 
     -- autoclose in 38/given seconds
     local closeTimer = setTimer(stargate_wormhole_close, vortexTime + SG_WORMHOLE_OPEN_TIME*1000, 1, stargateIDFrom, stargateIDTo)
-    stargate_setCloseTimer(stargateIDFrom, closeTimer)
-    stargate_setCloseTimer(stargateIDTo, closeTimer)
+    setElementData(stargate_getElement(stargateIDFrom), "stargateCloseTimer", closeTimer)
+    setElementData(stargate_getElement(stargateIDTo), "stargateCloseTimer", closeTimer)
 
     -- energy check
     setTimer(function(stargateIDFrom, stargateIDTo)
         local energyTimer = setTimer(stargate_wormhole_energyCheck, 1000, 0, stargateIDFrom, stargateIDTo)
-        stargate_setEnergyTimer(stargateIDFrom, energyTimer)
+        setElementData(stargate_getElement(stargateIDFrom), "stargateEnergyTimer", energyTimer)
+        setElementData(stargate_getElement(stargateIDTo), "stargateEnergyTimer", energyTimer)
     end, vortexTime+100, 1, stargateIDFrom, stargateIDTo)
 end
 
@@ -134,6 +135,22 @@ end
 --> Null; if connection cannot be secured, otherwise no return value
 function stargate_wormhole_secureConnection(stargateIDFrom, stargateIDTo)
     local sg_en = stargate_getEnergyElement(stargateIDFrom)
+    local activate_delay = GATE_OPEN_DELAY
+    local result = stargate_wormhole_checkAvailability(stargateIDFrom, stargateIDTo)
+    if result == enum_stargateStatus.GATE_DISABLED then
+        setTimer(stargate_diallingFailed, 10, 1, stargateIDFrom, stargateIDTo, result)
+        return nil
+    elseif result == enum_stargateStatus.GATE_GROUNDED then
+        setTimer(stargate_diallingFailed, 10, 1, stargateIDFrom, stargateIDTo, result)
+        return nil
+    elseif result == enum_stargateStatus.DIAL_SELF then
+        setTimer(stargate_diallingFailed, 10, 1, stargateIDFrom, stargateIDTo, result)
+        return nil
+    elseif stargateIDTo == nil or stargateIDTo == false then
+        setTimer(stargate_diallingFailed, 10, 1, stargateIDFrom, stargateIDTo, enum_stargateStatus.DIAL_UNKNOWN_ADDRESS)
+        return nil
+    end
+
     if stargate_isOpen(stargateIDTo) then -- second stargate dialed out faster
         stargate_diallingFailed(stargateIDFrom, stargateIDTo, enum_stargateStatus.GATE_OPEN)
         return nil
@@ -241,7 +258,14 @@ end
 --> stargateIDFrom      string      ID of source stargate
 --> stargateIDTo        string      ID of destination stargate
 function stargate_wormhole_close(stargateIDFrom, stargateIDTo)
-    killTimer(stargate_getEnergyTimer(stargateIDFrom))
+    if isTimer(stargate_getEnergyTimer(stargateIDFrom)) then
+        killTimer(stargate_getEnergyTimer(stargateIDFrom))
+        stargate_setEnergyTimer(stargateIDFrom, nil)
+        stargate_setEnergyTimer(stargateIDTo, nil)
+    end
+    if isTimer(stargate_getCloseTimer(stargateIDFrom)) then
+        killTimer(stargate_getCloseTimer(stargateIDFrom))
+    end
     -- prepare, disable teleportation
     stargate_marker_deactivate(stargateIDFrom, enum_markerType.EVENTHORIZON)
     stargate_marker_deactivate(stargateIDTo, enum_markerType.EVENTHORIZON)
@@ -269,6 +293,9 @@ function stargate_wormhole_close(stargateIDFrom, stargateIDTo)
         
         setElementData(stargate_getElement(stargateIDFrom), "dial_failed", false)
         setElementData(stargate_getElement(stargateIDTo), "dial_failed", false)
+
+        stargate_setCloseTimer(stargateIDFrom, nil)
+        stargate_setCloseTimer(stargateIDTo, nil)
     end, 3000, 1, stargateIDFrom, stargateIDTo)
 end
 addEvent("stargate_wormhole_close_client", true)

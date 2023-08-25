@@ -25,7 +25,7 @@ function dhd_setType(dhdID, v)
 end
 
 function dhd_setAttachedStargate(dhdID, v)
-    setElementData(dhd_getElement(dhdID), "attachedstargate", v)
+    setElementData(dhd_getElement(dhdID), "attachedStargate", v)
 end
 
 
@@ -46,7 +46,7 @@ function dhd_getType(dhdID)
 end
 
 function dhd_getAttachedStargate(dhdID)
-    setElementData(dhd_getElement(dhdID), "attachedstargate")
+    return (getElementData(dhd_getElement(dhdID), "attachedStargate"))
 end
 
 

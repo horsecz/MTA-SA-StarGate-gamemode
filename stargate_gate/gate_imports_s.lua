@@ -39,6 +39,10 @@ function energy_device_setStorage(...)
     return (exports.stargate_energy:energy_device_setStorage(...))
 end
 
+function energy_device_getStorage(...)
+    return (exports.stargate_energy:energy_device_getStorage(...))
+end
+
 function energy_device_setProduction(...)
     return (exports.stargate_energy:energy_device_setProduction(...))
 end
@@ -106,4 +110,8 @@ end
 
 function global_getData(...)
     return (exports.stargate_exports:global_getData(...))
+end
+
+function gui_showInfoWindow(...)
+    return (exports.stargate_gui:gui_showInfoWindow(...))
 end

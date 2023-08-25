@@ -19,6 +19,7 @@
     <export function="showInfoModelsLoadingWindow" type="client" />
 
     <include resource="stargate_exports" />
+    <include resource="stargate_gui" />
     <include resource="stargate_map" />
     <include resource="stargate_gate" />
     <include resource="stargate_energy" />

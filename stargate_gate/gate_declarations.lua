@@ -42,6 +42,7 @@ enum_markerType = {
 }
 
 enum_stargateStatus = {
+    DIAL_ABORTED = -7,
     DIAL_NO_ENERGY = -6,
     DIAL_SELF = -5,
     DIAL_GATE_INCOMING_TOGATE = -4,

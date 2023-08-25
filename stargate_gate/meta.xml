@@ -34,10 +34,16 @@
     <export function="stargate_ring_getID" type="shared" />
     <export function="stargate_getRingElement" type="shared" />
     <export function="stargate_getChevron" type="shared" />
+    <export function="stargate_getForceDialType" type="shared" />
+    <export function="stargate_getDefaultDialType" type="shared" />
+    <export function="stargate_getCloseTimer" type="shared" />
+    <export function="stargate_getConnectionID" type="shared" />
     <export function="stargate_getKawoosh" type="shared" />
     <export function="stargate_getHorizon" type="shared" />
     <export function="stargate_getIris" type="shared" />
-    <export function="stargate_getHorizonActivation" type="shared" />
+    <export function="stargate_isOpen" type="shared" />
+    <export function="stargate_isActive" type="shared" />
+    <export function="stargate_getIncomingStatus" type="shared" />
 
     <export function="stargate_dial" type="shared" />
     <export function="stargate_dialByID" type="server" />
@@ -47,11 +53,12 @@
     <export function="stargate_hasIris" type="shared" />
     <export function="stargate_wormhole_close" type="shared" />
     <export function="stargate_abortDial" type="shared" />
+    <export function="stargate_getAddress" type="shared" />
 
-    <export function="import_enum_markerType" type="server" />
+    <export function="import_enum_markerType" type="shared" />
     <export function="import_enum_galaxy" type="shared" />
-    <export function="import_enum_stargateStatus" type="server" />
-    <export function="import_enum_stargateDialType" type="server" />
+    <export function="import_enum_stargateStatus" type="shared" />
+    <export function="import_enum_stargateDialType" type="shared" />
     <export function="import_sg_mw" type="shared" />
 
     <file src="sounds/mw_chevron_incoming.mp3" />

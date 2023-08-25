@@ -31,7 +31,7 @@ end
 function planet_getDimensionPlanet(dimension)
     local pl = global_getData("PLANET_LIST")
     for i,p in pairs(pl) do
-        if planet_getPlanetDimension(dimension) == dimension then
+        if planet_getPlanetDimension(planet_getPlanetID(p)) == dimension then
             return p
         end
     end

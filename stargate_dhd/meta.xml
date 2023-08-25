@@ -8,6 +8,7 @@
     <script src="dhd_imports_c.lua" type="client"></script>
 
     <script src="dhd_gui_c.lua" type="client"></script>
+    <script src="dhd_gui_s.lua" type="server"></script>
 
     <export function="dhd_create" type="server" />
     <export function="dhd_remove" type="server" />

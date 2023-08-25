@@ -1,4 +1,4 @@
 # To be done
 
-- Make GUI working, opening/closing, etc.
-- DHD types (currently using enum_stargateGalaxy; no option to distinguish between classic and base DHD currently)
+- Little more testing
+- Maybe: doing (repeating) some actions very fast after eachother - something could be not handled 

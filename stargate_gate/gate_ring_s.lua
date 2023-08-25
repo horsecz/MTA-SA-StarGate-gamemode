@@ -30,6 +30,9 @@ function stargate_ring_getSymbolRotationTime(symbol_a, symbol_b)
     else
         symbolDistance = symbol_a-symbol_b
     end
+    if symbolDistance == 0 then
+        return -MW_RING_CHEVRON_LOCK_SLOW_DELAY + MW_RING_CHEVRON_LOCK_SLOW_DELAY/10
+    end
 
     local beginTime = 0
     for i=1,symbolDistance do
@@ -47,10 +50,15 @@ end
 --> Int; time [ms] that will take for ring to be rotated 
 function stargate_ring_rotateSymbols(ring, rotateClockwise, symbolDistance)
     local beginTime = 0
+    setElementData(ring, "ring_rotate_symbols_timers", {})
+    local sTrs = {}
+
     for i=1,symbolDistance do
         beginTime = beginTime + MW_RING_SPEED*3
-        setTimer(stargate_ring_rotateOneSymbol, beginTime, 1, ring, rotateClockwise)
+        local oSR = setTimer(stargate_ring_rotateOneSymbol, beginTime, 1, ring, rotateClockwise)
+        sTrs = array_push(sTrs, oSR)
     end
+    setElementData(ring, "ring_rotate_symbols_timers", sTrs)
     return beginTime
 end
 
@@ -62,7 +70,7 @@ end
 --- RETURNS:
 --> Int; time it will take for ring to be rotated
 function stargate_ring_rotateOneSymbol(ring, rotateClockwise)
-    setTimer(function(ring, rotateClockwise)
+    local oST = setTimer(function(ring, rotateClockwise)
         local x,y,z,rx,ry,rz = getElementAttachedOffsets(ring)
         local oneSymbolAngle = 360/39
         if rotateClockwise == true then

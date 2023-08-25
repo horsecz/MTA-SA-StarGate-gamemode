@@ -1,8 +1,9 @@
 # To be done
 
 Medium priority (needed but can be skipped for now):
-- Teleport element rotation (currently incorrect)
+- Teleport element rotation (currently incorrect sometimes)
 - (Better) collisions for stargate iris
+- Wrong gate ring rotation to last symbol (point of origin)
 - Transport animation
     - to hide model loading
     - can be very short; no need for long one (but can be optional)

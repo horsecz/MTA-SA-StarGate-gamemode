@@ -20,13 +20,13 @@ end
 
 
 function gui_setKeyOpen(player, key)
-    return (getElementData(player, "gui_key_open", key))
+    return (setElementData(player, "gui_key_open", key))
 end
 
 function gui_setKeyClose(player, key)
-    return (getElementData(player, "gui_key_close", key))
+    return (setElementData(player, "gui_key_close", key))
 end
 
 function gui_setKeyOpenClose(player, key)
-    return (getElementData(player, "gui_key_openclose", key))
+    return (setElementData(player, "gui_key_openclose", key))
 end

@@ -99,11 +99,11 @@ function stargate_setActive(stargateID, active)
 end
 
 function stargate_getDialAddress(stargateID)
-    return getElementData(getElementByID(stargateID), "diallingAddress")
+    return (getElementData(getElementByID(stargateID), "diallingAddress"))
 end
 
 function stargate_setDialAddress(stargateID, address)
-    return setElementData(getElementByID(stargateID), "diallingAddress", address)
+    return (setElementData(getElementByID(stargateID), "diallingAddress", address))
 end
 
 function stargate_getConnectionID(stargateID)
@@ -111,35 +111,35 @@ function stargate_getConnectionID(stargateID)
 end
 
 function stargate_setConnectionID(stargateID, id)
-    return setElementData(getElementByID(stargateID), "connectionID", id)
+    return (setElementData(getElementByID(stargateID), "connectionID", id))
 end
 
 function stargate_getAddress(stargateID)
-    return getElementData(getElementByID(stargateID), "address")
+    return (getElementData(getElementByID(stargateID), "address"))
 end
 
 function stargate_getIncomingStatus(stargateID) 
-    return getElementData(getElementByID(stargateID), "incomingStatus")
+    return (getElementData(getElementByID(stargateID), "incomingStatus"))
 end
 
 function stargate_setIncomingStatus(stargateID, status) 
-    return setElementData(getElementByID(stargateID), "incomingStatus", status)
+    return (setElementData(getElementByID(stargateID), "incomingStatus", status))
 end
 
 function stargate_setCloseTimer(stargateID, timer)
-    return setElementData(getElementByID(stargateID), "closeTimer", timer)
+    setElementData(getElementByID(stargateID), "stargateCloseTimer", timer)
 end
 
 function stargate_getCloseTimer(stargateID)
-    return getElementData(getElementByID(stargateID), "closeTimer")
+    return (getElementData(getElementByID(stargateID), "stargateCloseTimer"))
 end
 
 function stargate_setEnergyTimer(stargateID, timer)
-    return setElementData(getElementByID(stargateID), "energyTimer", timer)
+    setElementData(getElementByID(stargateID), "stargateEnergyTimer", timer)
 end
 
 function stargate_getEnergyTimer(stargateID)
-    return getElementData(getElementByID(stargateID), "energyTimer")
+    return (getElementData(getElementByID(stargateID), "stargateEnergyTimer"))
 end
 
 function stargate_setDefaultDialType(id, defaultDialType)
@@ -183,7 +183,8 @@ function stargate_setAssignedDHD(id, v)
         local stargate = stargate_getElement(id)
         local dhd = getElementByID(v)
         local dhdType = getElementData(dhd, "type")
-        if not dhdType == enum_galaxy.UNKOWN then   -- dont generate energy when DHD is Base type
+        if dhdType == enum_galaxy.UNKNOWN then   -- dont generate energy when DHD is Base type
+        else
             local sg_energy = getElementData(stargate, "energy")
             local dhd_energy = getElementData(dhd, "energy")
             local eTT = setTimer(energy_beginTransfer, 1000, 0, dhd_energy, sg_energy, GATE_ENERGY_WORMHOLE)
@@ -246,10 +247,8 @@ end
 
 function stargate_isValidAttribute(stargateID, attribute)
     if getElementData(getElementByID(stargateID), attribute) == nil then
-        outputChatBox("no! "..stargateID.." hasnt "..attribute)
         return false
     else
-        outputChatBox("yes")
         return true
     end
 end

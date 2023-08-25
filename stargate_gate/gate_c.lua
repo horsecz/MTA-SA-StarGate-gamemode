@@ -1,8 +1,8 @@
 --- gate_c.lua: Core module for stargates and their logic; client-side
 
 -- See stargate_dial in gate_s.lua
-function stargate_dial(stargateIDFrom, addressArray, stargateDialType)
-	triggerServerEvent("stargate_dial_from_client", resourceRoot, stargateIDFrom, addressArray, stargateDialType)
+function stargate_dial(stargateIDFrom, addressArray, stargateDialType, dialer)
+	triggerServerEvent("stargate_dial_from_client", resourceRoot, stargateIDFrom, addressArray, stargateDialType, dialer)
 end
 
 function stargate_abortDial(stargateIDFrom, dialFailed)

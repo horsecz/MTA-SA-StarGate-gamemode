@@ -33,5 +33,5 @@ function stargate_ring_getCurrentSymbol(stargateID)
     local ring = stargate_ring_getElement(stargateID.."R")
     local oneSymbolAngle = 360/39
     local tmpx, tmpy, tmpz, tmprx, ringRotation, tmprz = getElementAttachedOffsets(ring)
-    return (ringRotation/oneSymbolAngle)
+    return (math.floor(ringRotation/oneSymbolAngle))
 end
