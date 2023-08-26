@@ -92,8 +92,13 @@ function stargate_vortex_kill(player)
         local sgID = stargate_marker_getSource(source)
         local markerID = getElementID(source)
         if markerID == sgID.."KZM" then
+            if getElementData(player, "isStargateElement") == true then -- dont destroy itself, other stargate
+                return false 
+            end
+            if getElementAttachedTo(stargate_getElement(sgID)) then -- no destroying when stargate is attached to something
+                return false
+            end
             destroyElement(player)
-            outputChatBox("["..sgID.."] Vortex disintegrated you!")
             if isElement(player) and getElementType(player) == "ped" or getElementType(player) == "player" then
                 setElementAlpha(player, 0)
                 killPed(player)

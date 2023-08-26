@@ -241,6 +241,36 @@ function stargate_setPosition(stargateID, nx, ny, nz)
     end 
 end
 
+function stargate_attachToElement(stargateID, elementAttachTo, x,y,z, rx,ry,rz)
+    if not x then
+        x = 0
+    end 
+    if not y then
+        y = 0
+    end
+    if not z then
+        z = 0
+    end
+    if not rx then
+        rx = 0
+    end
+    if not ry then
+        ry = 0
+    end
+    if not rz then
+        rz = 0
+    end
+    
+    attachElements(stargate_getElement(stargateID), elementAttachTo, x,y,z, rx,ry,rz)
+end
+
+function stargate_detachFromElement(stargateID, elementDetachFrom)
+    if not elementDetachFrom then
+        elementDetachFrom = nil
+    end
+    detachElements(stargate_getElement(stargateID), elementDetachFrom)
+end
+
 ---
 --- OBSOLETE Functions
 ---

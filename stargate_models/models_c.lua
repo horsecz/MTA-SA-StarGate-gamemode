@@ -621,6 +621,10 @@ function models_loadHOTUModelsInRangeOfElement(e, range)
 	models_loadObjects(true)
 	setTimer(setElementFrozen, t+100, 1, getLocalPlayer(), false)
 	setTimer(setElementCollisionsEnabled, t+100, 1, getLocalPlayer(), true)
+	if isPedInVehicle(getLocalPlayer()) then
+		setTimer(setElementFrozen, t+100, 1, getPedOccupiedVehicle(getLocalPlayer()), false)
+		setTimer(setElementCollisionsEnabled, t+100, 1, getPedOccupiedVehicle(getLocalPlayer()), true)
+	end
 	setTimer(setCameraTarget, t+150, 1, getLocalPlayer())
 	setTimer(setElementData, t+100, 1, e, "planet_models_loaded", true)
 	setElementData(getLocalPlayer(), "loaded_models_list", loadedModelsList)

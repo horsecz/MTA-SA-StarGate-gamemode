@@ -33,3 +33,8 @@ Stagates are located in galaxy. The galaxy matters, because for different galaxi
 - Performing animations (ring rotation, event horizon, kawoosh-vortex effect, etc.) including sound effects
 - Element teleportation
 - Physics - wormhole operations, "stargate laws"
+
+## Commands
+
+- /sgattach [SG_ID]
+    - Attach stargate (by Stargate ID) to players vehicle

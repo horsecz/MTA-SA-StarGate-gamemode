@@ -37,3 +37,12 @@ end
 function energy_beginTransfer(...)
     return (exports.stargate_energy:energy_transfer(...))
 end
+
+
+function global_getData(...)
+    return (exports.stargate_exports:global_getData(...))
+end
+
+function global_setData(...)
+    return (exports.stargate_exports:global_setData(...))
+end

@@ -27,6 +27,8 @@
     <script src="gate_wormhole_s.lua" type="server"></script>
     <script src="gate_wormhole_c.lua" type="client"></script>
 
+    <script src="gate_commands_s.lua" type="server"></script>
+
     <export function="stargate_create" type="server" />
     <export function="stargate_getGalaxy" type="server" />
 

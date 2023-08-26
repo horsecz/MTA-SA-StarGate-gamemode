@@ -52,10 +52,12 @@ function stargate_wormhole_create(stargateIDFrom, stargateIDTo)
     -- teleport ability
     local x, y, z = stargate_getPosition(stargateIDFrom)
     local tpm = stargate_marker_create(x, y, z, "corona", 2, 25, 90, 200, 190, enum_markerType.EVENTHORIZON, stargateIDFrom)
-    
+    attachElements(tpm, getElementByID(stargateIDFrom))
+
     local x, y, z = stargate_getPosition(stargateIDTo)
     local rpm = stargate_marker_create(x, y, z, "corona", 2, 25, 90, 200, 190, enum_markerType.EVENTHORIZON, stargateIDTo)
     setElementData(rpm, "incoming", true)
+    attachElements(rpm, getElementByID(stargateIDTo))
 
     if stargate_iris_isActive(stargateIDFrom) then
         setElementAlpha(tpm, 0)
@@ -192,8 +194,14 @@ function stargate_wormhole_transport(hitElement)
     if stargate_marker_isEventHorizon(source) and getElementDimension(hitElement) == getElementDimension(source) then
         local stargateIDFrom = stargate_marker_getSource(source)
         if getElementData(source, "active") == false then -- closing gate
+            if getElementData(source, "isStargateElement") == true then -- dont destroy itself, other stargate
+                return false 
+            end
+            if getElementAttachedTo(stargate_getElement(stargateIDFrom)) then -- no destroying when stargate is attached to something
+                return false
+            end
+
             setElementAlpha(hitElement, 0)
-            outputChatBox("["..stargateIDFrom.."] Unstable event horizon killed you!")
             if getElementType(hitElement) == "ped" or getElementType(hitElement) == "player" then
                 killPed(hitElement) -- stargate open but (active and) horizon marker is present = unstable vortex still present
             else

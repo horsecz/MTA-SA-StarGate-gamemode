@@ -10,6 +10,7 @@ Medium priority (needed but can be skipped for now):
     - make element really be transported
         - while loading models (player), set his position to neutral dimension/position
         - after models are loaded teleport player into correct dimension and position
+- Stargate remove
 - Support of galaxies and other gate types
     - 8th chevron; dialling to another galaxy; support of galaxies and gate types
     - 9th chevron; dialling to Destiny;
