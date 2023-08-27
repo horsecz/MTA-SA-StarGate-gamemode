@@ -223,6 +223,16 @@ function stargate_getAddressSymbol(address, symbol)
     return address[symbol]
 end
 
+function stargate_convertAddressSymbolToGalaxy(symbol)
+    if symbol == 10 then
+        return enum_galaxy.MILKYWAY
+    elseif symbol == 20 then
+        return enum_galaxy.PEGASUS
+    else
+        return nil
+    end
+end
+
 
 function stargate_getPosition(stargateID)
     local x, y, z = getElementPosition(stargate_getElement(stargateID))

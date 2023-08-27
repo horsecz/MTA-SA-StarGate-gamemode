@@ -30,8 +30,8 @@
     <script src="gate_commands_s.lua" type="server"></script>
 
     <export function="stargate_create" type="server" />
-    <export function="stargate_getGalaxy" type="server" />
-
+    
+    <export function="stargate_getGalaxy" type="shared" />
     <export function="stargate_getID" type="shared" />
     <export function="stargate_ring_getID" type="shared" />
     <export function="stargate_getRingElement" type="shared" />
@@ -56,6 +56,7 @@
     <export function="stargate_wormhole_close" type="shared" />
     <export function="stargate_abortDial" type="shared" />
     <export function="stargate_getAddress" type="shared" />
+    <export function="stargate_convertAddressSymbolToGalaxy" type="shared" />
 
     <export function="import_enum_markerType" type="shared" />
     <export function="import_enum_galaxy" type="shared" />

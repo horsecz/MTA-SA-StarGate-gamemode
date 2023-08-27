@@ -22,6 +22,8 @@
     <script src="map_c.lua" type="client"></script>
     <script src="map_useful.lua" type="shared"></script>
 
+    <script src="map_1_s.lua" type="server"></script>
+
     <script src="map_imports_s.lua" type="server"></script>
     <script src="map_imports_c.lua" type="client"></script>
     

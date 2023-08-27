@@ -20,12 +20,12 @@
 
     <include resource="stargate_exports" />
     <include resource="stargate_gui" />
-    <include resource="stargate_map" />
     <include resource="stargate_gate" />
     <include resource="stargate_energy" />
     <include resource="stargate_lifesupport" />
     <include resource="stargate_planets" />
     <include resource="stargate_dhd" />
     <include resource="stargate_spawner" />
+    <include resource="stargate_map" />
     <include resource="stargate_models" />
 </meta>

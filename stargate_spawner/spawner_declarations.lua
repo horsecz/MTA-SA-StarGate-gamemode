@@ -22,9 +22,9 @@ enum_planetDimension = {
 
 -- Stargate addresses
 enum_stargateAddress = {
-    SanAndreas = { 10, 19, 24, 5, 32, 13, 0 },
-    Earth = { 23, 11, 15, 4, 9, 31, 0 },
-    Icarus = { 35, 4, 33, 15, 9, 3, 0 },
+    SanAndreas = { 10, 19, 24, 5, 32, 13 },
+    Earth = { 23, 11, 15, 4, 9, 31 },
+    Icarus = { 35, 4, 33, 15, 9, 3 },
 
-    Atlantis = { 19, 3, 35, 15, 10, 24, 0 }
+    Atlantis = { 19, 3, 35, 15, 10, 24 }
 }

@@ -47,11 +47,45 @@ function stargate_convertAddressToID(id, addressArray)
     if all_gates == nil then
         return false
     end
+    local address_withoutPOO = { addressArray[1], addressArray[2], addressArray[3], addressArray[4], addressArray[5], addressArray[6] }
+    local address_arraySize = array_size(addressArray)
+    local stargate_galaxy = nil
+    local address_POO = nil
+
+    if address_arraySize == 7 then -- 7 symbol address -> 7th symbol must be point of origin
+        address_POO = addressArray[7]
+    elseif address_arraySize == 8 then -- 8 symbol address -> 7th symbol is galaxy; 8th is point of origin
+        stargate_galaxy = stargate_convertAddressSymbolToGalaxy(addressArray[7])
+        address_POO = addressArray[8]
+    elseif address_arraySize == 9 then -- 9 symbol address -> it's not address but a code
+        address_withoutPOO = array_push(address_withoutPOO, addressArray[7])
+        address_withoutPOO = array_push(address_withoutPOO, addressArray[8])
+        address_withoutPOO = array_push(address_withoutPOO, addressArray[9])
+    else -- less than 7 or more than 9 symbols -> invalid
+        return false
+    end
+
+    if address_POO then -- check point of origin 
+        if not address_POO == 39 then
+            return false
+        end
+    end
+
+    
     for i, sg in pairs(all_gates) do
         local sg_id = stargate_getID(sg)
         local sg_addr = stargate_getAddress(sg_id)
-        if array_equal(addressArray, sg_addr) then
-            return sg_id
+        if array_equal(address_withoutPOO, sg_addr) then
+            if stargate_galaxy then
+                local sg_galaxy = stargate_getGalaxy(sg_id)
+                if stargate_galaxy == sg_galaxy then
+                    return sg_id
+                else
+                    return false
+                end
+            else
+                return sg_id
+            end
         end
     end
     return false

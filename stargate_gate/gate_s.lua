@@ -255,16 +255,36 @@ function stargate_animateOutgoingDial(stargateID, symbol, chevron, lastChevron)
     local ring = stargate_getRingElement(stargateID)
     local stargate = stargate_getElement(stargateID)
     local x, y, z, rx, ry, rz = getElementAttachedOffsets(ring)
-    local oneSymbolAngle = 360/39
-    local currentSymbol = math.floor(ry/oneSymbolAngle)
-    local symbolDistance = 0
-    local clockWise = true
-    if currentSymbol < symbol then
-        symbolDistance = symbol-currentSymbol
-    else
-        symbolDistance = currentSymbol-symbol
-        clockWise = false
+    local oneSymbolAngle = 360/39   -- 360 circle, 39 symbols
+    local currentSymbol = math.floor(ry/oneSymbolAngle) 
+    local currentSymbolNeg = 39 - currentSymbol
+    local symbol_neg = 39 - symbol 
+    local symbolDistance = math.abs(currentSymbol-symbol)
+    local clockWise = nil
+
+    if currentSymbol > symbol then -- 5 (34) -> 2 (37); 3 /// 35 (4) -> 2 (37);  
+        if currentSymbolNeg < symbol_neg then -- 5 -> 2
+            clockWise = false
+        else -- 35 -> 2
+            clockWise = true
+            symbolDistance = math.abs(currentSymbolNeg + symbol)
+        end
+    elseif currentSymbol < symbol then -- 2 [37] -> 5 [34] /// 2 [37] -> 35 [4]
+        if currentSymbolNeg > symbol_neg then -- 2 -> 5
+            clockWise = true
+        else -- 2 -> 35
+            clockWise = false
+            symbolDistance = math.abs(currentSymbol + symbol_neg)
+        end
+    else -- symbol == currentSymbol
+        symbolDistance = 0
     end
+    
+    if symbol == 39 and clockWise == true and math.abs(currentSymbol - symbol_neg) > math.abs(currentSymbol - symbol) then
+        symbolDistance = symbolDistance - 1
+    end
+
+    --outputChatBox("Rotating: "..tostring(currentSymbol).." -> "..tostring(symbol).." (D:"..tostring(symbolDistance).."; C:"..tostring(clockWise)..")")
     -- start rotating
     local timeTook = 0
     if symbolDistance > 0 then 
@@ -313,16 +333,17 @@ function stargate_diallingAnimation(stargateID, stargateDialType)
                 symbol_f_current = stargate_getAddressSymbol(stargate_getDialAddress(stargateID), i-1)
             end
 
-            symbol_target = stargate_getAddressSymbol(stargate_getDialAddress(stargateID), i)
             if i == 7 then
+                symbol_target = 39
                 timer = setTimer(stargate_animateOutgoingDial, t, 1, stargateID, symbol_target, i, true)
             else
+                symbol_target = stargate_getAddressSymbol(stargate_getDialAddress(stargateID), i)
                 timer = setTimer(stargate_animateOutgoingDial, t, 1, stargateID, symbol_target, i)
             end
             setElementData(stargate_getElement(stargateID), "rot_anim_timer_"..tostring(i), timer)
             t = t + stargate_ring_getSymbolRotationTime(symbol_f_current, symbol_target) + MW_RING_CHEVRON_LOCK_SLOW_DELAY*1.5
             if i == 7 then
-                t = t - MW_RING_CHEVRON_LOCK_SLOW_DELAY/7
+                t = t + MW_RING_CHEVRON_LOCK_SLOW_DELAY/20
             end
 
             if getElementData(stargate_getElement(stargateID), "dial_failed") == true then

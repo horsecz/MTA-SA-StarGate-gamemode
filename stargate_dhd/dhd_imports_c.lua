@@ -28,6 +28,14 @@ function stargate_getAddress(...)
     return (exports.stargate_gate:stargate_getAddress(...))
 end
 
+function stargate_convertAddressSymbolToGalaxy(...)
+    return (exports.stargate_gate:stargate_convertAddressSymbolToGalaxy(...))
+end
+
+function stargate_getGalaxy(...)
+    return (exports.stargate_gate:stargate_getGalaxy(...))
+end
+
 function stargate_getCloseTimer(...)
     return (exports.stargate_gate:stargate_getCloseTimer(...))
 end

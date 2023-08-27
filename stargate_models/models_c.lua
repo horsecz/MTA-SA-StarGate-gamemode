@@ -626,7 +626,17 @@ function models_loadHOTUModelsInRangeOfElement(e, range)
 		setTimer(setElementCollisionsEnabled, t+100, 1, getPedOccupiedVehicle(getLocalPlayer()), true)
 	end
 	setTimer(setCameraTarget, t+150, 1, getLocalPlayer())
-	setTimer(setElementData, t+100, 1, e, "planet_models_loaded", true)
+	setTimer(setElementAlpha, t+150, 1, getLocalPlayer(), 255)
+
+	local sgIDTo = getElementData(getLocalPlayer(), "stargate_player_in_transport")
+	if sgIDTo then
+		local tx, ty, tz = getElementPosition(getElementByID(sgIDTo))
+		local trx, try, trz = getElementRotation(getElementByID(sgIDTo))
+		setTimer(setElementPosition, t+150, 1, getLocalPlayer(), tx, ty, tz)
+		setTimer(setElementRotation, t+150, 1, getLocalPlayer(), trx, try, trz)
+		setTimer(setElementData, t+200, 1, getLocalPlayer(), "stargate_player_in_transport", nil)
+	end
+	setTimer(setElementData, t+150, 1, e, "planet_models_loaded", true)
 	setElementData(getLocalPlayer(), "loaded_models_list", loadedModelsList)
     outputDebugString("[MODELS|C] Loaded "..tostring(cnt).." objects in "..tostring(range).." range of '"..tostring(getElementID(e)).."' ")
 end
@@ -641,11 +651,11 @@ end
 --> Bool; false if player element is invalid, otherwise no return value
 function models_loadModelsNearPlayer(playerElement, s_range)
 	local range = tonumber(s_range)
-	if range > 250 then
-		range = 250
+	if range > 9999 then
+		range = 9999
 		outputDebugString("models_loadModelsNearPlayer(...) range capped to "..tostring(range), 2)
 	end
-	if not playerElement then
+	if not playerElement or not getElementType(playerElement) == "player" then
 		outputDebugString("models_loadModelsNearPlayer(...) missing playerElement ("..tostring(playerElement)..")", 1)
 		return false
 	end

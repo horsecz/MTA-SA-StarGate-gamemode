@@ -236,16 +236,18 @@ function stargate_wormhole_transport(hitElement)
             if (rx > 60 and rx < 115) then -- if lying on the ground, teleport element higher
                 z2 = z2 + 1
             end
-            setElementData(hitElement, "planet_models_loaded", false)
-            setCameraMatrix(hitElement, -10000,-10000,-1000)
+
             local planet = planet_getElementOccupiedPlanet(stargate_getElement(stargateIDTo))
-            planet_setElementOccupiedPlanet(hitElement, planet, true)
+            if getElementType(hitElement) == "player" then
+                stargate_wormhole_player_transport(hitElement, stargateIDFrom, stargateIDTo, planet)
+            else
+                planet_setElementOccupiedPlanet(hitElement, planet, true)
+                setElementPosition(hitElement, x2, y2, z2)
+                setElementRotation(hitElement, rx, ry, rz)
+                stargate_sound_play(stargateIDTo, enum_soundDescription.GATE_HORIZON_TOUCH, 75)
+            end
+            
             stargate_sound_play(stargateIDFrom, enum_soundDescription.GATE_HORIZON_TOUCH, 75)
-            stargate_sound_play(stargateIDTo, enum_soundDescription.GATE_HORIZON_TOUCH, 75)
-            setElementPosition(hitElement, x2, y2, z2)
-            setElementRotation(hitElement, rx, ry, rz)
-            setElementCollisionsEnabled(hitElement, false)
-            setElementFrozen(hitElement, true)
         else
             setElementAlpha(hitElement, 0)
             if getElementType(hitElement) == "ped" or getElementType(hitElement) == "player" then
@@ -255,6 +257,28 @@ function stargate_wormhole_transport(hitElement)
             end
         end
     end
+end
+
+-- Transport player from source stargate to destination stargate
+-- > 1. freeze, disable player movement, fade camera
+-- > 2. teleport to middle point (between src and dst)
+-- > 3. load models in planet
+-- > 4. teleport to destination
+function stargate_wormhole_player_transport(player, stargateIDFrom, stargateIDTo, targetPlanet)
+    setElementData(player, "planet_models_loaded", false)
+    setElementData(player, "stargate_player_in_transport", stargateIDTo)
+    setCameraMatrix(player, -10000,-10000,-1000)
+    setElementAlpha(player, 0)
+    setElementCollisionsEnabled(player, false)
+    setElementFrozen(player, true)
+
+    local x1, y1, z1 = stargate_getPosition(stargateIDFrom)
+    local x2, y2, z2 = stargate_getPosition(stargateIDTo)
+    local mx = ( x1 + x2 ) / 2
+    local my = ( y1 + y2 ) / 2
+    local mz = ( z1 + z2 ) / 2 - 10000
+    setElementPosition(player, mx, my, mz)
+    planet_setElementOccupiedPlanet(player, targetPlanet)
 end
 
 -- Close active wormhole between two stargates; shut down both gates

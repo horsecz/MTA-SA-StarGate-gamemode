@@ -1,5 +1,6 @@
 -- gamemode_s.lua:  Main gamemode script for Stargate for MTA:SA Gamemode; server-side
 RESOURCE_STOP = false       -- is resource being stopped?
+LAST_PLAYER_ID = 1          -- last player id
 
 -- Actions performed on player spawning
 -- Reset his alpha, camera, lifesupport and occupied planet
@@ -28,26 +29,15 @@ addEventHandler ( "onPlayerWasted", getRootElement(), onPlayerWasted)
 function onPlayerJoin(player)
     spawnPlayer(source, 0, 10, 4, 180)
     setElementFrozen(source, true)
-    local PLAYERS_JOINED = global_getData("var_players_joined")
 
-    if not PLAYERS_JOINED then
-        PLAYERS_JOINED = array_new()
-    end
-    PLAYERS_JOINED = array_push(PLAYERS_JOINED, source)
-    setElementID(source, array_size(PLAYERS_JOINED))
-    global_setData("var_players_joined", PLAYERS_JOINED)
+    setElementID(source, LAST_PLAYER_ID)
+    LAST_PLAYER_ID = LAST_PLAYER_ID + 1
 end
 addEventHandler( "onPlayerJoin", getRootElement(), onPlayerJoin)
 
 -- Actions performed on player leaving the server
 -- Remove player from joined players array
 function onPlayerLeave()
-    if not RESOURCE_STOP then
-        local PLAYERS_JOINED = global_getData("var_players_joined")
-        local id = tonumber(getElementID(source))
-        PLAYERS_JOINED = array_remove(PLAYERS_JOINED, array_get(PLAYERS_JOINED, id, true))
-        global_setData("var_players_joined", PLAYERS_JOINED)
-    end
 end
 addEventHandler( "onPlayerQuit", getRootElement(), onPlayerLeave)
 

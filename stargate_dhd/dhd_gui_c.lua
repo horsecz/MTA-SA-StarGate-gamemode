@@ -21,11 +21,18 @@ function dhd_openGUI()
     if DHD_GUI_OPEN == true then
         return false
     end
+    DHD_GUI_OPEN = true
+    DHD_GUI_ELEMENT = nil
+    DHD_GUI_LOCALONLY = false
+    DHD_GUI_FASTDIAL = false
+    DHD_GUI_ADDRESS_EDITBOX = nil
+    DHD_GUI_ADDRESS = nil
+    DHD_GUI_GRID_SELECTION = nil
+    DHD_GUI_GRIDLIST = nil
 
     local dhdID = dhd_getID(getElementData(getLocalPlayer(), "atDHD"))
     local type = dhd_getType(dhdID)
     dhd_classicGUI()
-    DHD_GUI_OPEN = true
     showCursor(true)
 end
 addEvent("dhd_openGUI_client", true)
@@ -67,6 +74,7 @@ function dhd_handleGUIRefreshAddressList()
 
     local dhdID = dhd_getID(getElementData(getLocalPlayer(), "atDHD"))
     local sgID = dhd_getAttachedStargate(dhdID)
+    local localGalaxy = stargate_getGalaxy(sgID)
     local SG_MW = global_getData("SG_MW") -- "all" stargates list
     if SG_MW == false or SG_MW == nil then
         local rowID = guiGridListAddRow(gridlist)
@@ -91,6 +99,11 @@ function dhd_handleGUIRefreshAddressList()
             else
                 sg_address = sg_address .. ", " .. tostring(symbol)
             end
+        end
+        if localGalaxy == stargate_getGalaxy(sgID) then
+            sg_address = sg_address .. ", 39"
+        else
+            sg_address = sg_address .. ", " .. tostring(stargate_convertAddressSymbolToGalaxy(stargate_getGalaxy(sgID))) .. ", 39"
         end
         local planet_name = planet_getPlanetName(sg_planetID)
         local galaxy = planet_getPlanetGalaxyString(sg_planetID)

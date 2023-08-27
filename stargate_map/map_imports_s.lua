@@ -11,3 +11,11 @@ end
 function models_getObjectID(...)
     return (exports.stargate_models:models_getObjectID(...))
 end
+
+function energy_device_create(...)
+    return (exports.stargate_energy:energy_device_create(...))
+end
+
+function energy_transfer(...)
+    return (exports.stargate_energy:energy_transfer(...))
+end

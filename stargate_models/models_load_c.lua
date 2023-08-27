@@ -13,7 +13,11 @@ function models_load_autoPlanetModelsLoad()
         models_load_stargateCore()
         models_load_dhdMW()
     end
-	models_loadModelsNearPlayer(getLocalPlayer(), 250)
+	if planet == 6969 or planet == "PLANET_6969" then
+		models_loadModelsNearPlayer(getLocalPlayer(), 1)
+	else
+		models_loadModelsNearPlayer(getLocalPlayer(), 9999)
+	end
 end
 addEvent("models_load_autoPlanetModelsLoad_event", true)
 addEventHandler("models_load_autoPlanetModelsLoad_event", root, models_load_autoPlanetModelsLoad)
