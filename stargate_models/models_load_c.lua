@@ -44,16 +44,45 @@ function models_load_stargateMW(unload)
 	end
 end
 
+-- Loads pegasus stargate model
+--- OPTIONAL PARAMETERS:
+--> unload		bool		will be model(s) unloaded?
+function models_load_stargatePG(unload)
+	local sg = models_getObjectID(getLocalPlayer(), "pegaze")
+
+	models_loadModelManually(sg, unload)
+	for i=1,2 do
+		models_loadModelManually(models_getObjectID(getLocalPlayer(), "CHpeg"..tostring(i)), unload)
+	end
+	for i=3,7 do
+		models_loadModelManually(models_getObjectID(getLocalPlayer(), "chpeg"..tostring(i)), unload)
+	end
+end
+
+-- Loads universe stargate model
+--- OPTIONAL PARAMETERS:
+--> unload		bool		will be model(s) unloaded?
+function models_load_stargateUA(unload)
+	local sg = models_getObjectID(getLocalPlayer(), "SGUGATE")
+	local sg_chevs_active = models_getObjectID(getLocalPlayer(), "SGUCHEV")
+
+	models_loadModelManually(sg, unload)
+	models_loadModelManually(sg_chevs_active, unload)
+end
+
 -- Loads horizon, activation and kawoosh-vortex for MW and PG stargates
 --- OPTIONAL PARAMETERS:
 --> unload		bool		will be model(s) unloaded?
 function models_load_stargateCore(unload)
 	for i=1,6 do
 		models_loadModelManually(models_getObjectID(getLocalPlayer(), "act"..tostring(i)), unload)
-		models_loadModelManually(models_getObjectID(getLocalPlayer(), tostring(i)), unload)
+		models_loadModelManually(models_getObjectID(getLocalPlayer(), tostring(i)), unload) -- mw horizon
+		models_loadModelManually(models_getObjectID(getLocalPlayer(), tostring(i).."peg"), unload) -- pg horizon
+		models_loadModelManually(models_getObjectID(getLocalPlayer(), tostring(i).."SGU"), unload) -- ua horizon
 	end
 	for i=1,12 do
-		models_loadModelManually(models_getObjectID(getLocalPlayer(), "Kawoosh"..tostring(i)), unload)
+		models_loadModelManually(models_getObjectID(getLocalPlayer(), "Kawoosh"..tostring(i)), unload) -- mw/pg kawoosh
+		models_loadModelManually(models_getObjectID(getLocalPlayer(), "SGUkaw"..tostring(i)), unload) -- ua kawoosh
 	end
 	for i=1,10 do
 		models_loadModelManually(models_getObjectID(getLocalPlayer(), "iris"..tostring(i)), unload)
@@ -65,5 +94,13 @@ end
 --> unload		bool		will be model(s) unloaded?
 function models_load_dhdMW(unload)
     local dhd = models_getObjectID(getLocalPlayer(), "dhd")
+	models_loadModelManually(dhd, unload)
+end
+
+-- Loads pegasus DHD model
+--- OPTIONAL PARAMETERS:
+--> unload		bool		will be model(s) unloaded?
+function models_load_dhdPG(unload)
+	local dhd = models_getObjectID(getLocalPlayer(), "pegdhd")
 	models_loadModelManually(dhd, unload)
 end

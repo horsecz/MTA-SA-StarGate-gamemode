@@ -9,7 +9,15 @@
 function stargate_horizon_create(stargateID, frame)
     local x, y, z = stargate_getPosition(stargateID)
     local horizon = createObject(1337, x, y, z)
-    models_setElementModelAttribute(horizon, tostring(frame))
+    local gateType = stargate_galaxy_get(stargateID)
+    if gateType == enum_galaxy.MILKYWAY then
+        models_setElementModelAttribute(horizon, tostring(frame))
+    elseif gateType == enum_galaxy.PEGASUS then
+        models_setElementModelAttribute(horizon, tostring(frame).."peg")
+    elseif gateType == enum_galaxy.UNIVERSE then
+        models_setElementModelAttribute(horizon, tostring(frame).."SGU")
+    end
+
     setElementCollisionsEnabled(horizon, false)
     setElementID(horizon, stargateID.."H"..tostring(frame))
     setElementAlpha(horizon, 0)

@@ -8,7 +8,13 @@
 --> Reference; kawoosh element
 function stargate_vortex_create(stargateID, frame)
     local vortex = createObject(1337, x, y, z)
-    models_setElementModelAttribute(vortex, "Kawoosh"..tostring(frame))
+    local gateType = stargate_galaxy_get(stargateID)
+    if gateType == enum_galaxy.MILKYWAY or gateType == enum_galaxy.PEGASUS then
+        models_setElementModelAttribute(vortex, "Kawoosh"..tostring(frame))
+    elseif gateType == enum_galaxy.UNIVERSE then
+        models_setElementModelAttribute(vortex, "SGUkaw"..tostring(frame))
+    end
+    
     setElementID(vortex, stargateID.."V"..tostring(frame))
     setElementCollisionsEnabled(vortex, false)
     setElementAlpha(vortex, 0)

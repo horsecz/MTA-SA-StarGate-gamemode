@@ -122,10 +122,10 @@ function dhd_activate(player)
         else
             local dhd_sg = getElementByID(dhd_sg_id)
             local energy_sg = getElementData(dhd_sg, "energy")
-            gui_showInfoWindow(player, "DHD", "You can now open DHD GUI with 'E' key or close it with 'F1' key!", 5000)
+            gui_showInfoWindow(player, "DHD", "You can now open or close DHD GUI with '"..gui_getKeyOpenClose(player).."'!", 5000)
             setElementData(player, "atDHD", dhd)
-            bindKey(player, gui_getKeyOpen(player), "down", dhd_openGUI, player)
-            bindKey(player, gui_getKeyClose(player), "down", dhd_closeGUI, player)
+            bindKey(player, gui_getKeyOpenClose(player), "down", dhd_openGUI, player)
+            bindKey(player, gui_getKeyOpenClose(player), "down", dhd_closeGUI, player)
         end
     end
 end
@@ -138,8 +138,8 @@ function dhd_leave(player)
     local marker = getElementByID(getElementID(source))
     if getElementData(marker, "isDHDMarker") == true then
         setElementData(player, "atDHD", nil)
-        unbindKey(player, gui_getKeyOpen(player), "down", dhd_openGUI)
-        unbindKey(player, gui_getKeyClose(player), "down", dhd_closeGUI)
+        unbindKey(player, gui_getKeyOpenClose(player), "down", dhd_openGUI)
+        unbindKey(player, gui_getKeyOpenClose(player), "down", dhd_closeGUI)
     end
 end
 

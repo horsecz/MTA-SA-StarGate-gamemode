@@ -1,5 +1,8 @@
 # To be done
 
+Test:
+- Creation of stargate pegasus and universe model(s)
+
 Medium priority (needed but can be skipped for now):
 - Teleport element rotation (currently incorrect sometimes)
 - (Better) collisions for stargate iris

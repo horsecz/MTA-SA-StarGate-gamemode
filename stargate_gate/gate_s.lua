@@ -51,7 +51,7 @@ function stargate_create(gateType, dimension, x, y, z, address, irisType, defaul
     local id = stargate_assignID(stargate)
     local existing = stargate_convertAddressToID(id, address)
     if not existing == false or not exiting == nil then
-        outputDebugString("[STARGATE] Attempt to create Stargate (at "..tostring(x)..","..tostring(y)..","..tostring(z)..") with same address as existing stargate ("..existing..")")
+        outputDebugString("[STARGATE] Attempt to create Stargate ("..tostring(id).."; at "..tostring(x)..","..tostring(y)..","..tostring(z)..") with same address as existing stargate ("..existing..")")
         destroyElement(stargate)
         return nil
     end
@@ -59,7 +59,12 @@ function stargate_create(gateType, dimension, x, y, z, address, irisType, defaul
     stargate_setAddress(id, address)
     stargate_setDefaultDialType(id, dt)
     stargate_setForceDialType(id, forceDefaultDialType)
-    energy_device_create(GATE_ENERGY_CAPACITY, 0, GATE_ENERGY_WORMHOLE, stargate, GATE_ENERGY_IDLE, 0, "stargate_energy_device")
+
+    local sg_energy_production = 0
+    if gateType == enum_galaxy.UNIVERSE then -- Universe stargate generates enough power for itself
+        sg_energy_production = GATE_ENERGY_WORMHOLE
+    end
+    energy_device_create(GATE_ENERGY_CAPACITY, sg_energy_production, GATE_ENERGY_WORMHOLE, stargate, GATE_ENERGY_IDLE, sg_energy_production, "stargate_energy_device")
     planet_setElementOccupiedPlanet(stargate, "PLANET_"..dimension)
     stargate_addCollisions(id)
     setElementData(stargate, "isStargateElement", true)
@@ -68,10 +73,25 @@ function stargate_create(gateType, dimension, x, y, z, address, irisType, defaul
     if gateType == enum_galaxy.MILKYWAY then
         models_setElementModelAttribute(stargate, "innerring")
         stargate_ring_create(id, x, y, z, rx, ry, rz)
-        stargate_galaxy_set(id, "milkyway")
+        stargate_galaxy_set(id, enum_galaxy.MILKYWAY)
+    elseif gateType == enum_galaxy.PEGASUS then
+        models_setElementModelAttribute(stargate, "pegaze")
+        stargate_galaxy_set(id, enum_galaxy.PEGASUS)
+    elseif gateType == enum_galaxy.UNIVERSE then
+        models_setElementModelAttribute(stargate, "SGUGATE")
+        stargate_galaxy_set(id, enum_galaxy.UNIVERSE)
+        --stargate_chevronring_create(id)
+    else
+        outputDebugString("[STARGATE] Attempt to create Stargate ("..tostring(id).."; at "..tostring(x)..","..tostring(y)..","..tostring(z)..") with unimplemented gate type (galaxy): "..tostring(gateType))
+        destroyElement(stargate)
+        return nil
     end
     
-    for i=1,9 do
+    if gateType == enum_galaxy.MILKYWAY or gateType == enum_galaxy.PEGASUS then
+        for i=1,9 do
+            stargate_chevron_create(id, i)
+        end
+    else -- Universe stargate has only (model for) all chevrons active or inactive
         stargate_chevron_create(id, i)
     end
     for i=1,12 do

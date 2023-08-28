@@ -35,3 +35,29 @@ addCommandHandler("outputmodels", function(cmd)
 	fileClose(f)
 	outputDebugString("[STARGATE:MODELS] Models descriptions are written in file: output.xml (stargate_models resource root at client-side)")
 end)
+
+-- Loads HOTU object and "displays" it in development world (by creating new object with the model)
+-- > if not given object element identifier, it will be destroyed shortly (in 10 seconds)
+-- > if player is not in development world, teleports him there (near the object)
+addCommandHandler("showmodel", function(cmd, dffFileName, objectID)
+	local id = models_getObjectID(getLocalPlayer(), dffFileName)
+	if not id then
+		outputChatBox("Invalid object identifier (dffFileName)")
+		return false
+	end
+	models_loadModelManually(id, false)
+	local o = createObject(1337, 0, 0, 5)
+	setElementModel(o, id)
+	setElementDimension(o, 6969)
+
+	if objectID then
+		setElementID(o, objectID)
+	else
+		setTimer(destroyElement, 10000, 1, o)
+	end
+
+	if not getElementDimension(getLocalPlayer()) == 6969 then
+		setElementPosition(getLocalPlayer(), 0, 1, 5)
+		setElementDimension(getLocalPlayer(), 6969)
+	end
+end)
