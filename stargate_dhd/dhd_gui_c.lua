@@ -8,7 +8,7 @@
 
 DHD_GUI_OPEN = false
 DHD_GUI_ELEMENT = nil
-DHD_GUI_LOCALONLY = false
+DHD_GUI_LOCALONLY = true
 DHD_GUI_FASTDIAL = false
 DHD_GUI_ADDRESS_EDITBOX = nil
 DHD_GUI_ADDRESS = nil
@@ -21,9 +21,8 @@ function dhd_openGUI()
     if DHD_GUI_OPEN == true then
         return false
     end
-    DHD_GUI_OPEN = true
     DHD_GUI_ELEMENT = nil
-    DHD_GUI_LOCALONLY = false
+    DHD_GUI_LOCALONLY = true
     DHD_GUI_FASTDIAL = false
     DHD_GUI_ADDRESS_EDITBOX = nil
     DHD_GUI_ADDRESS = nil
@@ -34,6 +33,8 @@ function dhd_openGUI()
     local type = dhd_getType(dhdID)
     dhd_classicGUI()
     showCursor(true)
+    DHD_GUI_OPEN = true
+    setElementData(getLocalPlayer(), "dhd_gui_isOpen", true)
 end
 addEvent("dhd_openGUI_client", true)
 addEventHandler("dhd_openGUI_client", localPlayer, dhd_openGUI)
@@ -52,11 +53,12 @@ function dhd_closeGUI()
     removeEventHandler("onClientGUIClick", Checkbox_FastDial, dhd_handleGUIFastDialClicked)
     removeEventHandler("onClientGUIClick", GridList_AddressList, dhd_handleGUIAddressListClicked)
     removeEventHandler("onClientGUIDoubleClick", GridList_AddressList, dhd_handleGUIAddressListDoubleClicked)
-    --removeEventHandler("onClientGUIClick", CheckBox_LocalOnly, dhd_handleGUILocalOnlyClicked)
+    removeEventHandler("onClientGUIClick", CheckBox_LocalOnly, dhd_handleGUILocalOnlyClicked)
     destroyElement(DHD_GUI_ELEMENT)
     DHD_GUI_ELEMENT = nil
     DHD_GUI_OPEN = false
     showCursor(false)
+    setElementData(getLocalPlayer(), "dhd_gui_isOpen", false)
 end
 addEvent("dhd_closeGUI_client", true)
 addEventHandler("dhd_closeGUI_client", localPlayer, dhd_closeGUI)
@@ -65,32 +67,30 @@ addEventHandler("dhd_closeGUI_client", localPlayer, dhd_closeGUI)
 function dhd_handleGUIRefreshAddressList()
     gridlist = DHD_GUI_GRIDLIST
     guiGridListClear(gridlist)
-    guiGridListSetSelectionMode(gridlist, 0)
-
-    guiGridListAddColumn(gridlist, "#", 0.1)
-    guiGridListAddColumn(gridlist, "Planet name", 0.38)
-    guiGridListAddColumn(gridlist, "Stargate address", 0.28)
-    guiGridListAddColumn(gridlist, "Galaxy", 0.2)
 
     local dhdID = dhd_getID(getElementData(getLocalPlayer(), "atDHD"))
     local sgID = dhd_getAttachedStargate(dhdID)
-    local localGalaxy = stargate_getGalaxy(sgID)
-    local SG_MW = global_getData("SG_MW") -- "all" stargates list
-    if SG_MW == false or SG_MW == nil then
+    local sg_planet = planet_getDimensionPlanet(getElementDimension(getElementByID(sgID)))
+    local sg_planetID = planet_getPlanetID(sg_planet)
+    local localGalaxy = planet_getPlanetGalaxy(sg_planetID)
+    local SG_LIST = global_getData("SG_LIST") -- "all" stargates list
+    if SG_LIST == false or SG_LIST == nil then
         local rowID = guiGridListAddRow(gridlist)
         guiGridListSetItemText(gridlist, rowID, 1, " ", false, false)
-        guiGridListSetItemText(gridlist, rowID, 2, "No stargates found", false, false)
+        guiGridListSetItemText(gridlist, rowID, 2, "No stargates found on server", false, false)
         guiGridListSetItemText(gridlist, rowID, 3, " ", false, false)
         guiGridListSetItemText(gridlist, rowID, 4, " ", false, false)
         return false 
     end
 
-    for i,sg in ipairs(SG_MW) do
+    local cnt = 0
+    for i,sg in ipairs(SG_LIST) do
         local rowID = guiGridListAddRow(gridlist)
         local sgID = stargate_getID(sg)
         local sg_addressTable = stargate_getAddress(sgID)
         local sg_planet = planet_getDimensionPlanet(getElementDimension(sg))
         local sg_planetID = planet_getPlanetID(sg_planet)
+        local sg_planet_galaxy = planet_getPlanetGalaxy(sg_planetID)
 
         local sg_address = ""
         for i,symbol in ipairs(sg_addressTable) do
@@ -100,21 +100,31 @@ function dhd_handleGUIRefreshAddressList()
                 sg_address = sg_address .. ", " .. tostring(symbol)
             end
         end
-        if localGalaxy == stargate_getGalaxy(sgID) then
+        if localGalaxy == sg_planet_galaxy or DHD_GUI_LOCALONLY == true then
             sg_address = sg_address .. ", 39"
-        else
+        elseif DHD_GUI_LOCALONLY == false and not localGalaxy == sg_planet_galaxy then
             sg_address = sg_address .. ", " .. tostring(stargate_convertAddressSymbolToGalaxy(stargate_getGalaxy(sgID))) .. ", 39"
         end
+
         local planet_name = planet_getPlanetName(sg_planetID)
-        local galaxy = planet_getPlanetGalaxyString(sg_planetID)
         if planet_name == nil or planet_name == false then
             planet_name = "?"
         end
+        local galaxy = planet_getPlanetGalaxyString(sg_planetID)
 
-        guiGridListSetItemText(gridlist, rowID, 1, tostring(i), false, false)
-        guiGridListSetItemText(gridlist, rowID, 2, tostring(planet_name), false, false)
-        guiGridListSetItemText(gridlist, rowID, 3, tostring(sg_address), false, false)
-        guiGridListSetItemText(gridlist, rowID, 4, tostring(galaxy), false, false)
+        if localGalaxy == sg_planet_galaxy and DHD_GUI_LOCALONLY == true then 
+            cnt = cnt + 1
+            guiGridListSetItemText(gridlist, rowID, 1, tostring(cnt), false, false)
+            guiGridListSetItemText(gridlist, rowID, 2, tostring(planet_name), false, false)
+            guiGridListSetItemText(gridlist, rowID, 3, tostring(sg_address), false, false)
+            guiGridListSetItemText(gridlist, rowID, 4, " ", false, false)
+        elseif DHD_GUI_LOCALONLY == false then
+            cnt = cnt + 1
+            guiGridListSetItemText(gridlist, rowID, 1, tostring(cnt), false, false)
+            guiGridListSetItemText(gridlist, rowID, 2, tostring(planet_name), false, false)
+            guiGridListSetItemText(gridlist, rowID, 3, tostring(sg_address), false, false)
+            guiGridListSetItemText(gridlist, rowID, 4, tostring(galaxy), false, false)
+        end
     end
 end
 
@@ -227,6 +237,7 @@ end
 -- Change local only value
 function dhd_handleGUILocalOnlyClicked()
     DHD_GUI_LOCALONLY = guiCheckBoxGetSelected(source)
+    dhd_handleGUIRefreshAddressList()
 end
 
 ---
@@ -290,7 +301,13 @@ function dhd_classicGUI()
             guiSetEnabled(CheckBox_LocalOnly, false)
         end
 
+        guiGridListSetSelectionMode(GridList_AddressList, 0)
+        guiGridListAddColumn(GridList_AddressList, "#", 0.1)
+        guiGridListAddColumn(GridList_AddressList, "Planet name", 0.38)
+        guiGridListAddColumn(GridList_AddressList, "Stargate address", 0.27)
+        guiGridListAddColumn(GridList_AddressList, "Galaxy", 0.19)
         dhd_handleGUIRefreshAddressList(GridList_AddressList)
+
         addEventHandler("onClientGUIClick", Button_Shutdown, dhd_handleGUIShutdown, false)
         addEventHandler("onClientGUIClick", Button_Dial, dhd_handleGUIDial, false)
         addEventHandler("onClientGUIAccepted", EditTextBox_Address, dhd_handleGUIDial)
@@ -298,5 +315,5 @@ function dhd_classicGUI()
         addEventHandler("onClientGUIClick", Checkbox_FastDial, dhd_handleGUIFastDialClicked, false)
         addEventHandler("onClientGUIClick", GridList_AddressList, dhd_handleGUIAddressListClicked, false)
         addEventHandler("onClientGUIDoubleClick", GridList_AddressList, dhd_handleGUIAddressListDoubleClicked, false)
-        --addEventHandler("onClientGUIClick", CheckBox_LocalOnly, dhd_handleGUILocalOnlyClicked, false)
+        addEventHandler("onClientGUIClick", CheckBox_LocalOnly, dhd_handleGUILocalOnlyClicked, false)
 end

@@ -7,13 +7,23 @@ function models_load_autoPlanetModelsLoad()
     local galaxy = planet_getElementOccupiedGalaxy(getLocalPlayer())
     local planet = planet_getElementOccupiedPlanet(getLocalPlayer())
     models_load_autoPlanetModelsUnload()
-    
-    if galaxy == enum_galaxy.MILKYWAY then
+	
+	-- load stargate models in specified galaxy
+	-- > exceptions: development world -> load all SG models
+    if galaxy == enum_galaxy.MILKYWAY or planet == "PLANET_6969"  then
         models_load_stargateMW()
-        models_load_stargateCore()
         models_load_dhdMW()
-    end
-	if planet == 6969 or planet == "PLANET_6969" then
+	end
+	if galaxy == enum_galaxy.PEGASUS or planet == "PLANET_6969"  then
+		models_load_stargatePG()
+        models_load_dhdPG()
+	end
+	if galaxy == enum_galaxy.UNIVERSE or planet == "PLANET_6969"  then
+		models_load_stargateUA()
+	end
+	models_load_stargateCore()
+
+	if planet == "PLANET_6969" then
 		models_loadModelsNearPlayer(getLocalPlayer(), 1)
 	else
 		models_loadModelsNearPlayer(getLocalPlayer(), 9999)
@@ -23,11 +33,23 @@ addEvent("models_load_autoPlanetModelsLoad_event", true)
 addEventHandler("models_load_autoPlanetModelsLoad_event", root, models_load_autoPlanetModelsLoad)
 global_setData("models_load_autoPlanetModelsLoad_event:added", true)
 
--- Unload core planet models (stargate milkyway, core stargate, dhd milkyway)
+-- Unload core planet models (stargate models, dhd models)
 function models_load_autoPlanetModelsUnload()
-    models_load_stargateMW(true)
-    models_load_stargateCore(true)
-    models_load_dhdMW(true) 
+	local galaxy = planet_getElementOccupiedGalaxy(getLocalPlayer())
+    local planet = planet_getElementOccupiedPlanet(getLocalPlayer())
+
+	if galaxy == enum_galaxy.MILKYWAY or planet == "PLANET_6969" then
+        models_load_stargateMW(true)
+        models_load_dhdMW(true)
+	end
+	if galaxy == enum_galaxy.PEGASUS or planet == "PLANET_6969" then
+		models_load_stargatePG(true)
+        models_load_dhdPG(true)
+	end
+	if galaxy == enum_galaxy.UNIVERSE or planet == "PLANET_6969" then
+		models_load_stargateUA(true)
+	end
+	models_load_stargateCore(true)
 end
 
 -- Loads milkyway stargate model

@@ -66,6 +66,14 @@ function planet_setElementOccupiedPlanet(...)
     return (exports.stargate_planets:planet_setElementOccupiedPlanet(...))
 end
 
+function planet_isPlanet(...)
+    return (exports.stargate_planets:planet_isPlanet(...))
+end
+
+function planet_getPlanetDimension(...)
+    return (exports.stargate_planets:planet_getPlanetDimension(...))
+end
+
 
 
 
@@ -110,6 +118,10 @@ end
 
 function global_getData(...)
     return (exports.stargate_exports:global_getData(...))
+end
+
+function global_setData(...)
+    return (exports.stargate_exports:global_setData(...))
 end
 
 function gui_showInfoWindow(...)

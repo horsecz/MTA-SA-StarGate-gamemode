@@ -4,6 +4,10 @@ function array_push(...)
     return (exports.stargate_exports:array_push(...))
 end
 
+function array_size(...)
+    return (exports.stargate_exports:array_size(...))
+end
+
 function models_getUnloadedObjectID(...)
     return (exports.stargate_models:models_getUnloadedObjectID(...))
 end
@@ -18,4 +22,8 @@ end
 
 function energy_transfer(...)
     return (exports.stargate_energy:energy_transfer(...))
+end
+
+function stargate_getPlanetStargates(...)
+    return (exports.stargate_gate:stargate_getPlanetStargates(...))
 end

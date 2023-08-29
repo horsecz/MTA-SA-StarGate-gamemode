@@ -281,6 +281,27 @@ function stargate_detachFromElement(stargateID, elementDetachFrom)
     detachElements(stargate_getElement(stargateID), elementDetachFrom)
 end
 
+function stargate_getPlanetStargates(planetID)
+    if not planet_isPlanet(planetID) then
+        return nil
+    end
+    local dimension = planet_getPlanetDimension(planetID)
+    local SG_LIST = global_getData("SG_LIST")
+    local planet_sgs = { }
+    for i,sg in ipairs(SG_LIST) do
+        local sg_dimension = getElementDimension(sg)
+        if sg_dimension == dimension then
+            planet_sgs = array_push(planet_sgs, sg)
+        end
+    end
+
+    return planet_sgs
+end
+
+function stargate_getAllStargates()
+    return (global_getData("SG_LIST"))
+end
+
 ---
 --- OBSOLETE Functions
 ---

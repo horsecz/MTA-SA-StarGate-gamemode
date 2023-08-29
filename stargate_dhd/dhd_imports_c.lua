@@ -24,6 +24,10 @@ function stargate_getID(...)
     return (exports.stargate_gate:stargate_getID(...))
 end
 
+function stargate_galaxy_get(...)
+    return (exports.stargate_gate:stargate_galaxy_get(...))
+end
+
 function stargate_getAddress(...)
     return (exports.stargate_gate:stargate_getAddress(...))
 end
@@ -74,6 +78,10 @@ end
 
 function planet_getPlanetGalaxyString(...)
     return (exports.stargate_planets:planet_getPlanetGalaxyString(...))
+end
+
+function planet_getPlanetGalaxy(...)
+    return (exports.stargate_planets:planet_getPlanetGalaxy(...))
 end
 
 function planet_getDimensionPlanet(...)

@@ -48,6 +48,8 @@ function dhd_create(type, dimension, x, y, z, rx, ry, rz, stargateID, galaxyDial
     
     if type == enum_galaxy.MILKYWAY then
         models_setElementModelAttribute(dhd, "dhd")
+    elseif type == enum_galaxy.PEGASUS then
+        models_setElementModelAttribute(dhd, "pegdhd")
     elseif type == enum_galaxy.UNKNOWN then
         models_setElementModelAttribute(dhd, "dhd")
         setElementAlpha(dhd, 0)
@@ -64,6 +66,12 @@ function dhd_create(type, dimension, x, y, z, rx, ry, rz, stargateID, galaxyDial
         dhd_attachToStargate(id, stargateID)
     end
     
+    local DHD_LIST = global_getData("DHD_LIST")
+    if DHD_LIST == false or DHD_LIST == nil then
+        DHD_LIST = { }
+    end
+    DHD_LIST = array_push(DHD_LIST, dhd)
+    global_setData("DHD_LIST", DHD_LIST)
     outputDebugString("Created DHD (ID="..tostring(getElementID(dhd)).." galaxy="..tostring(type)..") at "..tostring(x)..","..tostring(y)..","..tostring(z).."")
     return dhd
 end
@@ -124,8 +132,8 @@ function dhd_activate(player)
             local energy_sg = getElementData(dhd_sg, "energy")
             gui_showInfoWindow(player, "DHD", "You can now open or close DHD GUI with '"..gui_getKeyOpenClose(player).."'!", 5000)
             setElementData(player, "atDHD", dhd)
-            bindKey(player, gui_getKeyOpenClose(player), "down", dhd_openGUI, player)
             bindKey(player, gui_getKeyOpenClose(player), "down", dhd_closeGUI, player)
+            bindKey(player, gui_getKeyOpenClose(player), "down", dhd_openGUI, player)
         end
     end
 end
@@ -174,19 +182,32 @@ end
 -- RETURNS:
 --> String; ID for DHD Element
 function dhd_assignID(dhd, type)
-    local galaxy = "MW"
-    if LastDHDID == nil then
-        LastDHDID = 0
-    end
-    LastDHDID = LastDHDID + 1
-    if type == enum_galaxy.MILKYWAY then
-        galaxy = "MW"
-        local DHD_MW = global_getData("DHD_MW")
-        DHD_MW = array_push(DHD_MW, dhd)
-        global_setData("DHD_MW", DHD_MW)
+    local galaxy = nil
+    local id = nil
+    if LastDHDMWID == nil then
+        LastDHDMWID = 0
+    elseif LastDHDPGID == nil then
+        LastDHDPGID = 0
+    elseif LastDHDDFID == nil then
+        LastDHDDFID = 0
     end
 
-    local newID = "DHD_"..galaxy.."_"..tostring(LastDHDID)
+
+    if type == enum_galaxy.MILKYWAY then
+        galaxy = "MW"
+        LastDHDMWID = LastDHDMWID + 1
+        id = LastDHDMWID
+    elseif type == enum_galaxy.PEGASUS then
+        galaxy = "PG"
+        LastDHDPGID = LastDHDPGID + 1
+        id = LastDHDPGID
+    else
+        galaxy = "DF"
+        LastDHDDFID = LastDHDDFID + 1
+        id = LastDHDDFID
+    end
+
+    local newID = "DHD_" .. galaxy .. "_" .. tostring(id)
     setElementID(dhd, newID)
     return newID
 end

@@ -44,16 +44,15 @@ function spawner_gateSpawner()
 
     -- DEVELOPMENT ONLY
     newSG = stargate_create(enum_galaxy.MILKYWAY, enum_planetDimension.DevelopmentWorld, 0, 0, 2.25, {15,11,9,19,25,32}, nil, enum_stargateDialType.FAST, 90, 0, 0, false)
-    newDHD = dhd_create(enum_galaxy.MILKYWAY, enum_planetDimension.DevelopmentWorld, -2, 6, 1.7, 0, 0, 180, getElementID(newSG))
+    newDHD = dhd_create(enum_galaxy.MILKYWAY, enum_planetDimension.DevelopmentWorld, -2, 6, 1.7, 0, 0, 180, getElementID(newSG), true)
 
-    newSG = stargate_create(enum_galaxy.MILKYWAY, enum_planetDimension.DevelopmentWorld, 0, 0, 22, {14,11,9,19,25,32}, nil, enum_stargateDialType.FAST, 270, 0, 0, false)
+    newSG = stargate_create(enum_galaxy.MILKYWAY, enum_planetDimension.DevelopmentWorld, -8, 0, 4, {1,3,5,7,9,11}, "sgc", enum_stargateDialType.SLOW, 0, 0, 0, false, true)
+    newDHD = dhd_create(enum_galaxy.MILKYWAY, enum_planetDimension.DevelopmentWorld, -6, 8, 1.7, 0, 0, 210, getElementID(newSG))
 
-    newSG = stargate_create(enum_galaxy.MILKYWAY, enum_planetDimension.DevelopmentWorld, 20, 0, 4, {1,3,5,7,9,11}, "sgc", enum_stargateDialType.SLOW, 0, 0, 0, false, true)
-    newDHD = dhd_create(enum_galaxy.MILKYWAY, enum_planetDimension.DevelopmentWorld, 22, 6, 1.7, 0, 0, 210, getElementID(newSG))
-
-    newSG = stargate_create(enum_galaxy.MILKYWAY, enum_planetDimension.DevelopmentWorld, -20, 0, 3, {1,2,3,4,5,6}, "sgc", enum_stargateDialType.INSTANT, 45, 20, 45)
-    newDHD = dhd_create(enum_galaxy.MILKYWAY, enum_planetDimension.DevelopmentWorld, -20, 6, 1.7, 0, 0, 165, getElementID(newSG))
-    newDHD = dhd_create(enum_galaxy.MILKYWAY, enum_planetDimension.DevelopmentWorld, 10, 10, 1.7, 0, 0, 150)
+    newSG = stargate_create(enum_galaxy.PEGASUS, enum_planetDimension.DevelopmentWorld, -14, 0, 4, {1,5,11,15,19,25}, nil, enum_stargateDialType.SLOW, 0, 0, 0)
+    newDHD = dhd_create(enum_galaxy.PEGASUS, enum_planetDimension.DevelopmentWorld, -12, 8, 2, 0, 0, 170, getElementID(newSG))
+    
+    newSG = stargate_create(enum_galaxy.UNIVERSE, enum_planetDimension.DevelopmentWorld, -20, 0, 4, {1,5,11,15,19,26}, nil, enum_stargateDialType.SLOW, 0, 0, 0)
     -- DEVELOPMENT ONLY
 
     -- Earth
@@ -71,6 +70,7 @@ function spawner_gateSpawner()
 end
 
 -- Add stargate element to stargate gate element list
+-- TODO: is this even used somewhere?
 --- REQUIRED PARAMETERS:
 --> gateElement     reference       stargate element
 function spawner_gateList_add(gateElement)

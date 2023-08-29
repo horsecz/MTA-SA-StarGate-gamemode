@@ -43,7 +43,7 @@ end
 --- RETURNS:
 --> String; Stargate ID or false if address is invalid
 function stargate_convertAddressToID(id, addressArray)
-    local all_gates = stargate_galaxy_getAllElements(id)
+    local all_gates = stargate_getAllStargates()
     if all_gates == nil then
         return false
     end
@@ -93,15 +93,38 @@ end
 
 -- Assigns new ID to NEW stargate
 --- REQUIRED PARAMETERS:
---> stargate    reference   stargate element
+--> stargate    reference       stargate element
+--> galaxy      enum_galaxy     galaxy type of stargate
 --- RETURNS:
 --> String; ID of new stargate element
-function stargate_assignID(stargate)
+function stargate_assignID(stargate, galaxy)
+    local id = nil
+    local galaxy_text = nil
     if LastMWGateID == nil then
         LastMWGateID = 0
+    elseif LastPGGateID == nil then
+        LastPGGateID = 0
+    elseif LastUAGateID == nil then
+        LastUAGateID = 0
     end
-    LastMWGateID = LastMWGateID + 1
-    local newID = "SG_MW_"..tostring(LastMWGateID)
+    
+    if galaxy == enum_galaxy.MILKYWAY then
+        LastMWGateID = LastMWGateID + 1
+        id = LastMWGateID
+        galaxy_text = "MW"
+    elseif galaxy == enum_galaxy.PEGASUS then
+        LastPGGateID = LastPGGateID + 1
+        id = LastPGGateID
+        galaxy_text = "PG"
+    elseif galaxy == enum_galaxy.UNIVERSE then
+        LastUAGateID = LastUAGateID + 1
+        id = LastUAGateID
+        galaxy_text = "UA"
+    else 
+        return false
+    end
+
+    local newID = "SG_" .. galaxy_text .. "_" .. tostring(id)
     setElementID(stargate, newID)
     return newID
 end
@@ -112,12 +135,20 @@ end
 --> useDelay        bool        will be all chevrons turned on immediately or with (predefined) delay
 --> active          bool        are chevrons being activated or deactivated
 -- useDelay = use slow chevron turning on animation
-function stargate_setAllChevronsActive(stargateID, useDelay, active)
+function stargate_setAllChevronsActive(stargateID, useDelay, active, eight, nineth)
     local delay = 50
-    for i=1,7 do
-        setTimer(stargate_chevron_setActive, delay, 1, stargateID, i, active, true)
-        if useDelay then
-            delay = delay + MW_INCOMING_CHVRN_DELAY
+    local type = stargate_galaxy_get(stargateID)
+    if type == enum_galaxy.UNIVERSE then
+        setTimer(stargate_chevron_setActive, delay, 1, stargateID, 1, active, true)
+        return true
+    end
+
+    for i=1,9 do
+        if i <= 7 or ( i == 8 and eight ) or ( i == 9 and nineth ) then
+            setTimer(stargate_chevron_setActive, delay, 1, stargateID, i, active, true)
+            if useDelay then
+                delay = delay + MW_INCOMING_CHVRN_DELAY
+            end
         end
     end
 end

@@ -20,7 +20,7 @@ function stargate_chevron_create(stargateID, chevron)
     elseif gateType == enum_galaxy.PEGASUS then
         if chevron < 3 then
             models_setElementModelAttribute(newChevron, "CHpeg"..tostring(chevron))
-        elseif chevron < 7 then
+        elseif chevron < 8 then
             models_setElementModelAttribute(newChevron, "chpeg"..tostring(chevron))
         else
             models_setElementModelAttribute(newChevron, "CHpeg1")
