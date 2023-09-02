@@ -277,7 +277,11 @@ function stargate_wormhole_player_transport(player, stargateIDFrom, stargateIDTo
     local mx = ( x1 + x2 ) / 2
     local my = ( y1 + y2 ) / 2
     local mz = ( z1 + z2 ) / 2 - 10000
-    setElementPosition(player, mx, my, mz)
+    if getElementData(stargate_getElement(stargateIDTo), "isAtlantis") == true then
+        setElementPosition(player, x2, y2, z2)
+    else
+        setElementPosition(player, mx, my, mz)
+    end
     planet_setElementOccupiedPlanet(player, targetPlanet)
 end
 

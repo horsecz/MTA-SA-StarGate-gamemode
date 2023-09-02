@@ -72,7 +72,7 @@ function dhd_create(type, dimension, x, y, z, rx, ry, rz, stargateID, galaxyDial
     end
     DHD_LIST = array_push(DHD_LIST, dhd)
     global_setData("DHD_LIST", DHD_LIST)
-    outputDebugString("Created DHD (ID="..tostring(getElementID(dhd)).." galaxy="..tostring(type)..") at "..tostring(x)..","..tostring(y)..","..tostring(z).."")
+    outputDebugString("[DHD] Created DHD (ID="..tostring(getElementID(dhd)).." type="..tostring(type)..") at "..tostring(x)..","..tostring(y)..","..tostring(z).." ("..tostring("PLANET_"..tostring(dimension))..")")
     return dhd
 end
 

@@ -80,11 +80,12 @@ function spawner_gateSpawner()
 
     -- Earth
     newSG = stargate_create(enum_galaxy.MILKYWAY, enum_planetDimension.Earth, -66.228576660156, 1873.39, 2220.52, enum_stargateAddress.Earth, "sgc", enum_stargateDialType.SLOW, 0, 0, 180, false, true)
-    newDHD = dhd_create(enum_galaxy.UNKNOWN, enum_planetDimension.Earth, -66.386734008789, 1855.2181396484, 2217.7, 0, 0, 165, getElementID(newSG))
+    newDHD = dhd_create(enum_galaxy.UNKNOWN, enum_planetDimension.Earth, -66.386734008789, 1855.2181396484, 2217.7, 0, 0, 165, getElementID(newSG), true)
 
     -- Icarus
     newSG = stargate_create(enum_galaxy.MILKYWAY, enum_planetDimension.Icarus, -137.12, 1930.8, 2186.22, enum_stargateAddress.Icarus, nil, enum_stargateDialType.SLOW, 0, 0, 0, false, true)
-    newDHD = dhd_create(enum_galaxy.MILKYWAY, enum_planetDimension.Icarus, -134.35200500488, 1949.1099853516, 2184.1000976562, 0, 0, 241.00012207031, getElementID(newSG))
+    newDHD = dhd_create(enum_galaxy.MILKYWAY, enum_planetDimension.Icarus, -134.35200500488, 1949.1099853516, 2184.1000976562, 0, 0, 241.00012207031, getElementID(newSG), true)
+    setElementData(newDHD, "canDialDestiny", true)
 
     -- Abydos
     newSG = stargate_create(enum_galaxy.MILKYWAY, enum_planetDimension.Abydos, 87.6, 2453.6, 1203.1, enum_stargateAddress.Abydos, nil, enum_stargateDialType.FAST, 0, 0, 0)
@@ -113,7 +114,8 @@ function spawner_gateSpawner()
     
     -- Atlantis
     newSG = stargate_create(enum_galaxy.PEGASUS, enum_planetDimension.Atlantis, 575.6, -2786, 1999.85, enum_stargateAddress.Atlantis, "sgc", enum_stargateDialType.SLOW, 0, 0, 0, false, true)
-    newDHD = dhd_create(enum_galaxy.UNKNOWN, enum_planetDimension.Atlantis, 591, -2766, 2003.5, 0, 0, 180, getElementID(newSG))
+    setElementData(newSG, "isAtlantis", true)
+    newDHD = dhd_create(enum_galaxy.UNKNOWN, enum_planetDimension.Atlantis, 591, -2766, 2003.5, 0, 0, 180, getElementID(newSG), true)
         
     -- Pegasus - Random world 1 (greenish; ZPM hub)
     newSG = stargate_create(enum_galaxy.PEGASUS, enum_planetDimension.GreenWorld, -2377.2, 1564.7, 2003.6, enum_stargateAddress.GreenWorld, nil, enum_stargateDialType.FAST, 0, 0, 0)
@@ -129,11 +131,12 @@ function spawner_gateSpawner()
     
         
     -- Destiny
-    newSG = stargate_create(enum_galaxy.MILKYWAY, enum_planetDimension.Destiny, 0, -11, -22, enum_stargateAddress.Destiny, nil, enum_stargateDialType.SLOW, 0, 0, 0, false, true)
-    newDHD = dhd_create(enum_galaxy.UNKNOWN, enum_planetDimension.Destiny, 2, -28.5, -22, 0, 0, 180, getElementID(newSG))
+    newSG = stargate_create(enum_galaxy.UNIVERSE, enum_planetDimension.Destiny, 0.45, -11, -21.6, enum_stargateAddress.Destiny, nil, enum_stargateDialType.SLOW, 0, 0, 180, false, true)
+    setElementData(newSG, "isDestiny", true)
+    newDHD = dhd_create(enum_galaxy.UNKNOWN, enum_planetDimension.Destiny, 2, -28.5, -22, 0, 0, 180, getElementID(newSG), true)
         
     -- Universe - Desert
-    newSG = stargate_create(enum_galaxy.UNIVERSE, enum_planetDimension.UniDesert, 87.6, 2453.6, 1203.1, enum_stargateAddress.UniDesert, nil, enum_stargateDialType.FAST, 0, 0, 0)
+    newSG = stargate_create(enum_galaxy.UNIVERSE, enum_planetDimension.UniDesert, 1389.43, 1000.2, 2001.7, enum_stargateAddress.UniDesert, nil, enum_stargateDialType.FAST, 0, 0, 0)
 
     -- Universe - Snow desert
     newSG = stargate_create(enum_galaxy.UNIVERSE, enum_planetDimension.UniSnowDesert, -2376.9, -77.95, 2002.3, enum_stargateAddress.UniSnowDesert, nil, enum_stargateDialType.FAST, 0, 0, 0)
@@ -147,7 +150,7 @@ function spawner_gateSpawner()
 
     -- Asgard homeworld
     newSG = stargate_create(enum_galaxy.MILKYWAY, enum_planetDimension.AsgardHomeworld, 262.6, 2448.2, -12.61, enum_stargateAddress.AsgardHomeworld, nil, enum_stargateDialType.FAST, 0, 0, 0)
-    newDHD = dhd_create(enum_galaxy.MILKYWAY, enum_planetDimension.AsgardHomeworld, 266.2, 2451.9, -13.8, 0, 0, 180, getElementID(newSG))
+    newDHD = dhd_create(enum_galaxy.MILKYWAY, enum_planetDimension.AsgardHomeworld, 266.2, 2451.9, -13.8, 0, 0, 180, getElementID(newSG), true)
                 
     outputDebugString("[STARGATE:SPAWNER] Spawned Stargates and DHDs.")
 end

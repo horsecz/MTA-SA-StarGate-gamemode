@@ -70,9 +70,11 @@ function dhd_handleGUIRefreshAddressList()
 
     local dhdID = dhd_getID(getElementData(getLocalPlayer(), "atDHD"))
     local sgID = dhd_getAttachedStargate(dhdID)
+    local sourceSGID = sgID
     local sg_planet = planet_getDimensionPlanet(getElementDimension(getElementByID(sgID)))
     local sg_planetID = planet_getPlanetID(sg_planet)
     local localGalaxy = planet_getPlanetGalaxy(sg_planetID)
+    local canDialDestiny = dhd_canDialDestiny(dhdID) 
     local SG_LIST = global_getData("SG_LIST") -- "all" stargates list
     if SG_LIST == false or SG_LIST == nil then
         local rowID = guiGridListAddRow(gridlist)
@@ -92,6 +94,11 @@ function dhd_handleGUIRefreshAddressList()
         local sg_planetID = planet_getPlanetID(sg_planet)
         local sg_planet_galaxy = planet_getPlanetGalaxy(sg_planetID)
         local isDestiny = stargate_isDestinyGate(sgID)
+        local sg_dhd = stargate_getAssignedDHD(sgID)
+        local canDialGalaxy = false
+        if sg_dhd then
+            canDialGalaxy = dhd_canDialGalaxy(sg_dhd)
+        end
 
         local sg_address = ""
         for i,symbol in ipairs(sg_addressTable) do
@@ -101,15 +108,15 @@ function dhd_handleGUIRefreshAddressList()
                 sg_address = sg_address .. ", " .. tostring(symbol)
             end
         end
-        if localGalaxy == sg_planet_galaxy or DHD_GUI_LOCALONLY == true then
-            if sg_planet_galaxy == enum_galaxy.MILKYWAY then
+        if localGalaxy == sg_planet_galaxy or DHD_GUI_LOCALONLY == true then -- local stargate addresses
+            if localGalaxy == enum_galaxy.MILKYWAY then  -- Point of origin (MW has 39 symbols; PG and UA has 36)
                 sg_address = sg_address .. ", 39"
             else
                 sg_address = sg_address .. ", 36"
             end
-        elseif DHD_GUI_LOCALONLY == false and not localGalaxy == sg_planet_galaxy and not isDestiny then
-            sg_address = sg_address .. ", " .. tostring(stargate_convertAddressSymbolToGalaxy(sg_planet_galaxy))
-            if sg_planet_galaxy == enum_galaxy.MILKYWAY then
+        elseif DHD_GUI_LOCALONLY == false and not isDestiny then -- non local stargate addresses except destiny
+            sg_address = sg_address .. ", " .. tostring(stargate_convertGalaxyToAddressSymbol(sg_planet_galaxy))
+            if localGalaxy == enum_galaxy.MILKYWAY then
                 sg_address = sg_address .. ", 39"
             else
                 sg_address = sg_address .. ", 36"
@@ -122,18 +129,24 @@ function dhd_handleGUIRefreshAddressList()
         end
         local galaxy = planet_getPlanetGalaxyString(sg_planetID)
 
-        if localGalaxy == sg_planet_galaxy and DHD_GUI_LOCALONLY == true then 
+
+        if sourceSGID == sgID then -- dont show current (my/outgoing) stargate
+        elseif localGalaxy == sg_planet_galaxy and DHD_GUI_LOCALONLY == true then  -- local stargate row
             cnt = cnt + 1
             guiGridListSetItemText(gridlist, rowID, 1, tostring(cnt), false, false)
             guiGridListSetItemText(gridlist, rowID, 2, tostring(planet_name), false, false)
             guiGridListSetItemText(gridlist, rowID, 3, tostring(sg_address), false, false)
             guiGridListSetItemText(gridlist, rowID, 4, " ", false, false)
-        elseif DHD_GUI_LOCALONLY == false then
-            cnt = cnt + 1
-            guiGridListSetItemText(gridlist, rowID, 1, tostring(cnt), false, false)
-            guiGridListSetItemText(gridlist, rowID, 2, tostring(planet_name), false, false)
-            guiGridListSetItemText(gridlist, rowID, 3, tostring(sg_address), false, false)
-            guiGridListSetItemText(gridlist, rowID, 4, tostring(galaxy), false, false)
+        elseif DHD_GUI_LOCALONLY == false then -- non local stargate row
+            if canDialGalaxy == true or localGalaxy == sg_planet_galaxy then -- show only stargates which can dial non local stargates too (+ local stargates)
+                if ( isDestiny == true and canDialDestiny == true ) or isDestiny == false then -- if this DHD cannot dial Destiny, dont show it
+                    cnt = cnt + 1
+                    guiGridListSetItemText(gridlist, rowID, 1, tostring(cnt), false, false)
+                    guiGridListSetItemText(gridlist, rowID, 2, tostring(planet_name), false, false)
+                    guiGridListSetItemText(gridlist, rowID, 3, tostring(sg_address), false, false)
+                    guiGridListSetItemText(gridlist, rowID, 4, tostring(galaxy), false, false)
+                end
+            end
         end
     end
 end
@@ -313,9 +326,9 @@ function dhd_classicGUI()
 
         guiGridListSetSelectionMode(GridList_AddressList, 0)
         guiGridListAddColumn(GridList_AddressList, "#", 0.1)
-        guiGridListAddColumn(GridList_AddressList, "Planet name", 0.38)
-        guiGridListAddColumn(GridList_AddressList, "Stargate address", 0.27)
-        guiGridListAddColumn(GridList_AddressList, "Galaxy", 0.19)
+        guiGridListAddColumn(GridList_AddressList, "Planet name", 0.35)
+        guiGridListAddColumn(GridList_AddressList, "Stargate address", 0.32)
+        guiGridListAddColumn(GridList_AddressList, "Galaxy", 0.17)
         dhd_handleGUIRefreshAddressList(GridList_AddressList)
 
         addEventHandler("onClientGUIClick", Button_Shutdown, dhd_handleGUIShutdown, false)

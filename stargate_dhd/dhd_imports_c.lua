@@ -20,6 +20,14 @@ function stargate_getForceDialType(...)
     return (exports.stargate_gate:stargate_getForceDialType(...))
 end
 
+function stargate_getAssignedDHD(...)
+    return (exports.stargate_gate:stargate_getAssignedDHD(...))
+end
+
+function stargate_convertGalaxyToAddressSymbol(...)
+    return (exports.stargate_gate:stargate_convertGalaxyToAddressSymbol(...))
+end
+
 function stargate_isDestinyGate(...)
     return (exports.stargate_gate:stargate_isDestinyGate(...))
 end

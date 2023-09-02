@@ -52,13 +52,14 @@
     <export function="stargate_dial" type="shared" />
     <export function="stargate_dialByID" type="server" />
     <export function="stargate_dialFail" type="server" />
-    <export function="stargate_getAssignedDHD" type="server" />
+    <export function="stargate_getAssignedDHD" type="shared" />
     <export function="stargate_setAssignedDHD" type="server" />
     <export function="stargate_hasIris" type="shared" />
     <export function="stargate_wormhole_close" type="shared" />
     <export function="stargate_abortDial" type="shared" />
     <export function="stargate_getAddress" type="shared" />
     <export function="stargate_convertAddressSymbolToGalaxy" type="shared" />
+    <export function="stargate_convertGalaxyToAddressSymbol" type="shared" />
 
     <export function="import_enum_markerType" type="shared" />
     <export function="import_enum_galaxy" type="shared" />

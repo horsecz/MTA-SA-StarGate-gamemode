@@ -85,15 +85,21 @@ function stargate_convertAddressToID(id, addressArray)
     local sg_planet = planet_getDimensionPlanet(getElementDimension(sg_element))
     local sg_planetID = planet_getPlanetID(sg_planet)
     local sg_planet_galaxy = planet_getPlanetGalaxy(sg_planetID)
+    
+    local source_sg_planet = planet_getDimensionPlanet(getElementDimension(stargate_getElement(id)))
+    local source_sg_planetID = planet_getPlanetID(source_sg_planet)
+    local source_sg_planet_galaxy = planet_getPlanetGalaxy(source_sg_planetID)
 
     if address_POO then -- check point of origin (and/or galaxy symbol)
-        if address_POO == 39 and sg_planet_galaxy == enum_galaxy.MILKYWAY then
-        elseif address_POD == 36 and sg_planet_galaxy == enum_galaxy.PEGASUS then
-        elseif address_POD == 36 and sg_planet_galaxy == enum_galaxy.UNIVERSE then
+        if address_POO == 39 and source_sg_planet_galaxy == enum_galaxy.MILKYWAY then
+        elseif address_POO == 36 and source_sg_planet_galaxy == enum_galaxy.PEGASUS then
+        elseif address_POO == 36 and source_sg_planet_galaxy == enum_galaxy.UNIVERSE then
         else
             return false
         end
+    end
 
+    if stargate_galaxy then
         if not stargate_galaxy == sg_planet_galaxy then -- check 7th (galaxy) symbol in 8 symbol address
             return false
         end

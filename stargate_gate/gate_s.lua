@@ -139,7 +139,7 @@ function stargate_create(gateType, dimension, x, y, z, address, irisType, defaul
     end
     SG_LIST = array_push(SG_LIST, stargate)
     global_setData("SG_LIST", SG_LIST)
-    outputDebugString("[STARGATE] Created Stargate (ID="..tostring(getElementID(stargate)).." galaxy="..tostring(stargate_galaxy_get(id))..""..irisText..") at "..tostring(x)..","..tostring(y)..","..tostring(z).."")
+    outputDebugString("[STARGATE] Created Stargate (ID="..tostring(getElementID(stargate)).." type="..tostring(stargate_galaxy_get(id))..""..irisText..") at "..tostring(x)..","..tostring(y)..","..tostring(z).." ("..tostring("PLANET_"..tostring(dimension))..")")
     return stargate
 end
 

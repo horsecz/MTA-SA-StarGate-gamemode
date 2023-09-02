@@ -233,6 +233,16 @@ function stargate_convertAddressSymbolToGalaxy(symbol)
     end
 end
 
+function stargate_convertGalaxyToAddressSymbol(galaxy)
+    if galaxy == enum_galaxy.MILKYWAY then
+        return 10
+    elseif galaxy == enum_galaxy.PEGASUS then
+        return 20
+    else
+        return nil
+    end
+end
+
 function stargate_isDestinyGate(stargateID)
     return (getElementData(stargate_getElement(stargateID), "isDestiny"))
 end

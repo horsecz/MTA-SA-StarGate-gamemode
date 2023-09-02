@@ -4,7 +4,7 @@
 enum_planetName = {
     [0] = "San Andreas",
     [1] = "Earth",
-    [2] = "Icarus",
+    [2] = "Icarus base",
     [4] = "Abydos",
     [14] = "Random 1 (Green cave)",
     [16] = "Baals time machine",
