@@ -1,0 +1,6 @@
+<map edf:definitions="editor_main">
+	<object id="HOTU[18868]Ringcaller" model="1337" posX="268.66400146484" posY="1884.0500488281" posZ="-31.360000610352" dimension="0" rotX="0" rotY="0" rotZ="0" interior="0" scale="1" doublesided="false" collisions="true" element_model_data="Ringcaller" hotu_id="18868" hotu_object="true" ></object>
+	<object id="HOTU[18874]Embarkation69" model="1337" posX="268" posY="1844" posZ="-15.06054019928" dimension="0" rotX="0" rotY="0" rotZ="0" interior="0" scale="1" doublesided="false" collisions="true" element_model_data="Embarkation69" hotu_id="18874" hotu_object="true" ></object>
+	<object id="HOTU[18868]Ringcaller" model="1337" posX="294.80532836914" posY="1844.2745361328" posZ="-19.670757293701" dimension="0" rotX="0" rotY="0" rotZ="0" interior="0" scale="1" doublesided="false" collisions="true" element_model_data="Ringcaller" hotu_id="18868" hotu_object="true" ></object>
+	<object id="HOTU[18739]machinas2" model="1337" posX="254.39530944824" posY="1839.2683105469" posZ="-18.820014953613" dimension="0" rotX="0" rotY="0" rotZ="180.00012207031" interior="0" scale="1" doublesided="false" collisions="true" element_model_data="machinas2" hotu_id="18739" hotu_object="true" ></object>
+</map>

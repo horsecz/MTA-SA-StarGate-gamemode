@@ -47,6 +47,7 @@
     <export function="stargate_isActive" type="shared" />
     <export function="stargate_getIncomingStatus" type="shared" />
     <export function="stargate_getPlanetStargates" type="shared" />
+    <export function="stargate_isDestinyGate" type="shared" />
 
     <export function="stargate_dial" type="shared" />
     <export function="stargate_dialByID" type="server" />

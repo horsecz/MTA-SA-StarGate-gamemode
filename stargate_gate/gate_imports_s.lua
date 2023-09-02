@@ -74,6 +74,18 @@ function planet_getPlanetDimension(...)
     return (exports.stargate_planets:planet_getPlanetDimension(...))
 end
 
+function planet_getPlanetGalaxy(...)
+    return (exports.stargate_planets:planet_getPlanetGalaxy(...))
+end
+
+function planet_getDimensionPlanet(...)
+    return (exports.stargate_planets:planet_getDimensionPlanet(...))
+end
+
+function planet_getPlanetID(...)
+    return (exports.stargate_planets:planet_getPlanetID(...))
+end
+
 
 
 

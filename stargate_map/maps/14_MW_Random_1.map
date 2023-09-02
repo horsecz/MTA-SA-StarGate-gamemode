@@ -1,0 +1,4 @@
+<map>
+	<object id="HOTU[18745]dendron" model="1337" posX="1816.1999511719" posY="-2449.5300292969" posZ="2000" dimension="14" rotX="0" rotY="0" rotZ="180.00012207031" interior="0" scale="1" doublesided="false" collisions="true" element_model_data="dendron" hotu_id="18745" hotu_object="true" ></object>
+	<object id="HOTU[18818]inviplaq" model="1337" posX="1831.8000488281" posY="-2445.9599609375" posZ="2020.1700439453" dimension="14" rotX="2.2003173828125" rotY="270.00012207031" rotZ="0" interior="0" scale="1" doublesided="false" collisions="true" element_model_data="inviplaq" hotu_id="18818" hotu_object="true" ></object>
+</map>

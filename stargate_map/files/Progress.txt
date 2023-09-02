@@ -1,0 +1,7 @@
+Checked:
+stargate.IPL
+stargate_2.IPL
+stargate_3.IPL
+
+Progress:
+stargate_4.IPL:		checked lines 1 - 503

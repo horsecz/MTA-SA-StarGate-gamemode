@@ -233,6 +233,10 @@ function stargate_convertAddressSymbolToGalaxy(symbol)
     end
 end
 
+function stargate_isDestinyGate(stargateID)
+    return (getElementData(stargate_getElement(stargateID), "isDestiny"))
+end
+
 
 function stargate_getPosition(stargateID)
     local x, y, z = getElementPosition(stargate_getElement(stargateID))

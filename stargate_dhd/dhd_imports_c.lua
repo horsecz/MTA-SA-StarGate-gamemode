@@ -20,6 +20,10 @@ function stargate_getForceDialType(...)
     return (exports.stargate_gate:stargate_getForceDialType(...))
 end
 
+function stargate_isDestinyGate(...)
+    return (exports.stargate_gate:stargate_isDestinyGate(...))
+end
+
 function stargate_getID(...)
     return (exports.stargate_gate:stargate_getID(...))
 end

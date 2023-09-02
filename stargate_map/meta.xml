@@ -14,13 +14,28 @@
         <setting name="#time" value="12:0"></setting>
     </settings>
 
-    <map src="maps/0_SA.map" dimension="0"></map>
-    <map src="maps/1_Earth.map" dimension="1"></map>
-    <map src="maps/2_Icarus.map" dimension="2"></map>
+    <map src="maps/0_MW_SA.map" dimension="0"></map>
+    <map src="maps/1_MW_Earth.map" dimension="1"></map>
+    <map src="maps/2_MW_Icarus.map" dimension="2"></map>
+    <map src="maps/4_MW_Abydos.map" dimension="4"></map>
+    <map src="maps/6_UA_Destiny.map" dimension="6"></map>
+    <map src="maps/7_UA_Desert.map" dimension="7"></map>
+    <map src="maps/8_PG_Random_1.map" dimension="8"></map>
+    <map src="maps/9_UA_SnowDesert.map" dimension="9"></map>
+    <map src="maps/10_PG_Atlantis.map" dimension="10"></map>
+    <map src="maps/11_PG_Random_2.map" dimension="11"></map>
+    <map src="maps/12_UA_Cave.map" dimension="12"></map>
+    <map src="maps/13_UA_Obelisk.map" dimension="13"></map>
+    <map src="maps/14_MW_Random_1.map" dimension="14"></map>
+    <map src="maps/16_MW_BaalsTimeMachine.map" dimension="16"></map>
+    <map src="maps/17_MW_Village.map" dimension="17"></map>
+    <map src="maps/18_PG_Random_3.map" dimension="18"></map>
+    <map src="maps/19_OT_Othala.map" dimension="19"></map>
+    <map src="maps/20_MW_P3R-272.map" dimension="20"></map>
 
     <script src="map_s.lua" type="server"></script>
     <script src="map_c.lua" type="client"></script>
-    <script src="map_useful.lua" type="shared"></script>
+    <script src="map_useful_s.lua" type="server"></script>
 
     <script src="map_1_s.lua" type="server"></script>
 

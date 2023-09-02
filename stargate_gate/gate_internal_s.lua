@@ -51,6 +51,8 @@ function stargate_convertAddressToID(id, addressArray)
     local address_arraySize = array_size(addressArray)
     local stargate_galaxy = nil
     local address_POO = nil
+    local sg_id = nil
+    local sg_addr = nil
 
     if address_arraySize == 7 then -- 7 symbol address -> 7th symbol must be point of origin
         address_POO = addressArray[7]
@@ -64,31 +66,40 @@ function stargate_convertAddressToID(id, addressArray)
     else -- less than 7 or more than 9 symbols -> invalid
         return false
     end
+    
+    local sg_element = nil
+    for i, sg in pairs(all_gates) do
+        sg_id = stargate_getID(sg)
+        sg_addr = stargate_getAddress(sg_id)
+        sg_element = sg
+        if array_equal(address_withoutPOO, sg_addr) then
+            break
+        end
+        sg_id = false
+    end
 
-    if address_POO then -- check point of origin 
-        if not address_POO == 39 then
+    if sg_id == false or sg_id == nil then
+        return false
+    end
+
+    local sg_planet = planet_getDimensionPlanet(getElementDimension(sg_element))
+    local sg_planetID = planet_getPlanetID(sg_planet)
+    local sg_planet_galaxy = planet_getPlanetGalaxy(sg_planetID)
+
+    if address_POO then -- check point of origin (and/or galaxy symbol)
+        if address_POO == 39 and sg_planet_galaxy == enum_galaxy.MILKYWAY then
+        elseif address_POD == 36 and sg_planet_galaxy == enum_galaxy.PEGASUS then
+        elseif address_POD == 36 and sg_planet_galaxy == enum_galaxy.UNIVERSE then
+        else
+            return false
+        end
+
+        if not stargate_galaxy == sg_planet_galaxy then -- check 7th (galaxy) symbol in 8 symbol address
             return false
         end
     end
-
     
-    for i, sg in pairs(all_gates) do
-        local sg_id = stargate_getID(sg)
-        local sg_addr = stargate_getAddress(sg_id)
-        if array_equal(address_withoutPOO, sg_addr) then
-            if stargate_galaxy then
-                local sg_galaxy = stargate_getGalaxy(sg_id)
-                if stargate_galaxy == sg_galaxy then
-                    return sg_id
-                else
-                    return false
-                end
-            else
-                return sg_id
-            end
-        end
-    end
-    return false
+    return sg_id
 end
 
 -- Assigns new ID to NEW stargate

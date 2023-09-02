@@ -91,6 +91,7 @@ function dhd_handleGUIRefreshAddressList()
         local sg_planet = planet_getDimensionPlanet(getElementDimension(sg))
         local sg_planetID = planet_getPlanetID(sg_planet)
         local sg_planet_galaxy = planet_getPlanetGalaxy(sg_planetID)
+        local isDestiny = stargate_isDestinyGate(sgID)
 
         local sg_address = ""
         for i,symbol in ipairs(sg_addressTable) do
@@ -101,9 +102,18 @@ function dhd_handleGUIRefreshAddressList()
             end
         end
         if localGalaxy == sg_planet_galaxy or DHD_GUI_LOCALONLY == true then
-            sg_address = sg_address .. ", 39"
-        elseif DHD_GUI_LOCALONLY == false and not localGalaxy == sg_planet_galaxy then
-            sg_address = sg_address .. ", " .. tostring(stargate_convertAddressSymbolToGalaxy(stargate_getGalaxy(sgID))) .. ", 39"
+            if sg_planet_galaxy == enum_galaxy.MILKYWAY then
+                sg_address = sg_address .. ", 39"
+            else
+                sg_address = sg_address .. ", 36"
+            end
+        elseif DHD_GUI_LOCALONLY == false and not localGalaxy == sg_planet_galaxy and not isDestiny then
+            sg_address = sg_address .. ", " .. tostring(stargate_convertAddressSymbolToGalaxy(sg_planet_galaxy))
+            if sg_planet_galaxy == enum_galaxy.MILKYWAY then
+                sg_address = sg_address .. ", 39"
+            else
+                sg_address = sg_address .. ", 36"
+            end
         end
 
         local planet_name = planet_getPlanetName(sg_planetID)
