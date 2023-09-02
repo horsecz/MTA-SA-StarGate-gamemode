@@ -1,6 +1,10 @@
 -- chevron_s.lua: Chevron element module; server-side
 
 -- Create chevron object element and attach it to stargate
+-- > Milkyway -> creates chevrons 1 - 9
+-- > Pegasus  -> creates chevrons 1 - 7;
+--             > models for 8 and 9 are nonexistent -> creates chev1 model and rotates the object accordingly
+-- > Universe -> creates chevrons with lights on (1)
 --- REQUIRED PARAMETERS:
 --> stargateID      string      ID of stargate
 --> chevron         int         number of chevron (1-9) that is being created
@@ -9,7 +13,30 @@
 function stargate_chevron_create(stargateID, chevron)
     local x, y, z = stargate_getPosition(stargateID)
     local newChevron = createObject(1337, x, y, z)
-    models_setElementModelAttribute(newChevron, "chevs"..tostring(chevron))
+    local gateType = stargate_galaxy_get(stargateID)
+
+    if gateType == enum_galaxy.MILKYWAY then
+        models_setElementModelAttribute(newChevron, "chevs"..tostring(chevron))
+    elseif gateType == enum_galaxy.PEGASUS then
+        if chevron < 3 then
+            models_setElementModelAttribute(newChevron, "CHpeg"..tostring(chevron))
+        elseif chevron < 8 then
+            models_setElementModelAttribute(newChevron, "chpeg"..tostring(chevron))
+        else
+            models_setElementModelAttribute(newChevron, "CHpeg1")
+            setElementPosition(newChevron, x, y+0.002, z)
+            if chevron == 8 then
+                setElementRotation(newChevron, 0, 240, 0)
+            else -- chevron == 9
+                setElementRotation(newChevron, 0, 199.85, 0)
+            end
+        end
+    elseif gateType == enum_galaxy.UNIVERSE then
+        if chevron == 1 then
+            models_setElementModelAttribute(newChevron, "SGUCHEV")
+        end
+    end
+    
     local chevronID = stargate_chevron_assignID(newChevron, stargateID, chevron)
     setElementData(newChevron, "number", chevron)
     setElementData(newChevron, "active", false)

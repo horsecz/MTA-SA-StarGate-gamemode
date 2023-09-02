@@ -1,0 +1,4 @@
+<map>
+	<object id="HOTU[19028]ASGCOM" model="1337" posX="249.39999389648" posY="2454" posZ="-13.743200302124" dimension="19" rotX="0" rotY="0" rotZ="90.000213623047" interior="0" scale="1" doublesided="false" collisions="true" element_model_data="ASGCOM" hotu_id="19028" hotu_object="true" ></object>
+	<object id="HOTU[18877]Othala" model="1337" posX="262.6647644043" posY="2482.3198242188" posZ="-9.3748016357422" dimension="19" rotX="0" rotY="0" rotZ="0" interior="0" scale="1" doublesided="false" collisions="true" element_model_data="Othala" hotu_id="18877" hotu_object="true" ></object>
+</map>

@@ -7,7 +7,7 @@
 
 
 function stargate_galaxy_getGateCount(id)
-    if stargate_galaxy_get(id) == "milkyway"then
+    if stargate_galaxy_get(id) == enum_galaxy.MILKYWAY then
         return (array_size(SG_MW))
     end
 end
@@ -21,8 +21,10 @@ function stargate_galaxy_get(id)
     return (getElementData(stargate_getElement(id), "galaxy"))
 end
 
+-- OBSOLETE
+-- TODO: Remove
 function stargate_galaxy_getAllElements(id)
-    if stargate_galaxy_get(id) == "milkyway" then
+    if stargate_galaxy_get(id) == enum_galaxy.MILKYWAY then
         return (global_getData("SG_MW"))
     end
     return nil

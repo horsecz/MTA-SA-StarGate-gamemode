@@ -1,25 +1,21 @@
 # To be done
 
-- Load HOTU maps from IPL and convert them into separate .map files in separate dimensions per planet
-    - SGC (Earth)   -> DONE
-    - Icarus        -> DONE
-    - Abydos        
-    - Atlantis
-    - Pegasus worlds
-    - Destiny
-    - SG Universe worlds
 - Custom worlds
     - Main map & lobby (San Andreas)  -> dimension 0 / planet 0 (not Earth)
-    - Custom MW World 1, 2, ..
-    - Other MW Worlds ...
+    - Custom worlds
+        - Shooter or race world
+        - Other custom planets/worlds
+        - Development and Sandbox world
 - Basic functionality of SA map
     - Spawn area = Lobby in San Andreas
-    - Gate area in SA
+    - Gate area in SA (map from HOTU) - rings, etc.
 - Basic functionality of Milkyway maps
     - SGC
     - Icarus
     - Other worlds
 - Functionality of all HOTU maps
+- Additional objects and decorations in HOTU maps
+    - Some HOTU maps contained default GTA SA objects (decorations; trees, rocks, barrels, etc.); they are not included in generated .map files
 - Basic connection and co-working between resources
     - Spawn stargates and dhds in map worlds
 - San Andreas (and other worlds) NPCs and world "aliveness" (no ghost towns and worlds!)

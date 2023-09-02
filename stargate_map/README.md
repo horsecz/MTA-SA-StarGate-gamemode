@@ -5,6 +5,31 @@ This script is used for loading all maps that are used when playing on stargate 
 ## Maps
 
 Currently, there are available these maps:
-- San Andreas (added objects such as San Andreas stargate base)
-- Earth (SGC)
+- San Andreas
+    - HOTU stargate base
+- Earth
+    - SGC
+    - Hangars; Prometheus "base"
+    - SGC 1994 version
 - Icarus base
+- Abydos
+- Destiny
+- Universe Desert planet
+- Pegasus Grass world
+- Universe Snow world
+- Atlantis
+- Pegasus Storage planet
+- Universe Cave world
+- Universe Obelisk planet
+- MilkyWay Grass world
+- Ba'als time machine planet (Stargate: Continuum)
+- MilkyWay Village world
+- Pegasus snow ancient world
+- Asgard homeworld
+- P3R-272 (Ancient memory knowledge database machine world)
+
+## Interiors
+
+- Anubis ship and "sak base"
+- Hatak
+- Destiny Seed ship

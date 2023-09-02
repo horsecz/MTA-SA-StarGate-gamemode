@@ -25,11 +25,38 @@ end
 --- RETURNS:
 --> Int; time [ms] that will take for ring to rotate from symbol A to symbol B
 function stargate_ring_getSymbolRotationTime(symbol_a, symbol_b)
-    if symbol_a < symbol_b then
-        symbolDistance = symbol_b-symbol_a
-    else
-        symbolDistance = symbol_a-symbol_b
+    local currentSymbol = symbol_a
+    local symbol = symbol_b
+
+    local currentSymbolNeg = 39 - currentSymbol
+    local symbol_neg = 39 - symbol 
+    local symbolDistance = math.abs(currentSymbol-symbol)
+    local clockWise = nil
+
+    if currentSymbol > symbol then -- 5 (34) -> 2 (37); 3 /// 35 (4) -> 2 (37);  
+        if currentSymbolNeg < symbol_neg then -- 5 -> 2
+            clockWise = false
+        else -- 35 -> 2
+            clockWise = true
+            symbolDistance = math.abs(currentSymbolNeg + symbol)
+        end
+    elseif currentSymbol < symbol then -- 2 [37] -> 5 [34] /// 2 [37] -> 35 [4]
+        if currentSymbolNeg > symbol_neg then -- 2 -> 5
+            clockWise = true
+        else -- 2 -> 35
+            clockWise = false
+            symbolDistance = math.abs(currentSymbol + symbol_neg)
+        end
+    else -- symbol == currentSymbol
+        symbolDistance = 0
     end
+
+    if symbol == 39 and clockWise == true then
+        symbolDistance = symbolDistance - 1
+    elseif symbol == 39 and clockWise == false then
+        symbolDistance = symbolDistance + 2
+    end
+
     if symbolDistance == 0 then
         return -MW_RING_CHEVRON_LOCK_SLOW_DELAY + MW_RING_CHEVRON_LOCK_SLOW_DELAY/10
     end

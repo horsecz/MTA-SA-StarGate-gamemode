@@ -1,0 +1,8 @@
+<map>
+	<object id="HOTU[19121]iceplak" model="1337" posX="1999.9000244141" posY="0" posZ="3000" dimension="18" rotX="0" rotY="0" rotZ="0" interior="0" scale="1" doublesided="false" collisions="true" element_model_data="iceplak" hotu_id="19121" hotu_object="true" ></object>
+	<object id="HOTU[19122]ancientcrui" model="1337" posX="2033.4000244141" posY="-8" posZ="3003" dimension="18" rotX="0" rotY="0" rotZ="270.00012207031" interior="0" scale="1" doublesided="false" collisions="true" element_model_data="ancientcrui" hotu_id="19122" hotu_object="true" ></object>
+	<object id="HOTU[19123]icebord" model="1337" posX="2000" posY="0" posZ="3000" dimension="18" rotX="0" rotY="0" rotZ="0" interior="0" scale="1" doublesided="false" collisions="true" element_model_data="icebord" hotu_id="19123" hotu_object="true" ></object>
+	<object id="HOTU[19124]icemoun" model="1337" posX="1999.9000244141" posY="0" posZ="3000" dimension="18" rotX="0" rotY="0" rotZ="0" interior="0" scale="1" doublesided="false" collisions="true" element_model_data="icemoun" hotu_id="19124" hotu_object="true" ></object>
+	<object id="HOTU[19125]icetow" model="1337" posX="2000" posY="0" posZ="3000" dimension="18" rotX="0" rotY="0" rotZ="0" interior="0" scale="1" doublesided="false" collisions="true" element_model_data="icetow" hotu_id="19125" hotu_object="true" ></object>
+	<object id="HOTU[19121]iceplak" model="1337" posX="1999.9000244141" posY="0" posZ="3000" dimension="18" rotX="0" rotY="0" rotZ="0" interior="0" scale="1" doublesided="false" collisions="true" element_model_data="iceplak" hotu_id="19121" hotu_object="true" ></object>
+</map>

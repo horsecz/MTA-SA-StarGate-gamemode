@@ -44,35 +44,54 @@ Features, updates here are not the newest, but more up-to-date unlike **release*
 
 # Current release
 
-- Release 0.4b
-- Note: GUI Update
+- Release 0.5
+- Note: Map and Stargate update
 
 ## New features
 
-- DHD GUI
-    - opens with action button (E; closes with close button F1)
-    - selecting available stargates from list and dialling
-    - option to dial via manually entering stargate adress
-    - dialling speed/type option (if dialling type is not forced)
-    - disengage wormhole, cancel dialling process
-        - you cannot shutdown gate when wormhole is estabilished
-- Lifesupport UI
-    - info text regarding occupied planet and its atmosphere
-    - warning when lifesupport conditions are killing player
-    - right-center of screen, under money, permanent 
-- Planet UI
-    - info text about currently occupied planet and galaxy
-    - top-center of screen, permanent
-- Gamemode
-    - GUI info window at player join when models are being loaded
-    - GUI general info window (showInfoWindow function; /infowindow command)
-    - at join, player will be spawned and frozen, camera is in clouds - will target player after models are loaded 
-    - removed /dial command as it has no use now 
+- Map
+    - SGC
+        - DHD has type Base - DHD is replaced by dialling computer
+        - Energy is generated from external source device (energy room)
+    - New maps
+        - Loading all (or atleast 99%) maps from STARGATE:Horizon of the Universe mod
+            - Exceptions: Interiors (generated but not being loaded) and "non-planets" (or: maps without stargate)
+        - Only Stargates and DHDs spawned; no map functionality or interactions
+            - Note: Just spawned at +- correct position
+        - Asgard homeworld map - currently its planet galaxy is set as MilkyWay (correct: Othala)
+- Stargate
+    - Internal: not using 7th (8th) symbol in SG address
+        - stargates address is always sixth symbol one (with exception of Destiny and possible others - there address is not address but a code)
+        - point of origin (last symbol; 7th symbol mostly) and galaxy symbol (7th symbol in 8 symbol address) are autofilled in DHD GUI
+    - Can be now attached to any element
+        - Command: /sgattach [SG_ID] - will attach stargate to players vehicle (above; floating)
+    - Wormhole transport
+        - Since now, players are not transported directly when they go through stargate, instead player is in "void" until his models are loaded (and then transported to destination)
+    - Stargate Pegasus and Universe models - *work in progress*
+        - No dialling animations yet
+        - No sounds nor special (non model related) effects yet - everything is (re)used from MilkyWay gate
+        - For Universe model - no non-Destiny DHD (going to any Universe world except Destiny is one-way road; mobile DHD is not implemented yet)
+    - 8th and 9th chevron dialling
+        - No dial animations yet (using 7 chevron dialling animations now)
+        - No integration with energy resource
+            - Currently any stargate can be dialed by any other stargate without any restrictions
+                - The only thing that is restricted is DHD List in DHD GUI which shows stargates *that are supposed to be diallable*
+                - If user enters address manually in address bar (in DHD GUI) *and correctly*, any stargate can be dialed (currently)
+            - Energy requirements will be introduced for dialling to another galaxy (or Destiny) - in further releases
+        - Fully implemented in DHD, Stargates
+        - Stargates are local or global
+            - Local stargates can dial only other stargates within their galaxy (local stargates)
+            - Global stargates can additionally dial stargates in any other galaxy (but: the destination stargate must be global too and it cannot be Destiny if not special case)
+            - Special cases:
+                - Icarus base (or Icarus type stargate) - only this stargate can dial Destiny
+                - Destiny - this stargate is special for its own reason (is Destiny, the only stargate that has 9 chevron address)
 - DHD
-    - Base DHD type introduced
-        - DHD without model, invisible (object)
-        - Used in bases (SGC, Atlantis, ...)
-        - Usually near (or in) some other object that will represent the DHD (like in/near dialling computer in SGC or at Atlantis DHD console object)
+    - Base DHD is now an option (DHD without model) - enum_galaxy.UNKNOWN as DHD type
+    - GUI: Using Toggle key (instead open and close keys)
+- Models
+    - /showmodel command - displays given model (by hotu dff file name) in development world (zero-ish coordinates)
+    - Loading different stargate models depending on occupied (planets) galaxy (except Development world)
+
 
 ## Features
 
@@ -85,14 +104,24 @@ Features, updates here are not the newest, but more up-to-date unlike **release*
         - Iris autoclose option (when incoming wormhole) and autoopen (when gate closes)
         - If element is passing through stargate and destination gate has iris active, this element is destroyed
         - Note: any iris model can be mounted/used on any stargate model
-- DHD element (MilkyWay model)
+- DHD
     - dial ability
     - attaching to gates
     - energy generation and transfer to stargate if attached to some
     - DHD separated into default (dhd device) and base (SGC 'custom' DHD, Atlantis DHD, ...) types
         - default DHD gives enough energy for stargate to operate (non broken DHD)
         - base DHD gives no energy (stargate gets energy from external source instead)
-        - Note: currently no external sources are present, as well as base DHD's or SGC/Atlantis map
+    - DHD GUI
+        - opens with action button (E; closes with close button F1)
+        - selecting available stargates from list and dialling
+        - option to dial via manually entering stargate adress
+        - dialling speed/type option (if dialling type is not forced)
+        - disengage wormhole, cancel dialling process
+        - you cannot shutdown gate when wormhole is estabilished
+    - Base DHD type
+        - DHD without model, invisible (object)
+        - Used in bases (SGC, Atlantis, ...)
+        - Usually near (or in) some other object that will represent the DHD (like in/near dialling computer in SGC or at Atlantis DHD console object)
 - Models
     - Custom models from STARGATE:Horizon of the Universe V2.0 mod (atleast 99% of them)
     - Dynamic loading and unloading of custom models depending on players occupied planet
@@ -114,6 +143,9 @@ Features, updates here are not the newest, but more up-to-date unlike **release*
         - /mypos x y z    - moves you to new coordinates based on your current position
         - /dim d          - sets your planet/dimension to d
         - /poselement eID - teleports you to elements position (eID = elements ID)
+    - GUI info window at player join when models are being loaded
+    - GUI general info window (showInfoWindow function; /infowindow command)
+    - at join, player will be spawned and frozen, camera is in clouds - will target player after models are loaded 
 - Energy system
     - every element can have element data "energy" with all required statuses, on which can the element change its behavior; they can produce, store or transfer energy between themselves
     - integration with stargate and dhd scripts
@@ -127,10 +159,14 @@ Features, updates here are not the newest, but more up-to-date unlike **release*
 - Planet system
     - each dimension represents one planet with own atmosphere
     - integrated with stargates, spawner, etc.
+    - info text about currently occupied planet and galaxy
+        - top-center of screen, permanent
 - Lifesupport system
     - each player/ped has its own lifesupport stats depending on occupied planet (and its atmosphere)
     - very basic application of lifesupport stats (dying of low oxygen/high temperature/...)
     - integrated with planet system
+    - info text regarding occupied planet and its atmosphere
+        - right-center of screen, under money, permanent 
 - Spawner
     - Spawning all neccessary (server-side) objects, elements on map(s)
     - Gatespawner (spawns Stargates and DHDs)
@@ -153,6 +189,8 @@ Features, updates here are not the newest, but more up-to-date unlike **release*
     - global server and client events (player connect; join; respawn; ...), commands and actions
 - stargate_gate
     - stargate, its physics, model(s), behavior
+- stargate_gui
+    - global GUI(s) used in all other stargate resources
 - stargate_lifesupport
     - planet atmosphere, element life support stats
     - oxygen, nitrogen, water, vacuum; event&actions related to LS

@@ -223,6 +223,30 @@ function stargate_getAddressSymbol(address, symbol)
     return address[symbol]
 end
 
+function stargate_convertAddressSymbolToGalaxy(symbol)
+    if symbol == 10 then
+        return enum_galaxy.MILKYWAY
+    elseif symbol == 20 then
+        return enum_galaxy.PEGASUS
+    else
+        return nil
+    end
+end
+
+function stargate_convertGalaxyToAddressSymbol(galaxy)
+    if galaxy == enum_galaxy.MILKYWAY then
+        return 10
+    elseif galaxy == enum_galaxy.PEGASUS then
+        return 20
+    else
+        return nil
+    end
+end
+
+function stargate_isDestinyGate(stargateID)
+    return (getElementData(stargate_getElement(stargateID), "isDestiny"))
+end
+
 
 function stargate_getPosition(stargateID)
     local x, y, z = getElementPosition(stargate_getElement(stargateID))
@@ -239,6 +263,57 @@ function stargate_setPosition(stargateID, nx, ny, nz)
     if stargate_galaxy_get(stargateID) == "milkyway" then
         setElementPosition(stargate_getRingElement(stargateID), nx, ny, nz)
     end 
+end
+
+function stargate_attachToElement(stargateID, elementAttachTo, x,y,z, rx,ry,rz)
+    if not x then
+        x = 0
+    end 
+    if not y then
+        y = 0
+    end
+    if not z then
+        z = 0
+    end
+    if not rx then
+        rx = 0
+    end
+    if not ry then
+        ry = 0
+    end
+    if not rz then
+        rz = 0
+    end
+    
+    attachElements(stargate_getElement(stargateID), elementAttachTo, x,y,z, rx,ry,rz)
+end
+
+function stargate_detachFromElement(stargateID, elementDetachFrom)
+    if not elementDetachFrom then
+        elementDetachFrom = nil
+    end
+    detachElements(stargate_getElement(stargateID), elementDetachFrom)
+end
+
+function stargate_getPlanetStargates(planetID)
+    if not planet_isPlanet(planetID) then
+        return nil
+    end
+    local dimension = planet_getPlanetDimension(planetID)
+    local SG_LIST = global_getData("SG_LIST")
+    local planet_sgs = { }
+    for i,sg in ipairs(SG_LIST) do
+        local sg_dimension = getElementDimension(sg)
+        if sg_dimension == dimension then
+            planet_sgs = array_push(planet_sgs, sg)
+        end
+    end
+
+    return planet_sgs
+end
+
+function stargate_getAllStargates()
+    return (global_getData("SG_LIST"))
 end
 
 ---

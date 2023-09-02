@@ -16,6 +16,7 @@
     <export function="planet_getPlanetID" type="shared" />
     <export function="planet_getDimensionPlanet" type="shared" />
     <export function="planet_getPlanetElement" type="shared" />
+    <export function="planet_isPlanet" type="shared" />
 
     <export function="planet_getPlanetDimension" type="shared" />
     <export function="planet_getPlanetGalaxy" type="shared" />

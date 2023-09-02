@@ -48,10 +48,15 @@ function stargate_create(gateType, dimension, x, y, z, address, irisType, defaul
     end
 
     local stargate = createObject(1337, x, y, z, rx, ry, rz)
-    local id = stargate_assignID(stargate)
+    local id = stargate_assignID(stargate, gateType)
+    if id == false then
+        outputDebugString("[STARGATE] Attempt to create Stargate ("..tostring(id).."; at "..tostring(x)..","..tostring(y)..","..tostring(z)..") with unknown galaxy/type ("..tostring(gateType)..")")
+        destroyElement(stargate)
+        return nil
+    end
     local existing = stargate_convertAddressToID(id, address)
     if not existing == false or not exiting == nil then
-        outputDebugString("[STARGATE] Attempt to create Stargate (at "..tostring(x)..","..tostring(y)..","..tostring(z)..") with same address as existing stargate ("..existing..")")
+        outputDebugString("[STARGATE] Attempt to create Stargate ("..tostring(id).."; at "..tostring(x)..","..tostring(y)..","..tostring(z)..") with same address as existing stargate ("..existing..")")
         destroyElement(stargate)
         return nil
     end
@@ -59,19 +64,39 @@ function stargate_create(gateType, dimension, x, y, z, address, irisType, defaul
     stargate_setAddress(id, address)
     stargate_setDefaultDialType(id, dt)
     stargate_setForceDialType(id, forceDefaultDialType)
-    energy_device_create(GATE_ENERGY_CAPACITY, 0, GATE_ENERGY_WORMHOLE, stargate, GATE_ENERGY_IDLE, 0, "stargate_energy_device")
+
+    local sg_energy_production = 0
+    if gateType == enum_galaxy.UNIVERSE then -- Universe stargate generates enough power for itself
+        sg_energy_production = GATE_ENERGY_WORMHOLE
+    end
+    energy_device_create(GATE_ENERGY_CAPACITY, sg_energy_production, GATE_ENERGY_WORMHOLE, stargate, GATE_ENERGY_IDLE, sg_energy_production, "stargate_energy_device")
     planet_setElementOccupiedPlanet(stargate, "PLANET_"..dimension)
     stargate_addCollisions(id)
+    setElementData(stargate, "isStargateElement", true)
     
 
     if gateType == enum_galaxy.MILKYWAY then
         models_setElementModelAttribute(stargate, "innerring")
         stargate_ring_create(id, x, y, z, rx, ry, rz)
-        stargate_galaxy_set(id, "milkyway")
+        stargate_galaxy_set(id, enum_galaxy.MILKYWAY)
+    elseif gateType == enum_galaxy.PEGASUS then
+        models_setElementModelAttribute(stargate, "pegaze")
+        stargate_galaxy_set(id, enum_galaxy.PEGASUS)
+    elseif gateType == enum_galaxy.UNIVERSE then
+        models_setElementModelAttribute(stargate, "SGUGATE")
+        stargate_galaxy_set(id, enum_galaxy.UNIVERSE)
+    else
+        outputDebugString("[STARGATE] Attempt to create Stargate ("..tostring(id).."; at "..tostring(x)..","..tostring(y)..","..tostring(z)..") with unimplemented gate type (galaxy): "..tostring(gateType))
+        destroyElement(stargate)
+        return nil
     end
     
-    for i=1,9 do
-        stargate_chevron_create(id, i)
+    if gateType == enum_galaxy.MILKYWAY or gateType == enum_galaxy.PEGASUS then
+        for i=1,9 do
+            stargate_chevron_create(id, i)
+        end
+    else -- Universe stargate has only (model for) all chevrons active or inactive
+        stargate_chevron_create(id, 1)
     end
     for i=1,12 do
         stargate_vortex_create(id, i)
@@ -107,7 +132,14 @@ function stargate_create(gateType, dimension, x, y, z, address, irisType, defaul
     if not (irisType == nil or irisType == false) then
         irisText = " iris="..irisType
     end
-    outputDebugString("[STARGATE] Created Stargate (ID="..tostring(getElementID(stargate)).." galaxy="..tostring(stargate_galaxy_get(id))..""..irisText..") at "..tostring(x)..","..tostring(y)..","..tostring(z).."")
+
+    local SG_LIST = global_getData("SG_LIST")
+    if SG_LIST == nil or SG_LIST == false then
+        SG_LIST = { }
+    end
+    SG_LIST = array_push(SG_LIST, stargate)
+    global_setData("SG_LIST", SG_LIST)
+    outputDebugString("[STARGATE] Created Stargate (ID="..tostring(getElementID(stargate)).." type="..tostring(stargate_galaxy_get(id))..""..irisText..") at "..tostring(x)..","..tostring(y)..","..tostring(z).." ("..tostring("PLANET_"..tostring(dimension))..")")
     return stargate
 end
 
@@ -254,16 +286,36 @@ function stargate_animateOutgoingDial(stargateID, symbol, chevron, lastChevron)
     local ring = stargate_getRingElement(stargateID)
     local stargate = stargate_getElement(stargateID)
     local x, y, z, rx, ry, rz = getElementAttachedOffsets(ring)
-    local oneSymbolAngle = 360/39
-    local currentSymbol = math.floor(ry/oneSymbolAngle)
-    local symbolDistance = 0
-    local clockWise = true
-    if currentSymbol < symbol then
-        symbolDistance = symbol-currentSymbol
-    else
-        symbolDistance = currentSymbol-symbol
-        clockWise = false
+    local oneSymbolAngle = 360/39   -- 360 circle, 39 symbols
+    local currentSymbol = math.floor(ry/oneSymbolAngle) 
+    local currentSymbolNeg = 39 - currentSymbol
+    local symbol_neg = 39 - symbol 
+    local symbolDistance = math.abs(currentSymbol-symbol)
+    local clockWise = nil
+
+    if currentSymbol > symbol then -- 5 (34) -> 2 (37); 3 /// 35 (4) -> 2 (37);  
+        if currentSymbolNeg < symbol_neg then -- 5 -> 2
+            clockWise = false
+        else -- 35 -> 2
+            clockWise = true
+            symbolDistance = math.abs(currentSymbolNeg + symbol)
+        end
+    elseif currentSymbol < symbol then -- 2 [37] -> 5 [34] /// 2 [37] -> 35 [4]
+        if currentSymbolNeg > symbol_neg then -- 2 -> 5
+            clockWise = true
+        else -- 2 -> 35
+            clockWise = false
+            symbolDistance = math.abs(currentSymbol + symbol_neg)
+        end
+    else -- symbol == currentSymbol
+        symbolDistance = 0
     end
+    
+    if symbol == 39 and clockWise == true and math.abs(currentSymbol - symbol_neg) > math.abs(currentSymbol - symbol) then
+        symbolDistance = symbolDistance - 1
+    end
+
+    --outputChatBox("Rotating: "..tostring(currentSymbol).." -> "..tostring(symbol).." (D:"..tostring(symbolDistance).."; C:"..tostring(clockWise)..")")
     -- start rotating
     local timeTook = 0
     if symbolDistance > 0 then 
@@ -293,13 +345,56 @@ function stargate_animateOutgoingDial(stargateID, symbol, chevron, lastChevron)
     setElementData(stargate, "rot_anim_timer_"..tostring(chevron).."_semitimers", t)
 end
 
--- Perform dialling animation of Stargate; MilkyWay stargate type
+-- Select dialling animation which will be performed depending on stargate type
 --- REQUIRED PARAMETERS:
 --> stargateID          string                  ID of stargate
 --> stargateDialType    enum_stargateDialType   dialling mode/type
 --- RETURNS:
 --> Int; time [ms] it will take to perform dialling animation; false if dialling failed (or dial mode is invalid)
 function stargate_diallingAnimation(stargateID, stargateDialType)
+    local gateType = stargate_galaxy_get(stargateID)
+    local time = nil
+    if gateType == enum_galaxy.MILKYWAY then
+        time = stargate_diallingAnimation_mw(stargateID, stargateDialType)
+    elseif gateType == enum_galaxy.PEGASUS then
+        time = stargate_diallingAnimation_pg(stargateID, stargateDialType)
+    elseif gateType == enum_galaxy.UNIVERSE then
+        time = stargate_diallingAnimation_ua(stargateID, stargateDialType)
+    end
+    return time
+end
+
+-- Perform dialling animation of Stargate; Pegasus stargate type
+--- REQUIRED PARAMETERS:
+--> stargateID          string                  ID of stargate
+--> stargateDialType    enum_stargateDialType   dialling mode/type
+--- RETURNS:
+--> Int; time [ms] it will take to perform dialling animation; false if dialling failed (or dial mode is invalid)
+function stargate_diallingAnimation_pg(stargateID, stargateDialType)
+    -- TO BE DONE
+    stargate_setAllChevronsActive(stargateID, false, true)
+    return 1000
+end
+
+-- Perform dialling animation of Stargate; Universe stargate type
+--- REQUIRED PARAMETERS:
+--> stargateID          string                  ID of stargate
+--> stargateDialType    enum_stargateDialType   dialling mode/type
+--- RETURNS:
+--> Int; time [ms] it will take to perform dialling animation; false if dialling failed (or dial mode is invalid)
+function stargate_diallingAnimation_ua(stargateID, stargateDialType)
+    -- TO BE DONE
+    stargate_setAllChevronsActive(stargateID, false, true)
+    return 1000
+end
+
+-- Perform dialling animation of Stargate; MilkyWay stargate type
+--- REQUIRED PARAMETERS:
+--> stargateID          string                  ID of stargate
+--> stargateDialType    enum_stargateDialType   dialling mode/type
+--- RETURNS:
+--> Int; time [ms] it will take to perform dialling animation; false if dialling failed (or dial mode is invalid)
+function stargate_diallingAnimation_mw(stargateID, stargateDialType)
     local t = 50
     local symbol_target = nil
     local symbol_f_current = nil
@@ -312,16 +407,17 @@ function stargate_diallingAnimation(stargateID, stargateDialType)
                 symbol_f_current = stargate_getAddressSymbol(stargate_getDialAddress(stargateID), i-1)
             end
 
-            symbol_target = stargate_getAddressSymbol(stargate_getDialAddress(stargateID), i)
             if i == 7 then
+                symbol_target = 39
                 timer = setTimer(stargate_animateOutgoingDial, t, 1, stargateID, symbol_target, i, true)
             else
+                symbol_target = stargate_getAddressSymbol(stargate_getDialAddress(stargateID), i)
                 timer = setTimer(stargate_animateOutgoingDial, t, 1, stargateID, symbol_target, i)
             end
             setElementData(stargate_getElement(stargateID), "rot_anim_timer_"..tostring(i), timer)
             t = t + stargate_ring_getSymbolRotationTime(symbol_f_current, symbol_target) + MW_RING_CHEVRON_LOCK_SLOW_DELAY*1.5
             if i == 7 then
-                t = t - MW_RING_CHEVRON_LOCK_SLOW_DELAY/7
+                t = t + MW_RING_CHEVRON_LOCK_SLOW_DELAY/20
             end
 
             if getElementData(stargate_getElement(stargateID), "dial_failed") == true then

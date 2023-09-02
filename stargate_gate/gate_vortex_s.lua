@@ -8,7 +8,13 @@
 --> Reference; kawoosh element
 function stargate_vortex_create(stargateID, frame)
     local vortex = createObject(1337, x, y, z)
-    models_setElementModelAttribute(vortex, "Kawoosh"..tostring(frame))
+    local gateType = stargate_galaxy_get(stargateID)
+    if gateType == enum_galaxy.MILKYWAY or gateType == enum_galaxy.PEGASUS then
+        models_setElementModelAttribute(vortex, "Kawoosh"..tostring(frame))
+    elseif gateType == enum_galaxy.UNIVERSE then
+        models_setElementModelAttribute(vortex, "SGUkaw"..tostring(frame))
+    end
+    
     setElementID(vortex, stargateID.."V"..tostring(frame))
     setElementCollisionsEnabled(vortex, false)
     setElementAlpha(vortex, 0)
@@ -92,8 +98,13 @@ function stargate_vortex_kill(player)
         local sgID = stargate_marker_getSource(source)
         local markerID = getElementID(source)
         if markerID == sgID.."KZM" then
+            if getElementData(player, "isStargateElement") == true then -- dont destroy itself, other stargate
+                return false 
+            end
+            if getElementAttachedTo(stargate_getElement(sgID)) then -- no destroying when stargate is attached to something
+                return false
+            end
             destroyElement(player)
-            outputChatBox("["..sgID.."] Vortex disintegrated you!")
             if isElement(player) and getElementType(player) == "ped" or getElementType(player) == "player" then
                 setElementAlpha(player, 0)
                 killPed(player)

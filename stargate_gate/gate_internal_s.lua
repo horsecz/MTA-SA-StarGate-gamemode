@@ -43,31 +43,105 @@ end
 --- RETURNS:
 --> String; Stargate ID or false if address is invalid
 function stargate_convertAddressToID(id, addressArray)
-    local all_gates = stargate_galaxy_getAllElements(id)
+    local all_gates = stargate_getAllStargates()
     if all_gates == nil then
         return false
     end
+    local address_withoutPOO = { addressArray[1], addressArray[2], addressArray[3], addressArray[4], addressArray[5], addressArray[6] }
+    local address_arraySize = array_size(addressArray)
+    local stargate_galaxy = nil
+    local address_POO = nil
+    local sg_id = nil
+    local sg_addr = nil
+
+    if address_arraySize == 7 then -- 7 symbol address -> 7th symbol must be point of origin
+        address_POO = addressArray[7]
+    elseif address_arraySize == 8 then -- 8 symbol address -> 7th symbol is galaxy; 8th is point of origin
+        stargate_galaxy = stargate_convertAddressSymbolToGalaxy(addressArray[7])
+        address_POO = addressArray[8]
+    elseif address_arraySize == 9 then -- 9 symbol address -> it's not address but a code
+        address_withoutPOO = array_push(address_withoutPOO, addressArray[7])
+        address_withoutPOO = array_push(address_withoutPOO, addressArray[8])
+        address_withoutPOO = array_push(address_withoutPOO, addressArray[9])
+    else -- less than 7 or more than 9 symbols -> invalid
+        return false
+    end
+    
+    local sg_element = nil
     for i, sg in pairs(all_gates) do
-        local sg_id = stargate_getID(sg)
-        local sg_addr = stargate_getAddress(sg_id)
-        if array_equal(addressArray, sg_addr) then
-            return sg_id
+        sg_id = stargate_getID(sg)
+        sg_addr = stargate_getAddress(sg_id)
+        sg_element = sg
+        if array_equal(address_withoutPOO, sg_addr) then
+            break
+        end
+        sg_id = false
+    end
+
+    if sg_id == false or sg_id == nil then
+        return false
+    end
+
+    local sg_planet = planet_getDimensionPlanet(getElementDimension(sg_element))
+    local sg_planetID = planet_getPlanetID(sg_planet)
+    local sg_planet_galaxy = planet_getPlanetGalaxy(sg_planetID)
+    
+    local source_sg_planet = planet_getDimensionPlanet(getElementDimension(stargate_getElement(id)))
+    local source_sg_planetID = planet_getPlanetID(source_sg_planet)
+    local source_sg_planet_galaxy = planet_getPlanetGalaxy(source_sg_planetID)
+
+    if address_POO then -- check point of origin (and/or galaxy symbol)
+        if address_POO == 39 and source_sg_planet_galaxy == enum_galaxy.MILKYWAY then
+        elseif address_POO == 36 and source_sg_planet_galaxy == enum_galaxy.PEGASUS then
+        elseif address_POO == 36 and source_sg_planet_galaxy == enum_galaxy.UNIVERSE then
+        else
+            return false
         end
     end
-    return false
+
+    if stargate_galaxy then
+        if not stargate_galaxy == sg_planet_galaxy then -- check 7th (galaxy) symbol in 8 symbol address
+            return false
+        end
+    end
+    
+    return sg_id
 end
 
 -- Assigns new ID to NEW stargate
 --- REQUIRED PARAMETERS:
---> stargate    reference   stargate element
+--> stargate    reference       stargate element
+--> galaxy      enum_galaxy     galaxy type of stargate
 --- RETURNS:
 --> String; ID of new stargate element
-function stargate_assignID(stargate)
+function stargate_assignID(stargate, galaxy)
+    local id = nil
+    local galaxy_text = nil
     if LastMWGateID == nil then
         LastMWGateID = 0
+    elseif LastPGGateID == nil then
+        LastPGGateID = 0
+    elseif LastUAGateID == nil then
+        LastUAGateID = 0
     end
-    LastMWGateID = LastMWGateID + 1
-    local newID = "SG_MW_"..tostring(LastMWGateID)
+    
+    if galaxy == enum_galaxy.MILKYWAY then
+        LastMWGateID = LastMWGateID + 1
+        id = LastMWGateID
+        galaxy_text = "MW"
+    elseif galaxy == enum_galaxy.PEGASUS then
+        LastPGGateID = LastPGGateID + 1
+        id = LastPGGateID
+        galaxy_text = "PG"
+    elseif galaxy == enum_galaxy.UNIVERSE then
+        LastUAGateID = LastUAGateID + 1
+        id = LastUAGateID
+        galaxy_text = "UA"
+    else 
+        return false
+    end
+
+    local newID = "SG_" .. galaxy_text .. "_" .. tostring(id)
     setElementID(stargate, newID)
     return newID
 end
@@ -78,12 +152,20 @@ end
 --> useDelay        bool        will be all chevrons turned on immediately or with (predefined) delay
 --> active          bool        are chevrons being activated or deactivated
 -- useDelay = use slow chevron turning on animation
-function stargate_setAllChevronsActive(stargateID, useDelay, active)
+function stargate_setAllChevronsActive(stargateID, useDelay, active, eight, nineth)
     local delay = 50
-    for i=1,7 do
-        setTimer(stargate_chevron_setActive, delay, 1, stargateID, i, active, true)
-        if useDelay then
-            delay = delay + MW_INCOMING_CHVRN_DELAY
+    local type = stargate_galaxy_get(stargateID)
+    if type == enum_galaxy.UNIVERSE then
+        setTimer(stargate_chevron_setActive, delay, 1, stargateID, 1, active, true)
+        return true
+    end
+
+    for i=1,9 do
+        if i <= 7 or ( i == 8 and eight ) or ( i == 9 and nineth ) then
+            setTimer(stargate_chevron_setActive, delay, 1, stargateID, i, active, true)
+            if useDelay then
+                delay = delay + MW_INCOMING_CHVRN_DELAY
+            end
         end
     end
 end

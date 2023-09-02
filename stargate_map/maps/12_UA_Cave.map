@@ -1,0 +1,7 @@
+<map>
+	<object id="HOTU[19067]sgu3cav" model="1337" posX="-200" posY="-1060.4000244141" posZ="2012.1800537109" dimension="12" rotX="0" rotY="0" rotZ="0" interior="0" scale="1" doublesided="false" collisions="true" element_model_data="sgu3cav" hotu_id="19067" hotu_object="true" ></object>
+	<object id="HOTU[18863]sgusocle" model="1337" posX="-276.48599243164" posY="-1049.7099609375" posZ="1995.1800537109" dimension="12" rotX="0" rotY="0" rotZ="270.00012207031" interior="0" scale="1" doublesided="false" collisions="true" element_model_data="sgusocle" hotu_id="18863" hotu_object="true" ></object>
+	<object id="HOTU[18818]inviplaq" model="1337" posX="-200.3690032959" posY="-1055.2399902344" posZ="2018.6500244141" dimension="12" rotX="0" rotY="270.00012207031" rotZ="0" interior="0" scale="1" doublesided="false" collisions="true" element_model_data="inviplaq" hotu_id="18818" hotu_object="true" ></object>
+	<object id="HOTU[19149]SGUCAV2" model="1337" posX="-200" posY="-1060.4000244141" posZ="2012.1800537109" dimension="12" rotX="0" rotY="0" rotZ="0" interior="0" scale="1" doublesided="false" collisions="true" element_model_data="SGUCAV2" hotu_id="19149" hotu_object="true" ></object>
+	<object id="HOTU[19068]sgu3fl" model="1337" posX="-200" posY="-1060.4000244141" posZ="2012.1800537109" dimension="12" rotX="0" rotY="0" rotZ="0" interior="0" scale="1" doublesided="false" collisions="true" element_model_data="sgu3fl" hotu_id="19068" hotu_object="true" ></object>
+</map>

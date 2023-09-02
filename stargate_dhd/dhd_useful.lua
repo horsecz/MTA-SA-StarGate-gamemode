@@ -4,6 +4,7 @@
 --> isBroken            bool                    is DHD broken or not (working or not working at all)
 --> isDamaged           bool                    is DHD damaged (working but with issues)
 --> canDialGalaxy       bool                    can be stargate from another galaxy dialed via this DHD
+--> canDialDestiny      bool                    can be Destiny stargate dial via this DHD
 --> type                enum_galaxy             DHD type     
 --> attachedStargate    string                  attached stargate (ID)
 
@@ -18,6 +19,10 @@ end
 
 function dhd_setGalaxyDial(dhdID, galaxyDial)
     setElementData(dhd_getElement(dhdID), "canDialGalaxy", galaxyDial)
+end
+
+function dhd_setDestinyDial(dhdID, galaxyDial)
+    setElementData(dhd_getElement(dhdID), "canDialDestiny", galaxyDial)
 end
 
 function dhd_setType(dhdID, v)
@@ -39,6 +44,10 @@ end
 
 function dhd_canDialGalaxy(dhdID)
     return (getElementData(dhd_getElement(dhdID), "canDialGalaxy"))
+end
+
+function dhd_canDialDestiny(dhdID)
+    return (getElementData(dhd_getElement(dhdID), "canDialDestiny"))
 end
 
 function dhd_getType(dhdID)

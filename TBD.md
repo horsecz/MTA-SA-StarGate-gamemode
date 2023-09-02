@@ -2,21 +2,18 @@
 
 Plans for next releases. Plans don't have to be fullfilled at all, nor the order in which features will be completed. 
 
-## Complete to release 0.5
+## Complete to release 0.5b
 
-- HOTU maps (MilkyWay only; or all of them)
-    - Spawned stargates/dhds (only MW except Atlantis)
-    - Handling and integration with planet system
-    - Every planet is in separated .map file
-    - Note: *no map functionality* in *this release* (except: Stargates, DHDs and some minors maybe)
-- San Andreas map
-    - Complete stargate base
-    - Partial map functionality (SG base)
-- Wormhole transport
-    - don't transport player directly; first some "neutral middle point", horizon -> fade camera -> middle point -> models loaded -> teleport to destination -> unfade camera
-- Stargate
-    - don't use 7th symbol in SG address (rather auto detect it); except destiny gate ofc
-    - maybe: use addresses as in Garrys mod (not just numbers but A-Z and 0-9 -> 36 characters + '#' '*' '@')
+- Complete and generate .map files of remaining HOTU maps
+- Fixed stargate and dhd positions and rotations
+- External energy devices for stargates with base DHD
+- Atlantis DHD
+
+## Complete to release 0.5c
+
+- Transport rings
+- Energy requirements for dialling to another galaxy or destiny
+    - option for disabling/not checking (dev purposes mostly)
 
 ## Complete to release 0.6
 
@@ -25,17 +22,13 @@ Plans for next releases. Plans don't have to be fullfilled at all, nor the order
     - Iris autoclose (or Walter?)
     - Self destruct option
     - Doors
+    - Energy generators (base dhd)
     - Maybe: Walter
     - Maybe maybe: some peds, npcs and traffic
 - Maybe: unstable wormhole effect (model from garrys mod CAP?)
+- Maybe: Development world map (use SA 0,0,z but with custom objects like fences, whatever)
 
 ## Complete to release 0.7
-
-- Stargate Pegasus model
-- Stargate Universe model
-- Intergalactic travel
-
-## Complete to release 0.8
 
 - Stargate vehicles
 - Stargate weapons

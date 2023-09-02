@@ -20,12 +20,36 @@ function stargate_getForceDialType(...)
     return (exports.stargate_gate:stargate_getForceDialType(...))
 end
 
+function stargate_getAssignedDHD(...)
+    return (exports.stargate_gate:stargate_getAssignedDHD(...))
+end
+
+function stargate_convertGalaxyToAddressSymbol(...)
+    return (exports.stargate_gate:stargate_convertGalaxyToAddressSymbol(...))
+end
+
+function stargate_isDestinyGate(...)
+    return (exports.stargate_gate:stargate_isDestinyGate(...))
+end
+
 function stargate_getID(...)
     return (exports.stargate_gate:stargate_getID(...))
 end
 
+function stargate_galaxy_get(...)
+    return (exports.stargate_gate:stargate_galaxy_get(...))
+end
+
 function stargate_getAddress(...)
     return (exports.stargate_gate:stargate_getAddress(...))
+end
+
+function stargate_convertAddressSymbolToGalaxy(...)
+    return (exports.stargate_gate:stargate_convertAddressSymbolToGalaxy(...))
+end
+
+function stargate_getGalaxy(...)
+    return (exports.stargate_gate:stargate_getGalaxy(...))
 end
 
 function stargate_getCloseTimer(...)
@@ -66,6 +90,10 @@ end
 
 function planet_getPlanetGalaxyString(...)
     return (exports.stargate_planets:planet_getPlanetGalaxyString(...))
+end
+
+function planet_getPlanetGalaxy(...)
+    return (exports.stargate_planets:planet_getPlanetGalaxy(...))
 end
 
 function planet_getDimensionPlanet(...)
