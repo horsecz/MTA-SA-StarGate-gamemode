@@ -23,8 +23,10 @@ function models_load_autoPlanetModelsLoad()
 	end
 	models_load_stargateCore()
 
-	if planet == "PLANET_6969" then
+	if planet == "PLANET_6969" then	-- Development world
 		models_loadModelsNearPlayer(getLocalPlayer(), 1)
+	elseif planet == "PLANET_10" then	-- Atlantis
+		models_loadModelsNearPlayer(getLocalPlayer(), 100)	-- Cannot load whole map; range 100 will currently use ~2GB GPU VRAM
 	else
 		models_loadModelsNearPlayer(getLocalPlayer(), 9999)
 	end
