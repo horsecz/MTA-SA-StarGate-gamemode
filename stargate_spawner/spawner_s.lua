@@ -75,7 +75,7 @@ function spawner_gateSpawner()
     -- DEVELOPMENT ONLY
 
     -- San Andreas
-    newSG = stargate_create(enum_galaxy.MILKYWAY, enum_planetDimension.SanAndreas, 254.2, 1855.6, -17.6, enum_stargateAddress.SanAndreas, "sgc", enum_stargateDialType.SLOW, 0, 0, 0, false, true)
+    newSG = stargate_create(enum_galaxy.MILKYWAY, enum_planetDimension.SanAndreas, 254.33, 1855.555, -17.0, enum_stargateAddress.SanAndreas, "sgc", enum_stargateDialType.SLOW, 0, 0, 180, false, true)
     newDHD = dhd_create(enum_galaxy.UNKNOWN, enum_planetDimension.SanAndreas, 253.5, 1843.73, -18.7, 0, 0, 180, getElementID(newSG))
 
     -- Earth
